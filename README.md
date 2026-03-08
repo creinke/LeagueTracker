@@ -11,6 +11,6 @@ A Symfony 7 application.
 
 ```bash
 
-git clone https://github.com/yourname/project-name.git
-cd project-name
+git clone https://github.com/yourname/LeagueTracker.git
+cd LeagueTracker
 composer install
