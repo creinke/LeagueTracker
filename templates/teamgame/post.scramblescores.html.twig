@@ -1,0 +1,104 @@
+{# templates/teamgame/post.scores.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+    <style>
+        .btn {
+            padding: 0.15rem 0.275rem;
+        }
+        .table td {
+            padding: 0.1em;
+            height: 1.5em;
+            color: black;
+        }
+    </style>
+    
+    <div>
+        {{ form_start(form) }}
+            <h2>Event# {{ event.eventnumber }}</h2>
+            {{ form_errors(form) }}
+            
+            <div>
+                <div style="display:inline-block !important;">
+                    <h3>Game# {{ gamenumber }} @ {{ teamgame.startingtime|date("g:ia") }}</h3>
+                </div>
+            </div>
+            
+            <div class="table-responsive" style="width=100%;">
+                <table class="table" style="width: 100%;">
+                	<thead>
+                    	<tr>
+                        	<th>Start Date and Time</th>
+                        	<th>Pairings</th>
+                            <th>Event Type</th>
+                            <th>Event Format</th>
+                            <th>Nine{{ event.secondnine is empty ? '' : '(s)' }}</th>
+                            <th>Tee</th>
+                    	</tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ event.startdateandtime|date("n/j/y @ g:ia") }}</td>
+                            <td>
+                                {{ teamgame.teamone }}
+                                
+                                {% if teamgame.teamtwo is not empty %}
+                                    - playing with - </br>{{ teamgame.teamtwo }}
+                                {% endif %}    
+                            </td>
+                            <td>{{ event.eventtypeString }}</td>
+                            <td>{{ event.formatString }}</td>
+                            <td>{{ event.nine.name }}
+                                {% if event.secondnine is not empty %}
+                                    /{{ event.secondnine.name }}
+                                {% endif %}
+                            </td>
+                            <td>{{ event.tee.name }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+    			<br/>
+                <table class="table" style="width: 100%;">
+                    <tbody>
+                        {% set teamNumber = 1 %}
+                        
+                        {% for teamFormScoreBean in form.teamFormScoreBeanCollection %}
+                            {% if teamNumber == 1 %}
+                                {% set teamName = teamgame.teamone %}
+                            {% else %}
+                                {% set teamName = teamgame.teamtwo %}
+                            {% endif %}
+                            
+                            {% set teamNumber = teamNumber + 1 %}
+                            
+                            <tr>
+                                <td colspan="10"><strong>Scores for {{ teamName }}</strong></td>
+                            </tr>
+                                    
+                            <tr>
+                                <td style="padding-left: 100px;">&nbsp;</td>
+                                
+                                {% for strokes in teamFormScoreBean.firstnine %}
+                                    <td>{{ form_widget(strokes, {'type':'number'}) }}</td>
+                                {% endfor %}
+                                
+                                {% if event.secondnine is not empty %}
+                                    <tr>
+                                        <td style="padding-left: 100px;">&nbsp;</td>
+                                        
+                                        {% for strokes in teamFormScoreBean.secondnine %}
+                                            <td>{{ form_widget(strokes, {'type':'number'}) }}</td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

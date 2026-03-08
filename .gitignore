@@ -1,17 +1,54 @@
+### Symfony ###
+.env
+.env.*
+!.env.example
+.env.local
+.env.local.php
+.env.*.local
+/src/data/*
+!/src/data/.gitkeep
 
-###> symfony/framework-bundle ###
-/.env.local
-/.env.local.php
-/.env.*.local
 /config/secrets/prod/prod.decrypt.private.php
-/public/bundles/
+
 /var/
 /vendor/
-###< symfony/framework-bundle ###
+/public/bundles/
+/public/assets/
+/assets/vendor/
 
-###> symfony/webpack-encore-bundle ###
-/node_modules/
-/public/build/
-npm-debug.log
-yarn-error.log
-###< symfony/webpack-encore-bundle ###
+### Runtime Data ###
+/src/data
+
+### PHPUnit ###
+.phpunit.cache/
+coverage/
+
+### Node / Frontend ###
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+### Python ###
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+### IDE ###
+.idea/
+.settings/
+.project
+.buildpath
+
+### OS ###
+.DS_Store
+Thumbs.db
+
+### Logs ###
+*.log
+
+### Docker ###
+docker-data/
+docker/volumes/
+docker/mysql-data/

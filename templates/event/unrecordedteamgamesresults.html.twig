@@ -1,0 +1,23 @@
+{# templates/event/unrecordedteamgamesresults.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+    {% set sessionName = event.session.name %}
+    <h3>{{ league.name }} {{ season.name }} Season</h3>
+    <h4>Unable to compute the results for {{ sessionName }} Event# {{ event.eventnumber }} as the following teams have not yet recorded their scores: </h4>
+    
+    <ul>
+    {% for teamgame in teamgames %}
+    	<li>
+            {{ teamgame.teamone }}
+            
+            {% if teamgame.teamtwo is not empty %}
+                {{ teamgame.teamtwo }}
+            {% endif %}
+    	</li>
+    {% endfor %}
+    </ul>
+{% endblock %}

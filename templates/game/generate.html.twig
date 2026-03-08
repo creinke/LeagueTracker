@@ -1,0 +1,44 @@
+{# templates/game/generate.html.twig #}
+
+{% extends 'base.html.twig' %}
+{% form_theme form with [ 'custom_checkbox.html.twig' ] %} 
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+    <style>
+        .btn {
+            padding: 0.15rem 0.275rem;
+        }
+        .form-control {
+            padding: 1em inherit;
+            height: 1.5em;
+            width: 75%;
+        }
+        #form_players label {
+            display: block;
+            margin-bottom: 5px;
+            float: left;
+            width: 30%;
+            margin-left: 18px;
+        }
+        #form_players input[type='checkbox'] {
+            margin-left: -18px;
+            margin-right: 10px;
+        }    
+    </style>
+
+    <div>
+        <h2>Generate Games Player Selections</h2>
+        <p>
+            Check all players that will be playing in the games of this event and uncheck those that aren't.  "Regular" players are checked by default. 
+        </p>
+        <div>
+            {{ form_start(form, { 'attr': {'id': 'form_players'} }) }}
+                {% for player in form.players %}
+                    {{ form_widget(player) }}
+                {% endfor %}
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}

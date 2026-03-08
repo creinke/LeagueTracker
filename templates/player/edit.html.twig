@@ -1,0 +1,98 @@
+{# templates/player/edit.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+    <style>
+        .btn {
+            padding: 0.15rem 0.275rem;
+        }
+        .form-control {
+            padding: 0.3em inherit;
+            height: 2.5em;
+            width: 100%;
+        }
+        label {
+            margin-bottom: 0.15em;
+        }
+        .table, .table-responsive {
+			background-image: none;
+		}
+		.table > tbody > tr > td {
+			padding: 3px !important;
+			border-color: #fff !important;
+		}
+    </style>
+
+    <div>
+        {{ form_start(form) }}
+            {{ form_errors(form) }}
+            
+            <div class="table-responsive"> 
+                <table class="table table-condensed">
+                    <tbody>
+                        <tr>
+                            <td>{{ form_label(form.firstname) }}</td>
+                            <td>{{ form_widget(form.firstname) }}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #555;">{{ form_label(form.middlenameorinitial) }}</td>
+                            <td>{{ form_widget(form.middlenameorinitial) }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ form_label(form.lastname) }}</td>
+                            <td>{{ form_widget(form.lastname) }}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #555;">{{ form_label(form.generation) }}</td>
+                            <td>{{ form_widget(form.generation) }}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #555;">{{ form_label(form.defunct) }}</td>
+                            <td>{{ form_widget(form.defunct) }}</tr>
+                        </tr>
+                        <tr>
+                            <td>{{ form_label(form.seedhandicapindex) }}</td>
+                            <td>{{ form_widget(form.seedhandicapindex) }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ form_label(form.type) }}</td>
+                            <td>{{ form_widget(form.type) }}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #555;">{{ form_label(form.workemailaddress) }}</td>
+                            <td>{{ form_widget(form.workemailaddress) }}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #555;">{{ form_label(form.personalemailaddress) }}</td>
+                            <td>{{ form_widget(form.personalemailaddress) }}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #555;">{{ form_label(form.otheremailaddress) }}</td>
+                            <td>{{ form_widget(form.otheremailaddress) }}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #555;">{{ form_label(form.workphonenumber) }}</td>
+                            <td>{{ form_widget(form.workphonenumber) }}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #555;">{{ form_label(form.cellphonenumber) }}</td>
+                            <td>{{ form_widget(form.cellphonenumber) }}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #555;">{{ form_label(form.homephonenumber) }}</td>
+                            <td>{{ form_widget(form.homephonenumber) }}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #555;">{{ form_label(form.otherphonenumber) }}</td>
+                            <td>{{ form_widget(form.otherphonenumber) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        {{ form_end(form) }}
+    </div>
+    
+{% endblock %}

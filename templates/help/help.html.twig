@@ -1,0 +1,381 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} {{ title }}!{% endblock %}
+
+{% block body %}
+    <div class="table-of-content container">
+        <div class="altTitle">League Tracker Administrator Help</div>
+        <ul class="simple">
+            <li><a class="reference internal" href="#overview">Overview - Read First</a></li>
+            <li><a class="reference internal" href="#crud">Listing, Creating, Updating, Viewing, and Deleting League Entities</a></li>
+            <li style="padding-left: 4em;"><a class="reference internal" href="#add_teams_and_players">Adding Multiple Teams and Players to your League</a></li>
+            <li style="padding-left: 4em;"><a class="reference internal" href="#defuncting_teams_and_players">Defuncting Teams and Players in your League</a></li>
+            <li><a class="reference internal" href="#generating_season">Generating a Season and a Schedule for that Season</a></li>
+        </ul>
+        <div class="altTitle">League Tracker User Help</div>
+        <ul class="simple">
+            <li><a class="reference internal" href="#user_getting_started">Getting Started</a></li>
+            <li><a class="reference internal" href="#display_event_schedule">Display Event Schedule</a></li>
+            <li><a class="reference internal" href="#posting_scores">Posting Scores for an Event</a></li>
+            <li><a class="reference internal" href="#add_sub">Adding a Substitute Player</a></li>
+            <li><a class="reference internal" href="#display_event_results">Display Event Results</a></li>
+            <li><a class="reference internal" href="#team_events">Team Match Events</a></li>
+        </ul>        
+        <div class="article-column">
+            <article>
+                <div class="article-body markdown">
+                    <div class="document">
+                        <div class="documentwrapper">
+                            <div class="body">
+                                <div id="League Tracker Admin Help">
+                                    <hr/>
+                                    <h1>League Tracker Administrator Help</h1>
+
+                                    <h2><span id="overview">Overview</span></h2>
+                                    <p>
+                                    	League Tracker was originally developed for my work summer league.  After more than 10 years of promising my league that I would  
+                                    	update and modernize our website, I finally found time to do that and this software and website is the result of that effort.
+                                    </p>
+                                    <p>
+                                    	<h2>Feature List</h2>
+                                    </p>
+                                    <ul>
+                                    	<li>Designed specifically for league play and for either 2 or 3 person person teams.</li>
+                                    	<li>Accomodates both weekly team play as well as special league match events, e.g., scrambles, shambles, etc.</li>
+                                    	<li>Access to the system is entirely web based, meaning to use League Tracker, you and your league members must have access to the Internet.</li>
+                                    	<li style="padding-left: 4em;">League Tracker is Bootstrap enabled.  All pages and dialogs in the application are "responsive".  
+                                    	Each page adapt dynamically to the viewport of the device on which they are viewed.  This makes the pages respond, look good, and work reasonably 
+                                    	well on phones, tablets, laptops, as well as full screen devices.</li> 
+                                    	<li style="padding-left: 4em;">Currently, there are no installable "mobile or tablet apps" for League Tracker. Whether there will be one in the 
+                                    	furture is yet to be determined.</li>
+                                    </ul>
+                                    <h3>Seasons, Sessions, and Events</h3>
+                                    <ul>
+                                    	<li>Each team plays against each other during a <strong>Season</strong></li>
+                                    	<li style="padding-left: 4em;">A <strong>Season</strong> is broken into one or more <strong>Sessions</strong> and <strong>Sessions</strong> 
+                                    	contain one or more <strong>Events</strong></li>
+                                    	<li style="padding-left: 4em;">The following is an example of my league's 2018 season containing 2 sessions and 17 events:</li>
+                                    </ul>
+                                    <img src="{{ docbase }}images/help/season.jpg"/> 
+                                    <h3>Games</h3>
+                                    <ul>
+                                    	<li style="padding-left: 4em;">An <strong>Event</strong> consists of <strong>Games</strong> where in each <strong>Game</strong> one team plays 
+                                    	another in match play format; i.e, a team's A player match plays the other team's A player, and a team's B player match plays the other team's 
+                                    	B player.</li>
+                                    	<li style="padding-left: 4em;">The following is an example of one event in my league:</li>
+                                    </ul>
+                                    <img src="{{ docbase }}images/help/event.jpg"/> 
+                                    <h3>Scoring</h3>
+                                    <ul>
+                                    	<li style="padding-left: 4em;">If players tie on a hole (after applying the handicap), each player is awarded .5 points.  Winning a hole gives the 
+                                    	winner a whole point.</li>
+                                    	<li style="padding-left: 4em;">There is one point awarded for low player net.  If players tie low net, each player is awarded .5 points; otherwise, 
+                                    	the player with the lowest net is awarded the entire point.</li> 
+                                    	<li style="padding-left: 4em;">There is also one point awarded for low team net.  If teams tie low net, each team is awarded .5 points; otherwise, 
+                                    	the team with the lowest net is awarded the entire point.</li> 
+                                    	<li style="padding-left: 4em;">The following is an example of an event results.  The results also show current standings:</li> 
+                                    	<img src="{{ docbase }}images/help/event_results.jpg"/> 
+                                    </ul>
+                                    <h3>Generating a Schedule</h3>
+                                    <ul>
+                                    	<li>There is functionality to generate a <strong>Season</strong> and a "round robin" schedule of <strong>Events</strong> 
+                            	    	based on a number of parameters.  Here is an example of how I use this functionality in my league:</li>
+                                    	<li style="padding-left: 4em;">My league runs for 17 weeks (first parameter).</li>
+                                    	<li style="padding-left: 4em;">The generator splits the 17 weeks into two <strong>Sessions</strong> (another parameter)</li>
+                                    	<li style="padding-left: 4em;">The first <strong>Sessions</strong> lasts for 8 weeks.  For the first 7 weeks, teams play each other in a match play 
+                                    	format. The 8th week is what is called a "position match", where the team in first place at that time plays the team in second place, the third 
+                                    	place team plays the fourth place team, etc., on down the line.</li>
+                                    	<li style="padding-left: 4em;">After the 8th events, results are calculated and the team with the highest point total is the 1st half winner.</li> 
+                                    	<li style="padding-left: 4em;">The second <strong>Sessions</strong> also lasts for 8 weeks, and also for the first 7 weeks of that session
+                                    	teams play each other in a match play format, with the 8th week also being a "position match".</li>
+                                    	<li style="padding-left: 4em;">Also after the 8th event of the 2nd half, results for that half are calculated and the team with the highest point 
+                                    	for that half is the 2nd half winner.</li>
+                                    	<li style="padding-left: 4em;">The 17th week is "playoff match" where the winner of the first half plays the winner of the second half to determine 
+                                    	the league champion.  Everyone else plays a 2 person scramble with handicaps.</li> 
+                                    </ul>
+                                    <h3>Handicapping</h3>
+                                    <ul>
+                                    	<li>League Tracker uses the World Handicap Formula to determine a player's handicap index and handicap.  It's unofficial, but it works well as any 
+                                    	for league play and it gives a player an idea of what their handicap would be if they recorded their scores using an offical USGA site.</li>
+                                    	<li style="padding-left: 4em;">The following is an example of one player's handicap page.</li> 
+                                    	<img src="{{ docbase }}images/help/handicap.jpg"/> 
+                                    </ul>
+                                    <h3>Other Functionality</h3>
+                                    <ul>
+                                        <li>Most of the other administrator functionality in League Tracker is CRUD based, where you can list, <strong>C</strong>reate, 
+                                        <strong>R</strong>etrieve, <strong>U</strong>pdate, and <strong>D</strong>elete various League Tracker entities.</li>
+                                    </ul>                                    
+                                     
+                                    <h2><span id="crud">Listing, Creating, Updating, Viewing, and Deleting League Entities</span></h2>
+                                    <p>
+                                        The following <strong>Entities</strong> are part of the League Tracker Domain Model:  
+                                    <p>
+                                    <ul>
+                                        <li>Season:</li>
+                                            <p style="padding-left: 4em;">
+                                                A <strong>Season</strong> is merely a name for a period of time, for example <strong>2019</strong> for the 2019 season, or 
+                                                <strong>Fall 2019</strong> for the 2019 fall season.  A <strong>Season</strong> is a container for <strong>Sessions</strong>
+                                                and a <strong>Session</strong> is a container for <strong>Events</strong>.  
+                                            </p>
+                                        <li>Session:</li>
+                                            <p style="padding-left: 4em;">
+                                                A <strong>Session</strong> is also just a name for a period of time.  <strong>Sessions</strong> contain <strong>Events</strong> and
+                                                belong to a <strong>Season</strong>.  For example the <strong>1st half</strong> and <strong>2nd half</strong> sessions might be the 
+                                                names and time periods belonging to the 2019 season.  
+                                            </p>
+                                            <p style="padding-left: 4em;">
+                                                Team points are calculated for each session and for the entire season.  In this way you might have a first and a second half 
+                                                sessions to your season, and first and second half winers.  Also, if you so desire have a playoff bwtween these two winners at 
+                                                end of a season to determine a league champion.  
+                                            </p>
+                                            <p style="padding-left: 4em;">
+                                                You can have as many session for a season as you'd like for a season, however, the 1st half and the 2nd half model works generally 
+                                                well for most summer leagues.  The sample league demonstrates this model.
+                                            </p>
+                                        <li>Event:</li>
+                                            <p style="padding-left: 4em;">
+                                                An <strong>Event</strong> is played on a specific date and starts at a specified time.  <strong>Events</strong> contain 
+                                                <strong>Games</strong> and as was stated above, belong to a <strong>Session</strong> and correspondly a <strong>Season</strong>.    
+                                            </p>
+                                        <li>Game:</li>
+                                            <p style="padding-left: 4em;">
+                                                A <strong>Game</strong> is a match between two teams.  It is played on a specific date and starts at a specified time.  
+                                                In each <strong>Game</strong>, a team's best (or "A" player plays the opposing team's best player, an a team's second best player
+                                                or "B" player) plays the opposing team's second best player.   
+                                            </p>
+                                        <li>Player:</li>
+                                            <p style="padding-left: 4em;">
+                                                A <strong>Player</strong> is a person in a league. Player names must be unuque within a league, and League Tracker will not let you 
+                                                add a player name that already exists in the league.  You therefore need to somehow differentiate players with like names by using 
+                                                their middle initials or names.     
+                                            </p>
+                                            <p style="padding-left: 4em;">
+                                                All new players must have a seed handicap index.   It's required because a new player has not played enough rounds in the 
+                                                league to have established an official league handicap index.  Therefore, a "best guess" seed index is needed to be able to calculate a 
+                                                suitable handicapo for that player.  Ask each player what they usually shoot for 9 holes.  For example, let's say the 
+                                                player responds with "I usually shoot about a 46 or 47 for 9".  Subtract the par from the highest value they provide, let's say that 
+                                                par is 36.  Next multiply the result by .9 and use that as the seed handicap index.  In this case, 47 - 36 = 11 x .9 = 9.9.  This isn't 
+                                                perfect, but given that the player is honest, it has proven to be about right until a minimum number of scores have been recorded in the league to obtain a handicap index, as determined by the World Handicapping System.
+                                            </p>
+                                        <li>Team:</li>
+                                            <p style="padding-left: 4em;">
+                                                A <strong>Team</strong> consists of 2 players.  The player with the lowest handicap index is the A player and the other the B player.  
+                                                Who is the A or the B player is determined at the time an Event or a Game is player.  Therefore, the A and B players may be reversed 
+                                                if both players are very close in handicap index.     
+                                            </p>
+                                    </ul>
+                                    <p>
+                                        All the entities described above can be listed, created, updated, viewed, and deleted.  For example to see all the players in a league, click the 
+                                        <strong>Players</strong> menu item.  From this display you can create a new player or list of players, or view, update, and delete any individual 
+                                        player in the list.  The same functionality exists for all the enties listed above.  Usage is fairly self explanatory, just click the appropriate 
+                                        View, Delete, or Edit buttons associated with each entity in the appropriate lists in which they are contained.    
+                                    </p>
+
+                                    <h2><span id="add_teams_and_players">Adding Multiple Teams and Players to your League</span></h2>
+                                    <p>
+                                        When you click either the <strong>Players</strong> or the <strong>Teams</strong> menu item, you are presented with a list of players 
+                                        and teams in your league.  Initially, there will be no players or teams in your league so to add players and teams in bulk you have the 
+                                        option of adding a multiple players and teams by clicking on the <strong>Add Player List</strong> or a <strong>Add Team List</strong> 
+                                        on the list page.  This is a good and quick way of creating all the players and teams in your league with one dialog.  
+                                        <strong>Add New Player</strong> and <strong>Add New Team</strong> is a good way to add/create just a single player or team, and that 
+                                        link is on the player and team list page as well. 
+                                    <p>
+									<p>
+										Start by adding all your regular players in bulk, followed by adding all your teams containing these regular players.  Follow that by 
+										adding your subs in bulk.    
+									</p>
+
+                                    <h2><span id="defuncting_teams_and_players">Defuncting Teams and Players in your League</span></h2>
+									<p>
+										Teams and players are part of events.  Therefore, as long as an event exists that contain specific teams and players, those teams and 
+										players cannot be deleted.  However, they can become "defuncted", which is basically just another word for pending deletion.  Teams and 
+										players are actually deleted when they are no longer contained in an Event or Game of an Event.  
+									</p>
+                                    
+                                    <h2><span id="generating_season">Generating a Season and a Schedule for that Season</span></h2>
+                                    <p>
+                                    	Although you can manually create a new season, and then add sessions, events, and games to that season, that process can be very 
+                                    	laborious and time consuming.  To assist you in creating a schedule, a generate season option is available to you as follows.  Before 
+                                    	using this functionality, however, you must create all the regular players and teams that you are going to use in your that season.  Also, 
+                                    	you will need to defunct any teams that will not be playing in the newly generated season.    
+                                    </p>
+                                    <ul>
+                                    	<li>Start by clicking the <strong>Seasons</strong> menu item.</li>
+                                    	<li>Click the <strong>Generate Season</strong> link.</li>
+                                    		<li style="padding-left: 4em;">A <strong>Generate Season</strong> dialog will be displayed.</li>
+                                    		<li style="padding-left: 4em;">Fill in the field of that dialog as appropriate.</li>
+                                    		<li style="padding-left: 4em;">Click the <strong>Save</strong> button.</li>
+                                    </ul>
+                                    <p>
+                                    	A new season and all the sessions, events, and games for that season will now be generated.  You can then event
+                                    </p>
+                                </div>
+                                <div id="League Tracker User Help">
+                                    <hr/>
+                                    <h1>League Tracker User Help</h1>
+                                    
+                                    <h2><span id="user_getting_started">Getting Started</span></h2>
+                                    <p>
+                                        Before you can use League Tracker, your league administrator will need to provide you with a set of log in credentials.  
+                                        These credential not only provide you with access to League Tracker functionality, but also "lock" you into your specific league.
+                                        Once you have obtained your credentials, click the <strong>Login</strong> menu selection and enter those into the appropriate 
+                                        fields of that dialog.  After verification, an updated menu will be displayed providing you with additional functionality.   
+                                    </p>
+
+                                    <h2><span id="display_event_schedule">Display an Event Schedule</span></h2>
+                                    <p>
+                                        To display an schedule of events for a season: 
+                                    </p> 
+                                    <ul>
+                                        <li>Start by clicking on the <strong>Seasons</strong> menu item.</li>
+                                        <li style="padding-left: 4em;">A list of <strong>Seasons</strong> will be displayed.</li>
+                                        <li>Next click on <strong>Events</strong> button for the season schedule you are interested in seeing.</li>
+                                    </ul>
+                                    <p>
+                                        The league administrator controls how many seasons and subsequent events to keep.  The user has access to not only the 
+                                        current schedule and events, but also past history of any previus season events as well.
+                                    </p>
+                                    
+                                    <h2><span id="posting_scores">Posting Scores for an Event</span></h2>
+                                    <p>
+                                        When a schedule of events is displayed, you are provided with two options for each event: <strong>View</strong> and <strong>Results</strong>.  
+                                        To post or update your scores for an event:
+                                    </p>
+                                    <ul>
+                                        <li>Start by clicking the <strong>View</strong> button.</li>
+                                            <li style="padding-left: 4em;">The games for that particular event will be displayed.</li>  
+                                        <li>Next click on the appropriate <strong>Post/Edit Scores</strong> button.</li> 
+                                            <li style="padding-left: 4em;">A <strong>Post Games Scores</strong> dialog will be displayed.</li> 
+                                    </ul>
+                                    <p>
+                                    </p>  
+                                    <ul>
+                                        <li>Enter each players score as appropriate.</li>
+                                        <ul style="padding-left: 4em;">
+                                            <li>If a sub is playing for a player, click the <strong>Substitute Players</strong> link and select the appropriate subs for the player or
+                                             players in question.</li>
+                                            <li>If a player did not get a sub, just enter zeros for that player's scores.</li>
+                                                <li style="padding-left: 4em;">The playing partner's score will be used twice to calculate results.</li>
+                                            <li>If the entire team is a "no show", enter zeros for both player's scores.</li>
+                                                <li style="padding-left: 4em;">League Tracker will use the two player's worst scores from previously 
+                                            posted events to calculate results.</li>
+                                            <li>If an event is "rain shortened", enter zeros for the holes not played.</li>
+                                                <li style="padding-left: 4em;">  League Tracker will consider these scores as partials and split the points for the holes.</li>    
+                                        </ul>
+                                        <li>When all scores have been entered, click the <strong>Save</strong> button.  You will not be allowed to complete the dialog until all 
+                                        score fields contain a number.</li> 
+                                    </ul>
+                                    <p>
+                                        Note: If you need to enter a score for a new sub that is a sub not in the substitutes drop down list, add that sub 
+                                        using the Add Player functionality.  You will need to add the sub first and then return to the Post Games Scores dialog.  
+                                        See the <a class="reference internal" href="#add_sub">Adding a Substitute Player</a> help reference for details.    
+                                    </p>
+                                    
+                                    <h2><span id="add_sub">Adding a Substitute Player</span></h2>
+                                    <p>
+                                        All players have <strong>Add Player</strong> privileges.  This privilege has been provided to each player in order for players to 
+                                        <strong>Post/Edit Scores</strong> without needing to involve the league administrator.  
+                                    </p>
+                                    <ul>
+                                        <li>Start by clicking the <strong>Players</strong> menu item.  
+                                            <li style="padding-left: 4em;">A list of the league's current players will be displayed.</li>  
+                                        <li>Next click on the <strong>Add New Player</strong> link at the top right of the player's list.</li> 
+                                            <li style="padding-left: 4em;">An <strong>Add Player</strong> dialog will be displayed.</li>
+                                        <li>Enter the appropriate player information and click <strong>Save</strong>.  
+                                    </ul>
+                                    <p>
+                                        You only need to enter the required fields to be able to add the player to the sub list.  If you do not know all the 
+                                        optional information that is OK.  Send an email to the league administrator informing your administrator add any addional 
+                                        information as appropriate.
+                                    </p>
+                                    <p>
+                                        Determining the <strong>Seed Handicap Index</strong> value gets a little tricky.  It's required because a new player has not played enough rounds 
+                                        in theleague to have established an official league handicap index.  Therefore, a "best guess" seed index is needed to be able to calculate a 
+                                        suitable handicapo for that player.  Before the round, ask the sub what they usually shoot for 9 holes.  For example, let's say the 
+                                        sub responds with "I usually shoot about a 46 or 47 for 9".  Subtract the par from the highest value they provide, let's say that 
+                                        par is 36.  Next multiply the result by .9 and use that as the seed handicap index.  In this case, 47 - 36 = 11 x .9 = 9.9.  This isn't 
+                                        perfect, but given that the player is honest, it has proven to be about right until 5 scores have been recorded in the league.  
+                                    </p>
+                                    <p>
+                                        Lastly, League Tracker uses the standard <a href="http://www.usga.org/handicapping/handicap-manual.html#!rule-14389" target="_blank">USGA Handicap 
+                                        Formula</a> to calculate a player's handicap index and course handicap.  Click the provided link for full details of that formula. The handicap 
+                                        index computed by League Tracker is an official USGA handicap, but it works well enough for league play.  
+                                    </p> 
+                                    
+                                    <h2><span id="display_event_results">Display Event Results</span></h2>
+                                    <p>
+                                        To display an event results: 
+                                    </p> 
+                                    <ul>
+                                        <li>Start by clicking on the <strong>Seasons</strong> menu item.</li>
+                                        <li style="padding-left: 4em;">A list of <strong>Seasons</strong> will be displayed.</li>
+                                        <li>Next click on <strong>Events</strong> button for the season events you are interested in seeing.</li>
+                                        <li>Lastly, click on the <strong>Results</strong> button for the event results you want displayed.</li>
+                                    </ul>
+                                    <h2><span id="team_events">Team Events</span></h2>
+                                    <p>
+                                        In addition to the weekly league event schedule, League Tracker is also equipped to handle and calculate the results of special team match events, 
+                                        as follows:
+                                    </p> 
+                                    <ul>
+                                        <li><strong>Scramble:</strong> A 2 or more player team event where each player hits a tee shot on each hole, then everyone plays from the spot of the 
+                                        best shot. Play continues by selecting the best shot until one player hits the ball in the hole. The team score is total of the best shots.</li>
+                                        <li><strong>Shamble:</strong>  A format, similar to a scramble where every player hits from the tee; the best tee-shot is selected and then each player holes-out 
+                                        from the selected tee-shot.  Each player records their actaul score for each hole.  The team score for each hole is the best player's score.  The team's 
+                                        total score is the sum of the best players scores for all holes.</li>
+                                        <li><strong>Better Ball:</strong> Each player plays their own ball and records their score for each hole.  The team score for the hole is the better of 
+                                        each player's score. The team's total score is the sum of all best scores.</li>
+                                        <li><strong>Low Team Net:</strong> Each player plays their own ball and record their score for each hole. The player's score for the hole is the player's 
+                                        score after adjusting for the player's handicap.  The team total is the sum of both adjusted scores for both players combined.</li>
+                                    </ul>
+                                    <p>
+                                        For scrambles, only enter the team's score.  For all other formats, enter each player's actual score.  <strong>DO NOT</strong> adjust 
+                                        for handicaps. League Tracker will do all the necessary computations for you.  For scrambles, shambles, and better ball events, you also have the 
+                                        option to use a handicapping calculation built into League Tracker.  If you check "With Handicapping" option for these team match events, League 
+                                        Tracker will apply player and team handicaps as follows:   
+                                    </p>
+                                    <ul>
+                                        <li>
+                                            <strong>For scrambles:</strong>
+                                              
+                                            <ul>
+                                                <li>
+                                                    For 2 player teams, the team handicap is calculated by adding together 35% of the "A" player's and 15% of the "B" player's 
+                                                    handicaps. 
+                                                </li>
+                                                <li> 
+                                                    For 3 person teams, the team handicap is calculated by adding together 20% of the A-player's handicap, 15% of the B, and 
+                                                    10% of the C. 
+                                                </li>
+                                                <li>
+                                                    For 4 person teams, the team handicap is calculated by adding together 20% of the A-player's handicap, 15% of the B, 10% of the C, 
+                                                    and 5% of the D. 
+                                                </li>
+                                                <li>
+                                                    League Tracker adds the adjusted handicaps for all players, round off the total to a whole number and that is the team's handicap.  
+                                                </li>
+                                            </ul>
+                                        <li>
+                                            <strong>For shambles and better ball:</strong>  
+                                        
+                                            <ul>
+                                                <li>
+                                                    Each player's handicap is 70% of their full handicap.  
+                                                </li>
+                                                <li>
+                                                    League Tracker adds the adjusted handicaps of all the players and that is the team's handicap.  
+                                                </li>
+                                                
+                                            </ul>    
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="clearer"></div>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,71 @@
+{# templates/season/list.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+    <style>
+        .btn {
+            padding: 0.15rem 0.275rem;
+        }
+        .table td {
+            padding: 0px;
+            height: 1.5em;
+        }
+        .table th {
+            padding: 0px;
+            height: 1.5em;
+        }
+    </style>
+
+    {% if not seasons %}
+        <div class="text-right"> <!--You can add col-lg-12 if you want -->
+            <a href="{{ path('season_new') }}" class="btn btn-dark">Add New Season</a>
+            <a href="{{ path('season_generate') }}" class="btn btn-dark">Generate Season</a>
+       </div>
+    {% endif %}
+    
+    {% if seasons %}
+        <h2>Seasons for {{ league }}</h2>
+    
+        <div class="text-right"> <!--You can add col-lg-12 if you want -->
+            <a href="{{ path('season_new') }}" class="btn btn-dark">Add New Season</a>
+            <a href="{{ path('season_generate') }}" class="btn btn-dark">Generate Season</a>
+       </div>
+
+        <div class="table-responsive"> 
+            <table class="table table-striped table-condensed">
+                <thead>
+                    <tr>
+                        <th>Season</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for season in seasons %}
+                        <tr>
+                            <td>{{ season.name }}</td>
+                            <td>
+                                <a href="{{ path('event_list', {'id': season.id}) }}" class="btn btn-secondary btn-sm" data-method="GET">Events</a>
+                                {% if is_granted('ROLE_ADMIN') %}
+                                    <a href="{{ path('session_list', {'id': season.id}) }}" class="btn btn-secondary btn-sm" data-method="GET">Sessions</a>
+                                {% endif %}
+                                <a href="{{ path('season_view', {'id': season.id}) }}" class="btn btn-info btn-sm" data-method="GET">View</a>
+                                {% if is_granted('ROLE_SAMPLE') %}
+                                {% elseif is_granted('ROLE_ADMIN') %}
+                                    <a href="{{ path('season_delete', {'id': season.id}) }}" class="btn btn-danger btn-sm" data-method="DELETE">Delete</a>
+                                {% endif %}
+                                {% if is_granted('ROLE_ADMIN') %}
+                                    <a href="{{ path('season_edit', {'id': season.id}) }}" class="btn btn-primary btn-sm" data-method="POST">Edit</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>No seasons yet defined in {{ league }}</p>
+    {% endif %}
+{% endblock %}

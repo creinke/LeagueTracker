@@ -4,8 +4,22 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    locale: 'en'
 
 services:
+    Monolog\Logger:
+        alias: 'monolog.logger.debug'
+        public: true
+
+    Monolog\Logger $doctrineLogger:
+        alias: 'monolog.logger.doctrine'
+        public: true
+
+    event.form.type:
+        class: App\Form\Type\EventType
+        arguments: 
+            - "@doctrine.orm.entity_manager"
+            
     # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
@@ -19,6 +33,21 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
+            - '../src/data'
+
+    App\Repository\AbstractBaseRepository:
+        abstract: true
+        arguments:
+            $em: '@doctrine.orm.entity_manager'
+            $logger: '@logger'
+
+    App\Repository\UserRepository:
+      arguments:
+        $em: '@doctrine.orm.entity_manager'
+        $logger: '@logger'
+        $passwordHasher: '@security.user_password_hasher'
+      tags:
+        - { name: 'doctrine.repository_service' }
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

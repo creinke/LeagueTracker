@@ -1,19 +1,329 @@
+{# templates/base.html.twig #}
 <!DOCTYPE html>
-<html>
+{# <p>Debug: Current environment is {{ app.environment }}</p> #}
+
+{% if app.environment == "dev" %}
+    {% set docbase = 'http://leaguetracker.local/' %}
+{% else %}
+    {% set docbase = 'https://premiergolfleaguetracker.com/' %}
+{% endif %}
+<html lang="en-US">
     <head>
+        <title>{% block title %}League Tracker Home{% endblock %}</title>
         <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
-        {# Run `composer require symfony/webpack-encore-bundle` to start using Symfony UX #}
-        {% block stylesheets %}
-            {{ encore_entry_link_tags('app') }}
-        {% endblock %}
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <!--[if lt IE 9]>
+              <script src='{{ docbase }}js/html5shiv.js'></script>
+              <script src='{{ docbase }}js/respond.min.js'></script>
+            <![endif]
+        -->
+        
+        <link rel='stylesheet' id='font-awesome-css'  
+            href='{{ docbase }}css/font-awesome.min.css?ver=4.7.0' 
+            type='text/css' media='all' />
+        
+        <link rel='stylesheet' id='bootstrap-css-css'
+            href='{{ docbase }}css/bootstrap.min.css?ver=5.1.1'
+            type='text/css' media='screen, all' />
+            
+        <link rel='stylesheet' id='general-css-css'
+            href='{{ docbase }}css/style.css?ver=5.1.1'
+            type='text/css' media='screen, all' />
+            
+		<link rel='stylesheet' 
+		    href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'
+            type='text/css' media='screen, all' />
+
+        <link rel='stylesheet' id='mytheme-font1-css'
+            href='https://fonts.googleapis.com/css?family=Open+Sans%3A400italic%2C400%2C600%2C700&#038;ver=5.0.3'
+            type='text/css' media='all' />
+            
+        <link rel='stylesheet' id='mytheme-font2-css'
+            href='https://fonts.googleapis.com/css?family=Playfair+Display%3A400%2C700%2C400italic&#038;ver=5.0.3'
+            type='text/css' media='all' />
+            
+        <link rel='stylesheet' id='google-fonts-1-css'  
+            href='https://fonts.googleapis.com/css?family=Playball%3A100%2C100italic%2C200%2C200italic%2C300%2C300italic%2C400%2C400italic%2C500%2C500italic%2C600%2C600italic%2C700%2C700italic%2C800%2C800italic%2C900%2C900italic&#038;ver=5.1.1' 
+            type='text/css' media='all' />
+            
+        <script type='text/javascript'
+            src='{{ docbase }}js/jquery.js?ver=1.12.4'></script>
+            
+        <script type='text/javascript'
+            src='{{ docbase }}js/jquery-migrate.min.js?ver=1.4.1'></script>
 
         {% block javascripts %}
-            {{ encore_entry_script_tags('app') }}
+            {% block importmap %}{{ importmap('app') }}{% endblock %}
+            <script>
+                jQuery(document).ready(function() {
+                    jQuery("#print_button").click(function() {
+                    	window.print();
+                    });
+                });
+            </script>
         {% endblock %}
+        
+        <style type="text/css"></style>
+        <!--[if lte IE 9]>
+            	<link rel="stylesheet" type="text/css" href="{{ docbase }}css/vc_lte_ie9.min.css" media="screen">
+            <![endif]
+        -->
+        
+        <style type="text/css" media="print">
+            @page {
+                size: auto;   /* auto is the initial value */
+                margin: 0;    /* this affects the margin in the printer settings */
+            }
+            
+            #header, #print_button {
+                display: none;
+            }
+        </style>
+        
+        <style type="text/css" media="screen">
+            html {
+            }
+            
+            * html body {
+            }
+            
+            @media screen and ( max-width: 782px ) {
+                html {
+                    margin-top: 46px !important;
+                }
+                * html body {
+                    margin-top: 46px !important;
+                }
+            }
+        </style>
+    
+        <style type="text/css">
+            body, .item-title a {
+                font-family: "Open Sans", "Helvetica Neue", Helvetica, arial, serif;
+            }
+            .table-header {
+                font-family: "Playfair Display", Georgia, serif;
+            }
+            h1, h2, h3, h4, h5, h6, #navigation li, #copyright, .btn-default,
+                .button, .minus, .plus, .gallery-item a span, .caption, .comment-meta,
+                .table th, .table tr td:first-child, #main-container blockquote,
+                #main-cotainer .pagination>li>a, #main-container .dropcap,
+                #contact-container, .member-forum-table .row:first-child, .post .post-author a span,
+                .event-card, .event-data, .course-card, .course-data, #current_weather,
+                #current_temperature, .wpcf7-form p, .breadcrumbs, #product-reviews .meta {
+                font-family: "Playfair Display", Georgia, serif;
+            }
+            body {
+                font-size: 1.6em;
+            }
+            h1 {
+                font-size: 2.6em;
+            }
+            h2 {
+                font-size: 2em;
+            }
+            p {
+                line-height: 1.8em;
+            }
+            #main-container .pagination>.active>a, #main-container .pagination>.active>span,
+                #main-container .pagination>.active>a:hover, #bp-login-widget-form input[type="submit"],
+                .search-container form button {
+                background: #555;
+            }
+            #header #mobile-menu span, .search-container input[type="text"], .widget select,
+                #header #topbar h4.tee-mini-cart-subtotal, #header #topbar .tee-mini-cart-title h4,
+                #header.fixed_navigation #navigation ul li a, #header.fixed_navigation #navigation .menu-search a span {
+                color: #555 !important;
+            }
+            #header * {
+                color: #FFF;
+            }
+            body, a:hover, #main-container ul.pagination>li>a, #main-container #sidebar .widget ul li:before,
+                .flexslider .slides .event, .flexslider .slides .course,
+                #events-container .event, #courses-container .course, #main-container #events-container .event-content h3 a,
+                #main-container #courses-container .course-content h3 a, .dropdown-menu>li>a,
+                #close-address, .panel-title:before, #open-address, #signin #close-signin:hover,
+                #subscribe #close-subscribe:hover, #shop-container .product a,
+                .star-rating span:before, .comment-form-rating .stars a:hover,
+                .comment-form-rating .stars a.active, .variations .label {
+                color: #555;
+            }
+            #main-container .pagination>.active>a, #main-container .pagination>.active>span,
+                #main-container .pagination>.active>a:hover, #main-container .event-card hr,
+                #main-container .course-card hr, .wpb_vc_table td.vc_table_cell, .table>tbody>tr>td,
+                .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th {
+                border-color: #555 !important;
+            }
+            a, .btn-default i, .colored, #main-container .dropcap, .staff span,
+                .post .post-date, .post .post-comments, .post .post-tags, .post-likes,
+                .post-categories, .flexslider .slides .event-data, .flexslider .slides .course-data,
+                #events-container .event-data, #courses-container .course-data,
+                .dropdown-menu>li, #main-container .event-card h2, #main-container .course-card h2,
+                .timer_box:before, .timer_box p, #testimonials li:before, #testimonials li span,
+                #open-address:hover, #signin .btn-default i, #subscribe .btn-default i,
+                #signin #close-signin, #subscribe #close-subscribe, .topic-info,
+                #members-container .member h4, #footer a, #subscribe-view,
+                #shop-container .product a:hover, #product-reviews .meta,
+                .comment-form-rating .stars a {
+                color: #8e8e8e;
+            }
+            
+            #main-container ul.pagination>li>a, .search-container input[type="text"],
+                .widget select, .minus, .plus, .member-forum-table .row, #signin .heading hr
+                {
+                border-color: #CCC;
+            }
+            
+            #main-container .post-content ul li:before, ul.icon li:before {
+                content: "\e080";
+                font-family: 'Glyphicons Halflings';
+                font-size: 12px;
+                position: relative;
+                margin-right: 10px;
+                color: #ccc;
+            }
+
+            #header #topbar * {
+                color: #8e8e8e !important;
+            }
+
+            #logo {
+                width: 300px;
+            }
+            
+            #logo {
+                margin: 100px auto 0px auto;
+            }
+            
+            #navigation ul.sub-menu li a {
+                background: rgba(0, 0, 0, .7);
+            }
+            
+            #navigation {
+                margin: 20px 0 60px 0;
+            }
+
+            #background.small {
+                height: 300px;
+            }
+            
+            #main-container .colored-container {
+                background-image:
+                    url("{{ docbase }}images/content_bg.png");
+            }
+            
+            #footer, .event-card, .course-card, .table, .table-responsive,
+                #members-directory-form, #groups-directory-form, #create-group-form,
+                #members-directory-form, #groups-directory-form, #create-group-form {
+                background-image:
+                    url("{{ docbase }}images/footer_bg.png");
+            }
+        </style>
     </head>
-    <body>
-        {% block body %}{% endblock %}
-    </body>
+
+    <body
+        <div id="page">
+            <!-- START HEADER -->
+            <header id="header">
+                <div class="container">
+                    <a href="{{ docbase }}" title="Developed by RKM Associates, LLC" id="logo">
+                        <h2>Premier Golf League Tracker</h2>
+                        <h4>Powered by Bootstrap and Symfony 7</h4>
+                    </a>
+                    <!-- Mobile navigation -->
+                    <nav id="navigation-mobile"></nav>
+                    
+                    <!-- Menu -->
+                    <div id="navigation">
+                        <a href="#" id="show-mobile-menu"><span id="hamburger-menu" class="glyphicon glyphicon-menu-hamburger" style="font-size: 20px;"></span></a>
+                        <a href="#" id="close-navigation-mobile"><span class="glyphicon glyphicon-remove" style="font-size: 10px;></span></a>
+                        
+                        {{ include('includes/navigationbar.html.twig') }}
+                    </div>
+                </div>
+    
+                <!-- BACKGROUND HEADER-->
+                <div id="background" class="small"
+                    style="background-image: url('{{ docbase }}images/header.jpg');">
+                </div>
+            </header>
+    
+            <div id="main-container">
+                <!-- Start container -->
+                <section id="container" class="container">
+                    <div class="heading page-title animate_right_left">
+                        <h1>{{ title }}</h1>
+                        <hr>
+                    </div>
+                    <!-- Content -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="post-content">
+                                {% block body %}
+                                {% endblock %}
+                            </div>
+                        </div>
+                    </div>
+    
+                </section>
+            </div>
+    
+            <footer id="footer">
+                <div id="copyright">
+                    <p>
+                        © Copyright - RKM Associates, LLC
+                    </p>
+                </div>
+            </footer>
+        
+        </div>
+        
+    <script type='text/javascript'
+        src='{{ docbase }}js/plugins.js?ver=1'></script>
+    <script type='text/javascript'
+        src='{{ docbase }}js/custom.js?ver=1.0'></script>
+
+    <script type='text/javascript'>
+        document.addEventListener('click', function(e) {
+            if (e.target.matches('a[data-method="DELETE"]')) {
+                e.preventDefault();
+                if (confirm('Are you sure you want to delete this entity?')) {
+                    fetch(e.target.href, { method: 'DELETE' })
+                        .then(response => {
+                            if (response.redirected) {
+                                // Follow the redirect Location if present
+                                window.location.href = response.url;
+                            } else if (response.ok) {
+                                // Fallback to reload if no redirect
+                                window.location.reload();
+                            } else {
+                                console.error('Delete failed:', response.status);
+                            }
+                        })
+                        .catch(error => console.error('Delete failed:', error));
+                }
+            }
+        });
+
+        jQuery(document).ready(function() {
+    		jQuery(window).bind('scroll', function() {
+    			var scroll = jQuery(window).scrollTop();
+    			var menuElement = jQuery('#navigation');
+    			
+    			if (scroll > 250) {
+    			    if (!menuElement.is('.hidden')) {
+    				    menuElement.toggleClass('hide');
+    				    menuElement.addClass('hidden');
+    				}
+    			}
+    			else if (menuElement.is('.hidden')) {
+    				menuElement.toggleClass('hide');
+   				    menuElement.removeClass('hidden');
+    			}
+    		});
+    	});
+    </script>
+    
+	</body>
 </html>

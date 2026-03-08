@@ -1,0 +1,73 @@
+{# templates/game/edit.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+    <style>
+        .btn {
+            padding: 0.15rem 0.275rem;
+        }
+        .form-control {
+            padding: 1em inherit;
+            height: 1.5em;
+            width: 75%;
+        }
+        label {
+            margin-bottom: 0.15em;
+        }
+    </style>
+
+    <div>
+        <h3>Game #{{ gamenumber }} on {{ event.startdateandtime|date("m/d/Y") }} @ {{ teamgame.startingtime|date("g:ia")  }}</h3>
+    
+    
+        {{ form_start(form) }}
+            {{ form_errors(form) }}
+                
+            <div> 
+                <table class="table table-responsive table-striped table-condensed">
+                    <tbody>
+                        <tr>
+                            <td>{{ form_label(form.startingtime) }}</td>
+                            <td>{{ form_widget(form.startingtime) }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ form_label(form.teamone) }}</td>
+                            <td>{{ form_widget(form.teamone) }}</td>
+                        </tr>
+                        {% set playerLabels = ['Team One Player One', 'Team One Player Two', 'Team One Player Three', 'Team One Player Four'] %}
+                        {% for player in form.teamOnePlayerIdsCollection %}
+                            {% set playerLabel = playerLabels[loop.index0] %}
+                            <tr>
+                                <td>{{ form_label(player, playerLabel) }}</td>
+                                <td>{{ form_widget(player) }}</td
+                            </tr>
+                        {% endfor %}
+                        {% if event.teamsorplayerspergame > 1 %}
+                            <tr>
+                                <td>{{ form_label(form.teamtwo) }}</td>
+                                <td>{{ form_widget(form.teamtwo) }}</td>
+                            </tr>
+                            {% set playerLabels = ['Team Two Player One', 'Team Two Player Two', 'Team Two Player Three', 'Team Two Player Four'] %}
+                            {% for player in form.teamTwoPlayerIdsCollection %}
+                                {% set playerLabel = playerLabels[loop.index0] %}
+                                <tr>
+                                    <td>{{ form_label(player, playerLabel) }}</td>
+                                    <td>{{ form_widget(player) }}</td
+                                </tr>
+                            {% endfor %}
+                        {% endif %}
+                        <tr>
+                            &nbsp;
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                {{ form_widget(form.save) }}
+            </div>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

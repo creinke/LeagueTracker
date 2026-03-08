@@ -1,0 +1,75 @@
+{# templates/event/list.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+    <style>
+        .btn {
+            padding: 0.15rem 0.275rem;
+        }
+        .table td {
+            padding: 0px;
+            height: 1.5em;
+        }
+        .table th {
+            padding: 0px;
+            height: 1.5em;
+        }
+    </style>
+
+    {% if season is defined %}
+        <h2>Events for {{ season.name }} Season</h2>
+
+        {% set sessions = season.sessions %}
+        {% for session in sessions %}
+            <h3>Events for {{ session.name }}</h3>
+            
+            {% if is_granted('ROLE_ADMIN') %}
+                <div class="text-right">
+                    <a href="{{ path('event_new', {'id': session.id})  }}" class="btn btn-dark">Add New Event</a>
+                </div>
+            {% endif %}
+            
+            {% set events = session.events %}
+            {% if events.count() == 0 %}
+                   <p>No Events yet defined for the {{ session.name }} Session</p>
+            {% else %}
+                <div class="table-responsive"> 
+                    <table class="table table-striped table-condensed">
+                        <thead>
+                            <tr>
+                                <th>Event</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for event in events %}
+                                <tr>
+                                    <td># {{ event.eventnumber }} on {{ event.startdateandtime|date("n/j/y @ g:ia") }}</td>
+                                    <td>
+                                        <a href="{{ path('event_view', {'id': event.id}) }}" class="btn btn-info btn-sm" data-method="GET">View</a>
+                                        {% if is_granted('ROLE_SAMPLE') %}
+                                        {% elseif is_granted('ROLE_ADMIN') %}
+                                            <a href="{{ path('event_delete', {'id': event.id}) }}" class="btn btn-danger btn-sm" data-method="DELETE">Delete</a>
+                                        {% endif %}
+                                        {% if is_granted('ROLE_ADMIN') %}
+                                            <a href="{{ path('event_edit', {'id': event.id}) }}" class="btn btn-primary btn-sm" data-method="POST">Edit</a>
+                                        {% endif %}
+                                        {% if event.eventtypeString == "SINGLES MATCH" %}
+                                            <a href="{{ path('event_register', {'id': event.id}) }}" class="btn btn-info btn-sm" data-method="GET">Register</a>
+                                        {% endif %}
+                                        <a href="{{ path('event_results', {'id': event.id}) }}" class="btn btn-info btn-sm" data-method="GET">Results</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        {% endfor %}
+    {% else %}
+        <p>No seasons yet defined in League</p>
+    {% endif %}
+{% endblock %}

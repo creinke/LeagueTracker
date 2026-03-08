@@ -1,0 +1,177 @@
+{# templates/season/edit.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+    <style>
+        .btn {
+            padding: 0.15rem 0.275rem;
+        }
+        .form-control {
+            padding:0px 0px 0px .3em; 
+        }
+        label {
+            margin-bottom: 0.15em;
+        }
+        .table td {
+            padding: 0px;
+            height: 1.5em;
+        }
+        .table th {
+            padding: 0px;
+            height: 1.5em;
+        }
+    </style>
+
+    <div class="text-right"> <!--You can add col-lg-12 if you want -->
+        <a href="{{ path('session_new', {'id': season.id}) }}" class="btn btn-dark">Add New Session</a>
+   </div>
+   
+    <div>
+        <script type="text/javascript">
+            function onCourseChange() {
+                var $course = jQuery(this);
+                var $val = $course.val();
+                var $name = $course.attr('name');
+                var $regex = /\d+/g;
+                var $matches = $name.match($regex);
+                var $sessionNumber = $matches[0];
+                var $eventNumber = $matches[1];
+                
+                var $form = jQuery(this).closest('form');
+                // Simulate form data, but only include the selected course value.
+                var data = {};
+                data[$name] = $val;
+                //$token = jQuery('#form__token');
+                //data[$token.attr('name')] = $token.val();
+                    
+                // Submit data via AJAX to the form's action path.
+                jQuery.ajax({
+                    url : $form.attr('action'),
+                    type: $form.attr('method'),
+                    data : data,
+                    success: function(html) {
+                        // Replace event's nine and secondnine fields with the appropriate nines from the AJAX response. 
+                        $id = '#form_season_sessions_' + $sessionNumber + "_events_" + $eventNumber + '_nine';
+                        jQuery($id).replaceWith(jQuery(html).find($id));
+                        $id = '#form_season_sessions_' + $sessionNumber + "_events_" + $eventNumber + '_secondnine';
+                        jQuery($id).replaceWith(jQuery(html).find($id));
+                        
+                        // Replace event's tee field with the appropriate tee from the AJAX response. 
+                        $id = '#form_season_sessions_' + $sessionNumber + "_events_" + $eventNumber + '_tee';
+                        jQuery($id).replaceWith(jQuery(html).find($id));
+                    }
+                });
+            }
+		</script>
+        
+        {{ form_start(form) }}
+            {{ form_errors(form) }}
+            
+            {% set season = form.season %}
+            {{ form_row(season.name) }}
+            {{ form_row(season.startdate) }}
+            {{ form_row(season.enddate) }}
+            
+            {% set sessions = season.sessions %}
+            {% set sessioncount = sessions.count() %}
+            {% set sessionnumber = 0 %}
+            
+            {% if sessioncount > 0  %}
+            	<div style="margin-top: 2em;">
+                	<caption>Sessions for {{ seasonName }} Season</caption>
+                	
+                    <div class="table-responsive" style="margin-top: 30px;">
+                        <table class="table table-condensed">            
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for session in sessions %}
+                                    <tr>
+                                        <td>{{ form_widget(session.name) }}</td>
+                                        {{ form_errors(session.name) }}
+                                        <td>{{ form_widget(session.startdate) }}</td>
+                                        {{ form_errors(session.startdate) }}
+                                        <td>{{ form_widget(session.enddate) }}</td>
+                                        {{ form_errors(session.enddate) }}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {% for session in sessions %}
+			        {% set eventcount = session.events.count() %}
+			        
+                	<div style="margin-top: 2em;">
+                    	<caption>Events for {{ session.name.vars.value }} Session</caption>
+                    	
+                        {% if  eventcount > 0  %}
+                            <div class="table-responsive" style="margin-top: 30px;">
+                                <table class="table table-condensed">            
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 6em;">Event #</th>
+                                            <th>Start Date and Time<br/>Front Nine</th>
+                                            <th>Course<br/>Second Nine</th>
+                                            <th>Session<br/>Tee</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for event in session.events %}
+                                            <tr>
+                                                <td>{{ form_widget(event.eventnumber, {'attr': {'style': 'width: 6em;'}}) }}</td>
+                                                {{ form_errors(event.eventnumber) }}
+                                                <td>{{ form_widget(event.startdateandtime) }}</td>
+                                                {{ form_errors(event.startdateandtime) }}
+                                                <td>{{ form_widget(event.course) }}</td>
+                                                {{ form_errors(event.course) }}
+                                                <td>{{ form_widget(event.session) }}</td>
+                                                {{ form_errors(event.session) }}
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>{{ form_widget(event.nine) }}</td>
+                                                {{ form_errors(event.nine) }}
+                                                <td>{{ form_widget(event.secondnine) }}</td>
+                                                {{ form_errors(event.secondnine) }}
+                                                <td>{{ form_widget(event.tee) }}</td>
+                                                {{ form_errors(event.tee) }}
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <script>
+                                var $sessionnumber = {{ sessionnumber }};
+                                var $eventcount = {{ eventcount }};
+                                
+                                for ($eventNumber = 0; $eventNumber < $eventcount; $eventNumber++) {
+                                      var $id = "#form_season_sessions_" + $sessionnumber + "_events_" + $eventNumber + "_course";
+                                      var $course = jQuery($id);
+                                      $course.change(onCourseChange);
+                                }
+                            </script>
+                            {% set sessionnumber = sessionnumber + 1 %}
+                        {% else %}
+                            <div>
+                                <h4 style="margin-top: 2em;">No events yet configured for this session</h4>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+        {{ form_row(form.save) }}
+        {{ form_row(form._token) }}
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

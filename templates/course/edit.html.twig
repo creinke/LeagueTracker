@@ -1,0 +1,107 @@
+{# templates/season/edit.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+    <style>
+        .btn {
+            padding: 0.15rem 0.275rem;
+        }
+        .form-control {
+            padding:0px 0px 0px .3em; 
+        }
+        label {
+            margin-bottom: 0.15em;
+        }
+        .table, .table-responsive {
+			background-image: none;
+		}
+        .table td {
+            padding: 0px;
+            height: 1.5em;
+        }
+        .table th {
+            padding: 0px;
+            height: 1.5em;
+        }
+        .table > tbody > tr > td {
+ 			border-color: #fff !important;
+        }
+        .table td, .table th, .table > tbody > tr > td {
+        	padding: 1px !important;
+        }
+        .table > thead > tr > th {
+        	color: #555;
+        }
+        </style>
+
+    <div>
+        {{ form_start(form) }}
+            {{ form_errors(form) }}
+            {{ form_row(form.name) }}
+            {{ form_row(form.address) }}
+
+            <div class="table, table-responsive" style="margin-top: 30px;">
+                <table class="table">            
+                    <thead>
+                            <th>Nine</th>
+                            <th>Tee</th>
+                            <th>Hole Name</th>
+                            <th>Number</th>
+                            <th>Handicap</th>
+                            <th>Length</th>
+                            <th>Par</th>
+                    </thead>
+                    <tbody>
+                        {% for nine in form.nines %}
+                        <tr>
+                            <td>
+                                {{ form_widget(nine.name) }}
+                                {{ form_errors(nine.name) }}
+                            </td>
+                        </tr>
+                        {% for tee in nine.tees %}
+                        <tr>
+                            <td>&nbsp;</td>
+                            <td>
+                                {{ form_widget(tee.name) }}
+                                {{ form_errors(tee.name) }}
+                            </td>
+                        <tr>
+                        {% for hole in tee.holes %}
+                        <tr>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>
+                                {{ form_widget(hole.name) }}
+                                {{ form_errors(hole.name) }}
+                            </td>
+                            <td>
+                                {{ form_widget(hole.holenumber) }}
+                                {{ form_errors(hole.holenumber) }}
+                            </td>
+                            <td>
+                                {{ form_widget(hole.handicap) }}
+                                {{ form_errors(hole.handicap) }}
+                            </td>
+                            <td>
+                                {{ form_widget(hole.length) }}
+                                {{ form_errors(hole.length) }}
+                            </td>
+                            <td>
+                                {{ form_widget(hole.par) }}
+                                {{ form_errors(hole.par) }}
+                            </td>
+                        </tr>
+                        {% endfor %} <!-- holes -->
+                        {% endfor %} <!-- tees -->
+                        {% endfor %} <!-- nines -->
+                    </tbody>
+                </table>
+            </div>
+        {{ form_row(form.save) }}
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

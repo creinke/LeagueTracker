@@ -1,0 +1,27 @@
+  <IfModule mod_rewrite.c>
+      RewriteEngine On
+
+      # Test rule to confirm processing (temporary - remove after testing)
+      RewriteRule ^test-htaccess$ - [F]  # This should forbid /test-htaccess
+
+      # Determine the RewriteBase automatically and set it as environment variable.
+      RewriteCond %{REQUEST_URI}::$1 ^(/.+)/(.*)::\2$
+      RewriteRule ^(.*) - [E=BASE:%1]
+
+      # If the requested filename exists, simply serve it.
+      # We only want to let Apache serve files and not directories.
+      RewriteCond %{REQUEST_FILENAME} -f
+      RewriteRule .? - [L]
+
+      # Skip redirect for local development hosts
+      RewriteCond %{HTTP_HOST} !^(leaguetracker\.local|localhost)$ [NC]
+
+      # Apache redirect www to non-www and HTTP to HTTPS (only if not local)
+      RewriteCond %{HTTPS} off [OR]
+      RewriteCond %{HTTP_HOST} ^www\. [NC]
+      RewriteRule ^ https://premiergolfleaguetracker.com%{REQUEST_URI} [L,NE,R=301]
+
+      # Rewrite all other queries to the front controller.
+      RewriteRule .? %{ENV:BASE}/index.php [L]
+
+  </IfModule>

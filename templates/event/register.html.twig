@@ -1,0 +1,70 @@
+{# templates/game/generate.html.twig #}
+
+{% extends 'base.html.twig' %}
+{% form_theme form with [ 'custom_checkbox.html.twig' ] %} 
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+    <style>
+        .btn {
+            padding: 0.15rem 0.275rem;
+        }
+        .form-control {
+            padding: 1em inherit;
+            height: 1.5em;
+            width: 75%;
+        }
+        #form_players label {
+            display: block;
+            margin-bottom: 5px;
+            float: left;
+            width: 30%;
+            margin-left: 18px;
+        }
+        #form_players input[type='checkbox'] {
+            margin-left: -18px;
+            margin-right: 10px;
+        }    
+    </style>
+    <script>
+        jQuery(document).ready(
+            function() {
+                var $admin = jQuery("#admin");
+
+                if (typeof($admin)  === "undefined") {
+                	jQuery("#form_players input[type=checkbox]").prop('checked', jQuery(this).prop("checked")).each(
+                        function () {
+                            if (jQuery(this).is(":checked")) {
+                            	jQuery(this).prop('disabled', true);
+                            }
+            	        }
+            	    )
+                }
+            }
+        );
+    </script>
+    <div>
+        {% if is_granted('ROLE_ADMIN') %}
+            <h2 id="admin">
+        {% else %}
+            <h2>
+        {% endif %}
+                Register Selected Players in Event
+            </h2>
+        
+        <p>
+            Click the checkbox next to each player to register that player in this event.<br/>
+            <span style = "padding-left: 60px;">Impirtant Note: </span><br/>
+            <span style = "padding-left: 120px;">All registrations by a league member are final, to unregister yourself or another member, you must contact your league administrator.</span><br/>
+        </p>
+
+        <div>
+            {{ form_start(form, { 'attr': {'id': 'form_players'} }) }}
+                {% for player in form.players %}
+                    {{ form_widget(player) }}
+                {% endfor %}
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}

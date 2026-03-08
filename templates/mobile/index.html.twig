@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}League Tracker Mobile{% endblock %}
+
+{% block body %}
+    <div id="mobile-root"></div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {# This tells Symfony to load the initializer and its dependencies #}
+    {{ importmap('mobile/MobileAppInitializer') }}
+{% endblock %}

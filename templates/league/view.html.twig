@@ -1,0 +1,31 @@
+{# templates/league/view.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+    <style>
+        .btn {
+            padding: 0.15rem 0.275rem;
+        }
+        .table td {
+            padding: 0.1em;
+            height: 1.5em;
+            width: 50%;
+        }
+    </style>
+    
+    <h2>{{ league.name }}</h2>
+    
+    <table class="table table-striped">
+        <tbody>
+            <tr>
+                <td>League Name:</td>
+                <td>{{ league.name }}</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <a href="{{ path('league_list') }}" class="btn btn-dark">Back</a>
+{% endblock %}

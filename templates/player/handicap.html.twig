@@ -1,0 +1,80 @@
+{# templates/player/handicap.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+    <style>
+        .btn {
+            padding: 0.15rem 0.275rem;
+        }
+        .table td {
+            padding: 0.1em;
+            height: 1.5em;
+            width: 50%;
+        }
+    </style>
+    
+    <form name="form", method="post", action={{ path('player_handicap', { 'id': player.id }) }}">
+        <table class="table table-striped">
+            <tbody>
+                <tr>
+                    <td>Name: </td>
+                    <td>{{ player.name.fullname }}</td>
+                </tr>
+                <tr>
+                    <td>Slope:</td>
+                    <td><input type="text" name="slope" style="color: black;" value="{{ slope }}"></td>
+                </tr>
+                <tr>
+                    <td>Rating:</td>
+                    <td><input type="text" name="rating" style="color: black;" value="{{ rating }}"></td>
+                </tr>
+                <tr>
+                    <td>Par:</td>
+                    <td><input type="text" name="par" style="color: black;" value="{{ par }}"></td>
+                </tr>
+                <tr>
+                    {% set scoresRecorded = view.scores|length %}
+                    {% if  scoresRecorded < 5 %}
+                    <td>Seed Handicap Index:</td>
+                    {% else %}
+                    <td>Handicap Index:</td>
+                    {% endif %}
+                    <td>{{ view.handicapIndex }}</td>
+                </tr>
+                <tr>
+                    <td>Handicap:</td>
+                    {% if view.handicap is defined and view.handicap is not null %}
+                        <td>{{ view.handicap }}</td>
+                    {% else %}
+                        <td>Enter Slope, Rating, and Par values and click the Submit button.</td>
+                    {% endif %}
+                </tr>
+                <tr>
+                    <td>Scores:</td>
+                    <td>
+                        {% set scoreUsed = false %}
+                        {% for score in view.scores %}
+                            {% if view.scoresUsedFlag[loop.index0] %}*{% set scoreUsed = true %}
+                            {% endif %}
+                            {{ score.adjustedstrokesTotal }} 
+                            {% if score.adjustedstrokesTotal != score.totalStrokes %}
+                            	/ {{ score.totalStrokes }}
+                            {% endif %}
+                            on {{ score.timestamp|date("m/d/Y") }} (diff: {{ score.handicapdifferential }})<br/>
+                            {% if loop.last %}
+                                {% if scoreUsed %}<br/>* Indicates score used in Handicap Index calculation
+                                {% else %}<br/>Less than 5 scores recorded<br/>Will use Seed Handicap Index to calculate Handicap
+                                {% endif %} 
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <button type="submit" id="form_save" name="form[save]" class="btn btn-primary mt-3">Submit</button>
+    </form>
+{% endblock %}

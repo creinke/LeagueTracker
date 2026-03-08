@@ -1,0 +1,75 @@
+{# templates/player/view.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+    <style>
+        .btn {
+            padding: 0.15rem 0.275rem;
+        }
+        .table td {
+            padding: 0.1em;
+            height: 1.5em;
+            width: 50%;
+        }
+    </style>
+    
+    <table class="table table-striped">
+        <tbody>
+            <tr>
+                <td>Name: </td>
+                <td>{{ player.name.fullname }}</td>
+            </tr>
+            <tr>
+                <td>First Name:</td>
+                <td>{{ player.name.firstname }}</td>
+            </tr>
+            <tr>
+                <td>Middle Name or Initial:</td>
+                <td>{{ player.name.middlenameorinitial }}</td>
+            </tr>
+            <tr>
+                <td>Last Name:</td>
+                <td>{{ player.name.lastname }}</td>
+            </tr>
+            <tr>
+                <td>Generation:</td>
+                <td>{{ player.name.generation }}</td>
+            </tr>
+            <tr>
+                <td>Seed Handicap Index:</td>
+                <td>{{ player.seedhandicapindex }}</td>
+            </tr>
+            <tr>
+                <td>Work Email Address:</td>
+                <td>{{ player.workemailaddress }}</td>
+            </tr>
+            <tr>
+                <td>Personal Email Address:</td>
+                <td>{{ player.personalemailaddress }}</td>
+            </tr>
+            <tr>
+                <td>Other Email Address:</td>
+                <td>{{ player.otheremailaddress }}</td>
+            </tr>
+            <tr>
+                <td>Work Phone Number:</td>
+                <td>{{ player.workphonenumber }}</td>
+            </tr>
+            <tr>
+                <td>Cell Phone Number:</td>
+                <td>{{ player.cellphonenumber }}</td>
+            </tr>
+            <tr>
+                <td>Home Phone Number:</td>
+                <td>{{ player.homephonenumber }}</td>
+            </tr>
+            <tr>
+                <td>Other Phone Number:</td>
+                <td>{{ player.otherphonenumber }}</td>
+            </tr>
+        </tbody>
+    </table>
+{% endblock %}

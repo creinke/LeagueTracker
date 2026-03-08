@@ -1,0 +1,57 @@
+<div class="menu-league-tracker-container">
+    <ul id="menu-league-tracker" class="menu">
+        <li id="menu-item-home" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-home">
+            <a href="{{ path('home') }}">Home</a>
+        </li>
+        {% if is_granted('ROLE_SUPER') %}
+            <li id="menu-item-courses" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-home">
+                <a href="{{ path('course_list') }}">Courses</a>
+            </li>
+            <li id="menu-item-leagues" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-home">
+                <a href="{{ path('league_list') }}">Leagues</a>
+            </li>
+            <li id="menu-item-users" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-home">
+                <a href="{{ path('user_list') }}">Users</a>
+            </li>
+        {% endif %}
+        {% if app.user %}
+            <li id="menu-item-logout" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-logout">
+                <a href="{{ path('app_logout') }}">Logout</a>
+            </li>
+    		{% else %}
+            <li id="menu-item-login" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-login ">
+                <a href="{{ path('app_login') }}">Login</a>
+            </li>
+        {% endif %}
+        {% if is_granted('ROLE_USER') %}
+			<li id="menu-item-players" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-players">
+				<a href="{{ path('player_list') }}">Players</a>
+			</li>
+            <li id="menu-item-seasons" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-seasons">
+                <a href="{{ path('season_list') }}">Seasons</a>
+            </li>
+            <li id="menu-item-event" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-event current-menu-item current_page_item menu-item-has-children menu-item-event">
+                <a href="{{ path('event_viewseason') }}">Events</a>
+                <ul class="sub-menu" style="display: none;">
+                    <li id="menu-item-viewnext" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-viewnext">
+                        <a href="{{ path('event_viewnext') }}" style="width: 300px;">Display Next Event Pairings</a>
+                    </li>
+                    <li id="menu-item-viewlast" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-viewlast">
+                        <a href="{{ path('event_viewlast') }}" style="width: 300px;">Post Last Event Scores</a>
+                    </li>
+                    <li id="menu-item-resultslast" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-resultslast">
+                        <a href="{{ path('event_resultslast') }}" style="width: 300px;">Display Last Event Results</a>
+                    </li>
+                </ul>
+            </li>
+        {% endif %}
+        {% if is_granted('ROLE_ADMIN') %}
+            <li id="menu-item-teams" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-teams">
+                <a href="{{ path('team_list') }}">Teams</a>
+            </li>
+        {% endif %}
+        <li id="menu-item-help" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-teams">
+            <a href="{{ path('help') }}">Help</a>
+        </li>
+    </ul>
+</div>

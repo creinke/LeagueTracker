@@ -1,0 +1,139 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} {{ title }}!{% endblock %}
+
+{% block body %}
+    <!-- <h1>League Tracker Home Page</h1>  -->
+    {% if app.user and is_granted('ROLE_SAMPLE') %}
+        <p>
+            <h2>xxxWelcome to Premier Golf League Tracker!</h2>
+            To see if you might be interested in using this application, take a quick look at list of bullet items below.  If these features 
+            meet your league requirements, then just contact me at the email address I provide below and provide the information that I require.  I will help you get set 
+            up.  There is no cost to League Tracker.  It's here for any league to use free of charge.  
+        </p>
+        <p>
+            <h2>Feature List</h2>
+        </p>
+        <ul>
+            <li>Designed specifically for league play, with singles, 2, 3, or 4 person teams, stroke or match play.</li>
+            <li>Accomodates both singles and team play as well as special league match events, e.g., scramples, shambles, etc.</li>
+            <li>Access to the system is entirely web based, meaning to use League Tracker, you and your league members must have access to the Internet.</li>
+            <li style="padding-left: 4em;">League Tracker is Bootstrap enabled.  Meaning that all pages and dialogs in the application are "responsive" and "fit" the size of 
+            your screen.  Each page adapt dynamically to the viewport of the device on which they are viewed.  This makes the pages respond, look good, and work reasonably well 
+            on phones, tablets, laptops, as well as full screen devices.</li> 
+            <li style="padding-left: 4em;">Currently, there are no installable "mobile or tablet apps" for League Tracker. </li>
+        </ul>
+        <h3>Seasons, Sessions, and Events</h3>
+        <ul>
+            <li>Players or teams play against each other in a <strong>Season</strong></li>
+            <li style="padding-left: 4em;">A <strong>Season</strong> is broken into one or more <strong>Sessions</strong> and <strong>Sessions</strong> 
+            contain one or more <strong>Events</strong></li>
+            <li style="padding-left: 4em;">The following is an example of a sample league's 2018 season containing 2 sessions and 17 events:</li>
+            <li>Players or teams points for each session and the entire season are calculated each week.  For sinlges player points are accumulated sort of like the 
+            FedEx Cup point system, where players earn ponts each week for placing in the event from 1st to 10th place.  For match play, points are earned as described in the 
+            Scoring section below. </li>
+        </ul>
+        <img src="{{ docbase }}images/help/season.jpg"/> 
+        <h3>Games</h3>
+        <ul>
+            <li style="padding-left: 4em;">An <strong>Event</strong> consists of <strong>Games</strong> where in each <strong>Game</strong> singles play in stoke play or match play, 
+            or one team plays another in match play format, where a team's A player match plays the other team's A player, and a team's B player match plays the other team's 
+            B player.</li>
+            <li style="padding-left: 4em;">The following is an example of one team match play event in a sample league:</li>
+            <li style="padding-left: 4em;">For singles play, an <strong>Event</strong> consists of <strong>Games</strong> where in each <strong>Game</strong> one player plays 
+            against another in match play format or players play against all other players in the <strong>Event</strong> in stroke play.  </li>
+        </ul>
+        <img src="{{ docbase }}images/help/event.jpg"/> 
+        <h3>Team/Singles Match Play Scoring</h3>
+        <ul>
+            <li style="padding-left: 4em;">In match play, if players tie on a hole (after applying the handicap), each player is awarded .5 points.  Winning a hole gives the 
+            winner a whole point.</li>
+            <li style="padding-left: 4em;">There is one point awarded for low player net.  If players tie low net, each player is awarded .5 points; otherwise, 
+            the player with the lowest net is awarded the entire point.</li> 
+            <li style="padding-left: 4em;">In team play, there is also one point awarded for low team net.  If teams tie low net, each team is awarded .5 points; otherwise, 
+            the team with the lowest net is awarded the entire point.</li> 
+            <li style="padding-left: 4em;">The following is an example of an event results in a sample league.  The results also show current standings:</li> 
+            <img src="{{ docbase }}images/help/event_results.jpg"/> 
+        </ul>
+        <h3>Generating a Schedule</h3>
+        <ul>
+            <li>There is functionality to generate a <strong>Season</strong> and a "round robin" schedule of <strong>Events</strong> 
+            based on a number of parameters.  Here is an example of how this functionality works in a sample league:</li>
+            <li style="padding-left: 4em;">The 9 hole sample league runs for 17 weeks (first parameter).</li>
+            <li style="padding-left: 4em;">The generator splits the 17 weeks into two <strong>Sessions</strong> (another parameter)</li>
+            <li style="padding-left: 4em;">The first <strong>Sessions</strong> lasts for 8 weeks.  For the first 7 weeks, teams play each other in a match play format.  
+            The 8th week is what is called a "position match", where the team in first place at that time plays the team in second place, the third place team 
+            plays the fourth place team, etc., on down the line.</li>
+            <li style="padding-left: 4em;">After the 8th events, results are calculated and the team with the highest point total is the 1st half winner.</li> 
+            <li style="padding-left: 4em;">The second <strong>Sessions</strong> also lasts for 8 weeks, and also for the first 7 weeks of that session
+            teams play each other in a match play format, with the 8th week also being a "position match".</li>
+            <li style="padding-left: 4em;">Also after the 8th event of the 2nd half, results for that half are calculated and the team with the highest point 
+            for that half is the 2nd half winner.</li>
+            <li style="padding-left: 4em;">The 17th week is "playoff match" where the winner of the first half plays the winner of the second half to determine 
+            the league champion.  Everyone else plays a 2 person scramble with handicaps.</li> 
+        </ul>
+        <h3>Handicapping</h3>
+        <ul>
+            <li>League Tracker uses the World Handicap Formula to determine a player's handicap index and handicap.  It's unofficial, but it works well as any for league play and 
+            it gives a player an idea of what their handicap would be if they recorded their scores using an offical USGA site.</li>  League handicaps are separate from the club's USGA
+            handicap.  Handicaps are league specific.  If a player plays in multiple leagues, that player has a handicap index and handicap specific to that league.  
+            <li style="padding-left: 4em;">The following is an example of one player's handicap page.</li> 
+            <img src="{{ docbase }}images/help/handicap.jpg"/> 
+        </ul>
+        <h3>Other Functionality</h3>
+        <ul>
+            <li>Most of the other administrator functionality in League Tracker is CRUD based, where you can list, <strong>C</strong>reate, <strong>R</strong>etrieve, 
+            <strong>U</strong>pdate, and <strong>D</strong>elete various League Tracker entities.</li>
+        </ul>                                    
+        <h3>Special Events</h3>
+        <ul>
+            <li>
+                In addition to the weekly league event schedule, League Tracker is also equipped to handle and calculate the results of special team match events.  
+                League Tracker currently supports scrambles, shambles, better ball, and low team net formats, with and without adjusting for handicaps.  More details 
+                regarding team match events are available in the help section.  
+            </li>
+        </ul>                                    
+        <h2><span id="getting_started">Getting Started</span></h2>
+        <p>
+            To get started with your league, send an email to 
+            <a href="javascript:window.location.href = 'mailto:' + ['League','Tracker'].join('@')">creinke<!---->@<!---->rkm-associates.com</a> 
+            and provide the following information:  
+            <ul>
+                <li>The name of your league.</li>
+                <li>The course that your league plays, including:</li>
+                    <li style="padding-left: 4em;">The website where the the course scorecard can be found.</li> 
+            </ul>
+        </p>
+        <p>
+            Generally within 24 hours, you will recieve two sets of trial credentials for your league, administrator credentials and user credentials.  
+        </p>
+    {%  endif %}
+    {% if not app.user %}
+        <p>
+            <h2>Welcome to Premier Golf League Tracker!</h2>
+            If you have set up your league already, just log in with either your league's admin or user credentials.  
+        </p>
+        <p>
+            If you are here checking out League Tracker, firstly, <strong>it is free to use</strong>!  To get started, you can log in with either the credentials 
+            <strong>sample_admin/password</strong> or <strong>sample_user/password</strong>.  This will provide you access to the sample league as either the 
+            league's administrator or as a user/member of the sample league respectively.  If you log in as either the sample admin or as a sample user, you will not be able 
+            to modify or update any sample league data, but you will have access to all sample league data and most of the user interface dialogs and functionality.  
+        </p>
+        <p>
+            The sample league is a typical after work golf league, where each team consists of 2 players playing 9 holes.  There is an additional sample league
+            that works well for teams playing on a golf simulator, that is, 3 player teams playing 18 holes.  The credentials to access the 3 person 18 hole sample 
+            league an admin and a member are <strong>sample3_admin/password</strong> and <strong>sample3_user/password</strong> respectively.  
+            The purpose of providing two sample leagues is to show you the various functionality that league tracker provides.  
+        </p>
+        <p>
+            Likely the 2, 3, and 4 person per team functionality provided by League Tracker will work for most league play. Some leagues, however, 
+            may have different or more unique requirements.  Use the sample leagues to determine if League Tracker meet your leagues requirements.  If additional 
+            features are needed, just contact me at <a href="javascript:window.location.href = 'mailto:' + ['League','Tracker'].join('@')">creinke<!---->@<!---->rkm-associates.com</a> 
+            and I'll see if I can add those features.  
+        </p>        
+        <p>
+            Click the Help menu item for more details on using League Tracker.  Then log into to one of the sample leagues to see how things work and get more 
+            information on how to get going with your league.  
+        </p>
+    {% endif %}    
+{% endblock %}

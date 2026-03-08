@@ -1,0 +1,27 @@
+{# templates/user/new.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+    <style>
+        .btn {
+            padding: 0.15rem 0.275rem;
+        }
+        .form-control {
+            padding: 1em inherit;
+            height: 1.5em;
+            width: 75%;
+        }
+        label {
+            margin-bottom: 0.15em;
+        }
+    </style>
+
+    <div style="padding-left: 20%;">
+        {{ form_start(form) }}
+        {{ form_widget(form) }}
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

@@ -1,0 +1,246 @@
+{# templates/event/list.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+    <style>
+        .hr-reverted {
+        	width: 100% !important;
+        	height: unset !important; 
+        	border-bottom: 1px solid #555 !important;
+        	background-image: unset !important; 
+        	background-size: unset !important; 
+        	background-position: center !important; 
+        	background-repeat: unset !important; 
+        	margin: unset !important; 
+        	position: unset !important; 
+        	border: unset !important; 
+        	content: unset !important;
+        	z-index: unset !important; 
+        }
+		.table, .table-responsive {
+			background-image: unset;
+			margin-bottom: 30px;
+		}
+        th {
+            text-align: center;
+            white-space: nowrap;
+        }
+        .table td, .table > tbody > tr > td, .table th, .table > tbody > tr > th, .table tr td:first-child {
+            border-top: 1px;
+            box-shadow: unset; 
+            padding: 0px !important;
+            color: #555;
+            text-align: center;
+        }
+    </style>
+    
+    {% set season = seasonStandingsViewBean.season %}
+    {% set seasonStandings = seasonStandingsViewBean.seasonTeamStandings %}
+    {% set sessions = seasonStandingsViewBean.sessions %}
+    {% set sessionName = event.session.name %}
+    {% set sessionTeamStandings = seasonStandingsViewBean.sessionTeamStandings[sessionName] %}
+    {% set sortedSessionTeamStandings = sessionTeamStandings %}
+
+    <h3>
+        {{ league.name }}: {{ season.name }} Season 
+            <input type="button" value="Print Results" id="print_button" class="btn btn-primary mt-3" style="float:right;"/>
+    </h3>
+    
+    <h4>Results for {{ sessionName }} Event# {{ event.eventnumber }}</h4>
+    
+    <div class="table-responsive"> 
+        <!-- Team Standings Results Table -->
+        <table class="table table-condensed">
+            <tr>
+                <th>&nbsp;</th>
+                <th>&nbsp;</th>
+                <th>{{ sessionName }}</th>
+                <th>&nbsp;</th>
+                <th>Total</th>
+                <th>&nbsp;</th>
+            </tr>
+    
+            <tr>
+                <th>Team</th>
+                <th>{{ sessionName }} Points</th>
+                <th>Points Behind</th>
+                <th>Total Points</th>
+                <th>Points Behind</th>
+            </tr>
+    
+            <tr>
+                <td colspan="5"><hr style="border-bottom: 1px solid #555 !important;" class="hr-reverted"/></td>
+            </tr>
+            {# $standings #}
+            {% for teamStandings in sortedSessionTeamStandings %}
+            {% set teamName = teamStandings.teamName %}
+            <tr>
+                <td style="text-align: left;">{{ teamName }}</td>
+                <td>{{ sessionTeamStandings[teamName].formattedpoints }}</td>
+                <td>{{ sessionTeamStandings[teamName].formattedPointsBehind }}</td>
+                <td>{{ seasonStandings[teamName].formattedpoints }}</td>
+                <td>{{ seasonStandings[teamName].formattedPointsBehind }}</td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td colspan="5"><hr style="border-bottom: 1px solid #555 !important;" class="hr-reverted"/></td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="table-responsive"> 
+        <!-- Team Results Table -->
+        <table class="table table-condensed">
+            <tr>
+                <th>Match</th>
+                <th>Points</th>
+                <th>Team Low Net Points</th>
+                <th>Total Points</th>
+            </tr>
+    
+            <tr>
+                <td colspan="4"><hr style="border-bottom: 1px solid #555 !important;" class="hr-reverted"/></td>
+            </tr>
+            {# teamResults #}   
+            {% set teamResults = gameResultsViewBean.teamResults %}
+            
+            {% for teamResult in teamResults %}
+            <tr>
+                <td style="text-align: left;">{{ teamResult.teamOneName }}</td>
+                <td>{{ teamResult.teamOnePlayerFormattedPoints }}</td>
+                <td>{{ teamResult.teamOneNetFormattedPoints }}</td>
+                <td>{{ teamResult.teamOneTotalFormattedPoints }}</td>
+            </tr>
+
+            <tr>
+                <td style="text-align: left;">{{ teamResult.teamTwoName }}</td>
+                <td>{{ teamResult.teamTwoPlayerFormattedPoints }}</td>
+                <td>{{ teamResult.teamTwoNetFormattedPoints }}</td>
+                <td>{{ teamResult.teamTwoTotalFormattedPoints }}</td>
+            </tr>
+
+            <tr>
+                <td colspan="4"><hr style="border-bottom: 1px solid #555 !important;" class="hr-reverted"/></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+                    
+    <div class="table-responsive"> 
+        {% set ninesPlayed = gameResultsViewBean.ninesPlayed %}
+        {% set ninesPlayedLength = ninesPlayed | length %}
+        {% set firstNine = ninesPlayed[0].name %}
+        {% set secondNine = ninesPlayedLength == 1 ? null : ninesPlayed[1].name %}
+        
+        <!-- Player Results Table -->
+        <table class="table table-condensed">
+            <tr>
+                <th colspan="2">&nbsp;</th>
+                <th colspan="9">Actual Score/Adjusted Scores/Points</th>
+                <th colspan="3">&nbsp;</th>
+            </tr>
+    
+            <tr>
+                <th>Name</th>
+                {% if  ninesPlayedLength > 1 %}
+                    <th>Nine</th>
+                {% endif %}
+                <th>HC</th>
+                <th>1</th>
+                <th>2</th>
+                <th>3</th>
+                <th>4</th>
+                <th>5</th>
+                <th>6</th>
+                <th>7</th>
+                <th>8</th>
+                <th>9</th>
+                <th>Total</th>
+                <th>Net</th>
+                <th>Total</th>
+            </tr>
+            <tr>
+                <td colspan="15"><hr style="border-bottom: 3px solid #555 !important;" class="hr-reverted"/></td>
+            </tr>
+
+            {# $playerResults #}
+            {% for teamMatch in gameResultsViewBean.teamMatches %}
+                {% for playerMatch in teamMatch %}
+                    {% for playerResult in playerMatch %}
+                        <tr>
+                            {% if playerResult.nine.name == firstNine %}
+                                <td style="text-align: left;">{{ playerResult.playerName }}</td>
+                                {% if  ninesPlayedLength > 1 %}
+                                    <td>{{ playerResult.nine.name }}</td>
+                                {% endif %}
+                                <td>{{ playerResult.handicap }}
+                                {% if  ninesPlayedLength > 1 %}
+                                    /{{ playerResult.handicap * 2 }}
+                                </td>
+                                {% endif %}
+                            {% else %}
+                                <td>&nbsp;</td>
+                                {% if  ninesPlayedLength > 1 %}
+                                    <td>{{ playerResult.nine.name }}</td>
+                                {% endif %}
+                                <td>&nbsp;</td>
+                            {% endif %}
+        
+                            {% for holeNumber in 0..8 %}
+                            {% set holeStrokes = playerResult.holeStrokes[holeNumber] %}
+                            <td>
+                                {% if holeStrokes == 0 %}
+                                    {{ holeStrokes }}
+                                {% elseif holeStrokes != playerResult.adjustedNetStrokes[holeNumber] %}
+                                    {{ holeStrokes }}/{{ playerResult.adjustedNetStrokes[holeNumber] }}
+                                {% else %}
+                                    {{ holeStrokes }}
+                                {% endif %}
+                            </td>
+                            {% endfor %}
+                            <td>
+                                {{ playerResult.holeStrokesTotal }}
+                                {% if playerResult.adjustedHoleStrokesTotal <  playerResult.holeStrokesTotal %}
+                                    /{{ playerResult.adjustedHoleStrokesTotal }}
+                                {% endif %}
+                            </td>
+                            <td>{{ playerResult.netStrokesTotal }}</td>
+                            <td>&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td>&nbsp;</td>
+                            {% if  ninesPlayedLength > 1 %}
+                                <td>&nbsp;</td>
+                            {% endif %}
+                            <td>&nbsp;</td>
+        
+                            {% for holeNumber in 0..8 %}
+                            <td>
+                                {{ playerResult.holePoints[holeNumber] }}
+                            </td>
+                            {% endfor %}
+                            <td>
+                                {{ playerResult.totalHolePoints }}
+                            </td>
+                            <td>
+                                {{ playerResult.netPoints }}
+                            </td>
+                            <td>
+                                {{ playerResult.totalPoints }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    <tr>
+                        <td colspan="15"><hr style="border-bottom: 1px solid #555 !important;" class="hr-reverted"/></td>
+                    </tr>
+                {% endfor %}
+                <tr>
+                    <td colspan="15"><hr style="border-bottom: 2px solid #555 !important;" class="hr-reverted"/></td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% endblock %}

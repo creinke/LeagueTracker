@@ -1,13 +1,4 @@
 {
-    "doctrine/annotations": {
-        "version": "1.13",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "main",
-            "version": "1.10",
-            "ref": "64d8583af5ea57b7afa4aba4b159907f3a148b05"
-        }
-    },
     "doctrine/cache": {
         "version": "2.2.0"
     },
@@ -77,12 +68,6 @@
     "egulias/email-validator": {
         "version": "3.1.2"
     },
-    "friendsofphp/proxy-manager-lts": {
-        "version": "v1.0.12"
-    },
-    "laminas/laminas-code": {
-        "version": "4.5.1"
-    },
     "monolog/monolog": {
         "version": "2.6.0"
     },
@@ -101,6 +86,21 @@
     "phpstan/phpdoc-parser": {
         "version": "1.5.1"
     },
+    "phpunit/phpunit": {
+        "version": "11.5",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "11.1",
+            "ref": "c6658a60fc9d594805370eacdf542c3d6b5c0869"
+        },
+        "files": [
+            "./.env.test",
+            "./phpunit.dist.xml",
+            "./tests/bootstrap.php",
+            "./bin/phpunit"
+        ]
+    },
     "psr/cache": {
         "version": "3.0.0"
     },
@@ -116,20 +116,20 @@
     "psr/log": {
         "version": "3.0.0"
     },
-    "sensio/framework-extra-bundle": {
-        "version": "6.2",
+    "symfony/asset-mapper": {
+        "version": "7.2",
         "recipe": {
             "repo": "github.com/symfony/recipes",
             "branch": "main",
-            "version": "5.2",
-            "ref": "fb7e19da7f013d0d422fa9bce16f5c510e27609b"
+            "version": "6.4",
+            "ref": "5ad1308aa756d58f999ffbe1540d1189f5d7d14a"
         },
         "files": [
-            "./config/packages/sensio_framework_extra.yaml"
+            "./assets/app.js",
+            "./assets/styles/app.css",
+            "./config/packages/asset_mapper.yaml",
+            "./importmap.php"
         ]
-    },
-    "symfony/asset": {
-        "version": "v6.0.7"
     },
     "symfony/cache": {
         "version": "v6.0.8"
@@ -330,9 +330,6 @@
     "symfony/polyfill-mbstring": {
         "version": "v1.25.0"
     },
-    "symfony/polyfill-php81": {
-        "version": "v1.25.0"
-    },
     "symfony/process": {
         "version": "v6.0.8"
     },
@@ -341,9 +338,6 @@
     },
     "symfony/property-info": {
         "version": "v6.0.7"
-    },
-    "symfony/proxy-manager-bridge": {
-        "version": "v6.0.6"
     },
     "symfony/routing": {
         "version": "6.0",
@@ -471,28 +465,6 @@
         "files": [
             "./config/packages/messenger.yaml"
         ]
-    },
-    "symfony/webpack-encore-bundle": {
-        "version": "1.14",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "main",
-            "version": "1.10",
-            "ref": "91f4d29f5ebbd2fcccc71ca55a17d14a17b308e8"
-        },
-        "files": [
-            "./assets/app.js",
-            "./assets/bootstrap.js",
-            "./assets/controllers.json",
-            "./assets/controllers/hello_controller.js",
-            "./assets/styles/app.css",
-            "./config/packages/webpack_encore.yaml",
-            "./package.json",
-            "./webpack.config.js"
-        ]
-    },
-    "symfony/yaml": {
-        "version": "v6.0.3"
     },
     "twig/extra-bundle": {
         "version": "v3.4.0"

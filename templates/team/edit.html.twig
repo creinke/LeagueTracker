@@ -1,0 +1,62 @@
+{# templates/team/edit.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+    <style>
+        .btn {
+            padding: 0.15rem 0.275rem;
+        }
+        .form-control {
+            padding: 0.3em inherit;
+            height: 2.5em;
+            width: 100%;
+        }
+        label {
+            margin-bottom: 0.15em;
+        }
+        .table, .table-responsive {
+			background-image: none;
+		}
+		.table > tbody > tr > td {
+			padding: 3px !important;
+			border-color: #fff !important;
+		}
+    </style>
+
+    <div>
+        {{ form_start(form) }}
+            {{ form_errors(form) }}
+            
+            <div class="table-responsive"> 
+                <table class="table table-condensed">
+                    <tbody>
+                        <tr>
+                            <td>{{ form_label(form.name) }}</td>
+                            <td>{{ form_widget(form.name) }}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #555;">{{ form_label(form.defunct) }}</td>
+                            <td>{{ form_widget(form.defunct) }}</tr>
+                        </tr>
+                        <tr>
+                            <td>{{ form_label(form.teamnumber) }}</td>
+                            <td>{{ form_widget(form.teamnumber) }}</td>
+                        </tr>
+                        {% set playerLabels = ['Player One', 'Player Two', 'Player Three', 'Player Four'] %}
+                        {% for player in form.players %}
+                        {% set playerLabel = playerLabels[loop.index0] %}
+                        <tr>
+                            <td>{{ form_label(player, playerLabel) }}</td>
+                            <td>{{ form_widget(player) }}</td
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {{ form_end(form) }}
+    </div>
+    
+{% endblock %}

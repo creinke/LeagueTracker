@@ -1,0 +1,32 @@
+{# templates/event/unrecordedsinglesmatchplayresults.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+    {% set sessionName = event.session.name %}
+    <h3>{{ league.name }} {{ season.name }} Season</h3>
+    <h4>Unable to compute the results for {{ sessionName }} Event# {{ event.eventnumber }} as the following players have not yet recorded their scores: </h4>
+    
+    <ul>
+    {% for game in games %}
+        {% set playerMatches = game.playermatches %}
+        
+        <li>
+
+        {% for playerMatch in playerMatches %}
+            {% set players = playerMatch.matchPlayers %}
+        
+    		{% for player in players %}
+    		    {% if loop.index0 != 0 %}
+                    , 
+                {% endif %}
+                {{ player.name.lastname }}
+            {% endfor %}
+        {% endfor %}
+            		
+        </li>
+    {% endfor %}
+    </ul>
+{% endblock %}

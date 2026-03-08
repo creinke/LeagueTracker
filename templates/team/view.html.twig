@@ -1,0 +1,35 @@
+{# templates/team/view.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+    <style>
+        .table td {
+            padding: 0.1em;
+            height: 1.5em;
+            width: 50%;
+        }
+    </style>
+    
+    <table class="table table-striped">
+        <tbody>
+            <tr>
+                <td>Name: </td>
+                <td>{{ team.name }}</td>
+            </tr>
+            <tr>
+                <td>Team Number:</td>
+                <td>{{ team.teamnumber }}</td>
+            </tr>
+            {% set playerLabels = ['Player One', 'Player Two', 'Player Three', 'Player Four'] %}
+            {% for player in team.players %}
+            <tr>
+                <td>{{ playerLabels[loop.index0] }}</td>
+                <td>{{ player.name.fullname }}</td
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

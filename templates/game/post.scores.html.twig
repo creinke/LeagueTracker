@@ -1,0 +1,274 @@
+{# templates/game/post.scores.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+    <style>
+        .btn {
+            padding: 0.15rem 0.275rem;
+        }
+        .table td {
+            padding: 0.1em;
+            height: 1.5em;
+            color: black;
+        }
+    </style>
+    
+    <div>
+        {{ form_start(form) }}
+            <h2>Event# {{ event.eventnumber }}</h2>
+            {{ form_errors(form) }}
+            
+            <div>
+                <div style="display:inline-block !important;">
+                    <h3>Game# {{ gamenumber }} @ {{ game.startingtime|date("g:ia") }}</h3>
+                </div>
+                <div style="float:right; display:inline-block;">
+                    <a href="{{ path('game_change_players', {'gamenumber': gamenumber, 'event_id': event.id, 'game_id': game.id})  }}" class="btn btn-dark">Substitute Players</a>
+                </div>
+                <div>
+                    {% if viewOnly %} 
+                        <p>
+                            This Game is for view only and closed for postings or updates.  Please contact your league administrator if 
+                            changes are required to this Game.   
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="table-responsive" style="width=100%;">
+                <table class="table" style="width: 100%;">
+                	<thead>
+                    	<tr>
+                        	<th>Start Date and Time</th>
+                            {% if not singlesMatch %} 
+                            	<th>Match</th>
+                            {% endif %}
+                            <th>Event Type</th>
+                            <th>Event Format</th>
+                            <th>Nine{{ event.secondnine is empty ? '' : '(s)' }}</th>
+                            <th 
+                                {% if event.mixedteesenabled %}
+                                    style="display: none;"
+                                {% endif %}>
+                                Tee
+                            </th>
+                    	</tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ event.startdateandtime|date("n/j/y @ g:ia") }}</td>
+                            {% if not singlesMatch %} 
+                                {% set teamMatch = game.teammatches[0] %}
+                                {% set teamOne = teamMatch.teamone %}
+                                {% set teamTwo = teamMatch.teamtwo %}
+                                <td>{{ teamOne.name }} vs </br>{{ teamTwo.name }}</td>
+                            {% endif %}
+                            <td>{{ event.eventtypeString }}</td>
+                            <td>{{ event.formatString }}</td>
+                            <td>{{ event.nine.name }}
+                                {% if event.secondnine is not empty %}
+                                    /{{ event.secondnine.name }}
+                                {% endif %}
+                            </td>
+                            <td 
+                                {% if event.mixedteesenabled %}
+                                    style="display: none;"
+                                {% endif %}>
+                                {{ event.tee.name }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+    			<br/>
+                <table class="table" style="width: 100%;">
+                    <tbody>
+                        {% set scoreIndex = 0 %}
+                      
+                        {% if matchPlay %}
+                            {% for playerMatch in game.playermatches %}
+                                {% set playerOne = playerMatch.playerone %}
+                                {% set playerTwo = playerMatch.playertwo %}
+                            
+                                <tr>
+                                    <td><strong>{{ playerOne.name.fullname }} vs {{ playerTwo.name.fullname }}</strong></td>
+                                    
+                                    <td class="table-header" 
+                                        {% if not event.mixedteesenabled %}
+                                            style="display: none;"
+                                        {% endif %}>
+                                        <strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Tee</strong>
+                                    </td>
+                                    <td colspan="3"></td>
+                                    <td class="table-header"><strong>Scores</strong></td>
+                                    <td colspan="5"></td>
+                                </tr>
+                                <tr>
+                                    {% set score = form.playerScores[scoreIndex] %}
+                                    {% set duplicatescore = scores[scoreIndex].duplicate %}
+                                    {% set scoreIndex = scoreIndex + 1 %}
+                                    
+                                    <td style="padding-left: 100px;">
+                                        {% if duplicatescore %}
+                                            Duplicate score
+                                        {% else %}
+                                            Score
+                                        {% endif %}
+    
+                                        {{ playerOne.name.fullname }}
+                                        
+                                        {% if playerOne.type == "REGULAR" %}
+                                            :
+                                        {%  else %}
+                                            (sub):
+                                        {% endif %}
+                                    </td>
+                                    
+                                    <td
+                                        {% if not event.mixedteesenabled %}
+                                            style="display: none;"
+                                        {% endif %}>
+                                        {{ form_widget(score.tee) }}
+                                    </td>
+                                    
+                                    {% for strokes in score.strokes %}
+                                        {% if viewOnly %} 
+                                            <td>{{ form_widget(strokes, {'type':'number', 'disabled': 'disabled'}) }}</td>
+                                        {%  else %}
+                                            <td>{{ form_widget(strokes, {'type':'number'}) }}</td>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tr>
+                                {% if event.secondnine is not empty %}
+                                    <tr>
+                                        {% set score = form.playerScores[scoreIndex] %}
+                                        {% set duplicatescore = scores[scoreIndex].duplicate %}
+                                        {% set scoreIndex = scoreIndex + 1 %}
+                                        
+                                        <td style="padding-left: 100px;">&nbsp;</td>
+                                        
+                                        <td
+                                            {% if not event.mixedteesenabled %}
+                                                style="display: none;"
+                                            {% endif %}>
+                                            {{ form_widget(score.tee) }}
+                                        </td>
+                                    
+                                        {% for strokes in score.strokes %}
+                                            {% if viewOnly %} 
+                                                <td>{{ form_widget(strokes, {'type':'number', 'disabled': 'disabled'}) }}</td>
+                                            {%  else %}
+                                                <td>{{ form_widget(strokes, {'type':'number'}) }}</td>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </tr>
+                                {% endif %}
+                                <tr>
+                                    {% set score = form.playerScores[scoreIndex] %}
+                                    {% set duplicatescore = scores[scoreIndex].duplicate %}
+                                    {% set scoreIndex = scoreIndex + 1 %}
+                                    
+                                    <td style="padding-left: 100px;">
+                                        {% if duplicatescore %}
+                                            Duplicate score
+                                        {% else %}
+                                            Score
+                                        {% endif %}
+    
+                                        {{ playerTwo.name.fullname }}
+                                        
+                                        {% if playerTwo.type == "REGULAR" %}
+                                            :
+                                        {%  else %}
+                                            (sub):
+                                        {% endif %}
+                                    </td>
+                                    
+                                    <td
+                                        {% if not event.mixedteesenabled %}
+                                            style="display: none;"
+                                        {% endif %}>
+                                        {{ form_widget(score.tee) }}
+                                    </td>
+                                    
+                                    {% for strokes in score.strokes %}
+                                        {% if viewOnly %} 
+                                            <td>{{ form_widget(strokes, {'type':'number', 'disabled': 'disabled'}) }}</td>
+                                        {%  else %}
+                                            <td>{{ form_widget(strokes, {'type':'number'}) }}</td>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tr>
+                                {% if event.secondnine is not empty %}
+                                    <tr>
+                                        {% set score = form.playerScores[scoreIndex] %}
+                                        {% set duplicatescore = scores[scoreIndex].duplicate %}
+                                        {% set scoreIndex = scoreIndex + 1 %}
+                                        
+                                        <td style="padding-left: 100px;">&nbsp;</td>
+                                        
+                                        <td
+                                            {% if not event.mixedteesenabled %}
+                                                style="display: none;"
+                                            {% endif %}>
+                                            {{ form_widget(score.tee) }}
+                                        </td>
+                                        
+                                        {% for strokes in score.strokes %}
+                                            <td>{{ form_widget(strokes, {'type':'number'}) }}</td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td><strong>Player</strong></td>
+                                
+                                <td class="table-header" 
+                                    {% if not event.mixedteesenabled %}
+                                        style="display: none;"
+                                    {% endif %}>
+                                    <strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Tee</strong>
+                                </td>
+                                <td colspan="3"></td>
+                                <td class="table-header"><strong>Scores</strong></td>
+                                <td colspan="5"></td>
+                            </tr>
+                            {% for scoreIndex in 0..scores|length - 1 %}
+                                {% set score = form.playerScores[scoreIndex] %}
+
+                                <tr>
+                                    <td style="padding-left: 100px;">
+                                    {% if event.secondnine is empty %}
+                                        {{ scores[scoreIndex].player.name.fullname }}
+                                    {% elseif loop.index0 is divisible by(2) %}
+                                        {{ scores[scoreIndex].player.name.fullname }}
+                                    {% else %}
+                                        &nbsp;
+                                    {% endif %}
+                                    </td>
+                                    <td
+                                        {% if not event.mixedteesenabled %}
+                                            style="display: none;"
+                                        {% endif %}>
+                                        {{ form_widget(score.tee) }}
+                                    </td>
+                                    
+                                    {% for strokes in score.strokes %}
+                                        {% if viewOnly %} 
+                                            <td>{{ form_widget(strokes, {'type':'number', 'disabled': 'disabled'}) }}</td>
+                                        {%  else %}
+                                            <td>{{ form_widget(strokes, {'type':'number'}) }}</td>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                        {% endif %}                            
+                    </tbody>
+                </table>
+            </div>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

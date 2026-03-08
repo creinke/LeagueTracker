@@ -1,0 +1,22 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h1>{{ title }}</h1>
+
+        {% if course %}
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h2 class="card-title">{{ course.name }}</h2>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-warning mt-3">
+                Course not found.
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

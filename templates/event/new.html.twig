@@ -1,0 +1,178 @@
+{# templates/event/new.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {{ title }}
+{% endblock %}
+
+{% block body %}
+    <style>
+        .btn {
+        	padding: 0.15rem 0.275rem;
+        }
+        
+        .form-control {
+        	padding: 1em inherit;
+        	height: 1.5em;
+        	width: 75%;
+        }
+        
+        label {
+        	margin-bottom: 0.15em;
+        }
+    </style>
+    
+    <div style="padding-left: 20%;">
+    	{{ form_start(form) }}
+    	{{ form_widget(form) }}
+    	{{ form_end(form) }}
+    </div>
+    
+    <script type="text/javascript">
+        function modifySinglesMatchStrokePlayHtml() {
+            if ($eventTypeValue == '5' && $eventFormatValue == '6') {
+                $numberOfPlayersPerTeamDiv.hide();
+                $numberOfPlayersPerTeamInput.val('1');
+                $teamsOrPlayersPerGameLabel.text('Number of Players Per Game');
+                $teamsOrPlayersPerGameInput.val('4');
+            } else {
+                $numberOfPlayersPerTeamDiv.show();
+                $numberOfPlayersPerTeamLabel.text('Number of Players Per Team');
+                $numberOfPlayersPerTeamInput.val('2');
+                $teamsOrPlayersPerGameLabel.text('Number of Teams Per Game');
+                $teamsOrPlayersPerGameInput.val('2');
+            }
+        }
+
+        function showOrHideTeamMatchHtml() {
+        	if ($eventTypeValue == '4' && $eventFormatValue != '5') {
+                $withhandicappingCheckboxDiv.show();
+            } else {
+                $withhandicappingCheckboxDiv.hide();
+            }
+        }
+    
+        function populateFormatSelectElement() {
+            var $selectHtml = jQuery('<select>');
+            
+            if ($eventTypeValue == '4') {
+                jQuery.each($teamMatchOptions, function(val, text) {
+                    $selectHtml.append(
+                        jQuery('<option></option>').val(val).html(text)
+                    );
+                });
+            } else if ($eventTypeValue == '5') {
+                jQuery.each($singlesMatchOptions, function(val, text) {
+                    $selectHtml.append(
+                        jQuery('<option></option>').val(val).html(text)
+                    );
+                });
+            } else {
+                jQuery.each($leagueMatchOptions, function(val, text) {
+                    $selectHtml.append(
+                        jQuery('<option></option>').val(val).html(text)
+                    );
+                });
+            }
+            jQuery('#form_event_format').empty().append($selectHtml.html());
+        }
+    </script>
+    
+    <script type="text/javascript">
+        var $eventTypeSelect;
+        var $withhandicappingCheckbox;
+        var $withhandicappingCheckboxDiv;
+        var $eventTypeValue;
+    
+        var $leagueMatchOptions = {
+            1: 'MATCH PLAY'
+        };
+            
+        var $singlesMatchOptions = {
+            1 : 'MATCH PLAY',
+            6 : 'STROKE PLAY'
+        };
+            
+        var $teamMatchOptions = {
+            2 : 'BETTER BALL',
+            3 : 'SHAMBLE',
+            4 : 'SCRAMBLE',
+            5 : 'LOW TEAM NET'
+        };
+        
+        jQuery(document).ready(function() {
+            $eventTypeSelect = jQuery('#form_event_eventtype');
+            $eventTypeValue = $eventTypeSelect.val();
+            $eventFormatSelect = jQuery('#form_event_format');
+            $eventFormatValue = $eventFormatSelect.val();
+            $withhandicappingCheckbox = jQuery('#form_event_withhandicapping');
+            $withhandicappingCheckboxDiv = $withhandicappingCheckbox.parent();
+    
+            $teamsOrPlayersPerGameInput = jQuery('#form_event_teamsorplayerspergame');
+            $teamsOrPlayersPerGameDiv = $teamsOrPlayersPerGameInput.parent();
+            $teamsOrPlayersPerGameLabel = $teamsOrPlayersPerGameDiv.find("label");
+    
+            $numberOfPlayersPerTeamInput = jQuery('#form_event_playersperteam');
+            $numberOfPlayersPerTeamDiv = $numberOfPlayersPerTeamInput.parent();
+            $numberOfPlayersPerTeamLabel = $numberOfPlayersPerTeamDiv.find("label");
+            
+            showOrHideTeamMatchHtml();
+            populateFormatSelectElement();
+            modifySinglesMatchStrokePlayHtml();
+            
+            $eventTypeSelect.on('change', function() {
+            	$eventTypeValue = this.value;
+            	$eventFormatValue = $eventFormatSelect.val();
+            	
+                showOrHideTeamMatchHtml();
+                populateFormatSelectElement();
+                modifySinglesMatchStrokePlayHtml();
+            });
+    
+            $eventFormatSelect.on('change', function() {
+                $eventFormatValue = this.value;
+                showOrHideTeamMatchHtml();
+                modifySinglesMatchStrokePlayHtml();
+            });
+        });
+    </script>
+    
+    <script type="text/javascript">
+        var $course = jQuery('#form_event_course');
+         
+        // When course gets selected ...
+        $course.change(function() {
+            // ... Retrieve the corresponding form.
+            var $form = jQuery(this).closest('form');
+            // Simulate form data, but only include the selected sport value.
+            var data = {};
+            data[$course.attr('name')] = $course.val();
+            $token = jQuery('#form__token');
+            data[$token.attr('name')] = $token.val();
+            
+            // Submit data via AJAX to the form's action path.
+            jQuery.ajax({
+                url : $form.attr('action'),
+                type: $form.attr('method'),
+                data : data,
+                success: function(html) {
+                    // Replace current position field ...
+                    jQuery('#form_event_nine').replaceWith(
+                        // ... with the returned one from the AJAX response.
+                        jQuery(html).find('#form_event_nine')
+                    );
+                    jQuery('#form_event_secondnine').replaceWith(
+                        // ... with the returned one from the AJAX response.
+                        jQuery(html).find('#form_event_secondnine')
+                    );
+                    // Nines now displays the appropriate nine names.
+                    jQuery('#form_event_tee').replaceWith(
+                        // ... with the returned one from the AJAX response.
+                        jQuery(html).find('#form_event_tee')
+                    );
+                }
+            });
+        });
+    </script>
+{% endblock %}

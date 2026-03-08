@@ -1,0 +1,74 @@
+{# templates/game/change.players.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+    <style>
+        .btn {
+            padding: 0.15rem 0.275rem;
+        }
+        .table td {
+            padding: 0.1em;
+            height: 1.5em;
+        }
+    </style>
+    
+    <div>
+        {{ form_start(form) }}
+            <h2>Event# {{ event.eventnumber }}</h2>
+
+            <div>
+                <div style="display:inline-block !important;">
+                    <h3>Game# {{ gamenumber }} @ {{ game.startingtime|date("g:ia") }}</h3>
+                </div>
+            </div>
+            
+            {% set teammatch = game.teammatches[0] %}
+            {% set teamone = teammatch.teamone %}
+            {% set teamtwo = teammatch.teamtwo %}
+            
+            <div class="table-responsive" style="width=100%;">
+                <table class="table" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>Start Date and Time</th>
+                            <th>Match</th>
+                            <th>Event Type</th>
+                            <th>Event Format</th>
+                            <th>Nine{{ event.secondnine is empty ? '' : '(s)' }}</th>
+                            <th>Tee</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ event.startdateandtime|date("n/j/y @ g:ia") }}</td>
+                            <td>{{ teamone.name }} vs {{ teamtwo.name }}</td>
+                            <td>{{ event.eventtypeString }}</td>
+                            <td>{{ event.formatString }}</td>
+                            <td>{{ event.nine.name }}{{ event.secondnine is empty ? '' : '/' . event.secondnine.name }}</td>
+                            <td>{{ event.tee.name }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <br/>
+                
+                {{ form_errors(form) }}
+                
+                <table class="table">
+                    <tbody>
+                        {% set playerLabels = ['Player One', 'Player Two', 'Player Three', 'Player Four'] %}
+                        {% for player in form.players %}
+                        {% set playerLabel = playerLabels[loop.index0] %}
+                        <tr>
+                            <td>{{ form_label(player, playerLabel) }}</td>
+                            <td>{{ form_widget(player) }}</td
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

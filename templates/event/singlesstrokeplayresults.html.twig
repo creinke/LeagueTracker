@@ -1,0 +1,231 @@
+{# templates/event/singlesstrokeplayresults.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+    <style>
+        .hr-reverted {
+        	width: 100% !important;
+        	height: unset !important; 
+        	border-bottom: 1px solid #555 !important;
+        	background-image: unset !important; 
+        	background-size: unset !important; 
+        	background-position: center !important; 
+        	background-repeat: unset !important; 
+        	margin: unset !important; 
+        	position: unset !important; 
+        	border: unset !important; 
+        	content: unset !important;
+        	z-index: unset !important; 
+        }
+		.table, .table-responsive {
+			background-image: unset;
+			margin-bottom: 30px;
+		}
+        th {
+            text-align: center;
+            white-space: nowrap;
+        }
+        .table td, .table > tbody > tr > td, .table th, .table > tbody > tr > th, .table tr td:first-child {
+            border-top: 1px;
+            box-shadow: unset; 
+            padding: 0px !important;
+            color: #555;
+            text-align: center;
+        }
+    </style>
+    
+    {% set sessionName = event.session.name %}
+
+    <h3>
+        {{ league.name }}: {{ season.name }} Season 
+            <input type="button" value="Print Results" id="print_button" class="btn btn-primary mt-3" style="float:right;"/>
+    </h3>
+    
+    <h4>Results for {{ sessionName }} Event# {{ event.eventnumber }}</h4>
+    <h4 style="margin-left: 5em;">{{ singlesStrokePlayEventViewBean.description }}</h4>
+    <br/><br/>
+    
+    <div class="table-responsive"> 
+        <table class="table table-condensed">
+            <tr>
+                <th>Player Name</th>
+                <th>Place</th>
+                {% if singlesStrokePlayEventViewBean.displayNet %}
+                    <th>Net Score</th>
+                {% endif %}
+                {% if singlesStrokePlayEventViewBean.displayTotal %}
+                    <th>Total Score</th>
+                {% endif %}
+                <th>Tie Breaker</th>
+                <th>Skins</th>
+            </tr>
+            <tr>
+                <td colspan="8"><hr style="border-bottom: 3px solid #555 !important;" class="hr-reverted"/></td>
+            </tr>
+            {# $standings #}
+            {% for player in singlesStrokePlayEventViewBean.players %}
+                <tr>
+                    <td style="text-align: left;">{{ player['name'] }}</td>
+                    <td>{{ player['place'] }}</td>
+                    {% if singlesStrokePlayEventViewBean.displayNet %}
+                        <td>{{ player['totalNetScore'] }}</td>
+                    {% endif %}
+                    {% if singlesStrokePlayEventViewBean.displayTotal %}
+                        <td>{{ player['totalScore'] }}</td>
+                    {% endif %}
+                    <td>
+                        {% if player['tieBreaker'] is not empty %}
+                            {{ player['tieBreaker'] }}
+                        {% else %}
+                            &nbsp;
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if player['skins'] is not empty %}
+                            {{ player['skins'] }}
+                        {% else %}
+                            &nbsp;
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            <tr>
+                <td colspan="8"><hr style="border-bottom: 2px solid #555 !important;" class="hr-reverted"/></td>
+            </tr>
+        </table>
+    </div>
+    
+    <div class="table-responsive"> 
+        {% set ninesPlayed = singlesStrokePlayEventViewBean.ninesPlayed %}
+        {% set firstNine = event.nine.name %}
+        {% set secondNine = ninesPlayed == 1 ? null : event.secondnine.name %}
+        
+        <!-- Player Results Table -->
+        <table class="table table-condensed">
+            <tr>
+                <th colspan="2">&nbsp;</th>
+                <th colspan="9">
+                    Actual Scores
+                    {% if singlesStrokePlayEventViewBean.displayNet %}
+                        /Net Scores
+                    {% endif %}
+                </th>
+                <th colspan="4">&nbsp;</th>
+            </tr>
+    
+            <tr>
+                <th style="text-align: left;">Player</th>
+                {% if  ninesPlayed > 1 %}
+                    <th>Nine</th>
+                {% endif %}
+                <th>HC</th>
+                <th>1</th>
+                <th>2</th>
+                <th>3</th>
+                <th>4</th>
+                <th>5</th>
+                <th>6</th>
+                <th>7</th>
+                <th>8</th>
+                <th>9</th>
+                {% if singlesStrokePlayEventViewBean.displayTotal %}
+                    <th>Total</th>
+                {% endif %}
+                {% if singlesStrokePlayEventViewBean.displayNet %}
+                    <th>Net</th>
+                {% endif %}
+            </tr>
+            <tr>
+                <td colspan="15"><hr style="border-bottom: 3px solid #555 !important;" class="hr-reverted"/></td>
+            </tr>
+
+            {# $playerResults #}
+            {% for player in singlesStrokePlayEventViewBean.players %}
+                <tr>
+                    <td style="text-align: left;">{{ player['name'] }}</td>
+                        
+                    {% if  ninesPlayed > 1 %}
+                        <td>{{ firstNine }}</td>
+                    {% endif %}
+                    <td>
+                        {{ player['firstNineHandicap'] }}
+                    </td>
+
+                    {% for holeNumber in 0..8 %}
+                        <td>
+                            {{ player['firstNineScores'][holeNumber] }}/{{ player['firstNineNetScores'][holeNumber] }}
+                        </td>
+                    {% endfor %}
+                    {% if singlesStrokePlayEventViewBean.displayTotal %}
+                        <td>{{ player['firstNineTotalScore'] }}</td>
+                    {% endif %}
+                    {% if singlesStrokePlayEventViewBean.displayNet %}
+                        <td>{{ player['firstNineTotalNetScore'] }}</td>
+                    {% endif %}
+                </tr>
+                {% if ninesPlayed > 1 %}
+                    <tr>
+                        <td &nbsp;</td>
+                            
+                        <td>{{ secondNine }}</td>
+                        <td>{{ player['secondNineHandicap'] }}/{{ player['eighteenHoleHandicap'] }}</td>
+    
+                        {% for holeNumber in 0..8 %}
+                            <td>
+                                {{ player['secondNineScores'][holeNumber] }}/{{ player['secondNineNetScores'][holeNumber] }}
+                            </td>
+                        {% endfor %}
+                        
+                        {% if singlesStrokePlayEventViewBean.displayTotal %}
+                            <td>{{ player['secondNineTotalScore'] }}/{{ player['totalScore'] }}</td>
+                        {% endif %}
+                        {% if singlesStrokePlayEventViewBean.displayNet %}
+                            <td>{{ player['secondNineTotalNetScore'] }}/{{ player['totalNetScore'] }}</td>
+                        {% endif %}
+                    </tr>
+                    
+                    <tr>
+                        <td colspan="15"><hr style="border-bottom: 1px solid #555 !important;" class="hr-reverted"/></td>
+                    </tr>
+                {% endif %}
+                <tr>
+                    <td colspan="15"><hr style="border-bottom: 1px solid #555 !important;" class="hr-reverted"/></td>
+                </tr>
+            {% endfor %}
+
+            <tr>
+                <td colspan="15"><hr style="border-bottom: 2px solid #555 !important;" class="hr-reverted"/></td>
+            </tr>
+        </table>
+    </div>
+    
+    <h4>Season standings after {{ sessionName }} Event# {{ event.eventnumber }}</h4>
+    
+    <div class="table-responsive"> 
+        <table class="table table-condensed">
+            <tr>
+                <th>Player Name</th>
+                <th>Session Points</th>
+                <th>Total Points</th>
+            </tr>
+            <tr>
+                <td colspan="3"><hr style="border-bottom: 3px solid #555 !important;" class="hr-reverted"/></td>
+            </tr>
+            {# $standings #}
+            {% for player in players %}
+                <tr>
+                    <td style="text-align: left;">{{ player['name'] }}</td>
+                    <td>{{ singlesStrokePlayEventViewBean.format_player_points(player['sessionPoints']) }} </td>
+                    <td>{{ singlesStrokePlayEventViewBean.format_player_points(player['seasonPoints']) }} </td>
+                </tr>
+            {% endfor %}
+            <tr>
+                <td colspan="3"><hr style="border-bottom: 2px solid #555 !important;" class="hr-reverted"/></td>
+            </tr>
+        </table>
+    </div>
+    
+{% endblock %}

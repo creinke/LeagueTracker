@@ -1,0 +1,89 @@
+{# templates/game/edit.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+    <style>
+        .btn {
+            padding: 0.15rem 0.275rem;
+        }
+        .form-control {
+            padding: 0.3em inherit;
+            height: 2.5em;
+            width: 100%;
+        }
+        label {
+            margin-bottom: 0.15em;
+        }
+    </style>
+
+    <div>
+        {% if matchPlay %}
+            <h2>Singles Match Play</h2>
+        {% else %}
+            <h2>Singles Stroke Play</h2>
+        {% endif %}           
+        
+        <h3>Game #{{ gamenumber }} on {{ eventStartdateandtime|date("m/d/Y") }} @ {{ gameStartingtime|date("g:ia")  }}</h3>
+    
+        {{ form_start(form) }}
+            {{ form_errors(form) }}
+            
+            {% if matchPlay %}
+                <div class="table-responsive" style="width=100%;">
+                    <table class="table" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th style="width: 50%;">Player[1]</th>
+                                <th></th>
+                                <th style="width: 50%;">Player[2}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% set playerCount = form.players.count %}
+                        
+                            <tr>
+                                <td>{{ form_widget(form.players[0]) }}</td>
+                                <td>vs</td>
+                                <td>{{ form_widget(form.players[1]) }}</td>
+                            </tr>
+                            {% if playerCount > 2 %}
+                                <tr>
+                                    <td>{{ form_widget(form.players[2]) }}</td>
+                                    <td>vs</td>
+                                    <td>{{ form_widget(form.players[3]) }}</td>
+                                </tr>
+                            {% endif %}
+                            <tr>
+                                <td>Starting Time: </td>
+                                <td></td>
+                                <td>{{ form_widget(form.startingtime) }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="table-responsive" style="width=100%;">
+                    <table class="table" style="width: 100%;">
+                        <tbody>
+                            {% for player in form.players %}
+                                <tr>
+                                    <td style="width: 10%;">Player[{{ loop.index }}]</td>
+                                    <td>{{ form_widget(player) }}</td>
+                                </tr>
+                            {% endfor %}
+                            <tr>
+                                <td>Starting Time: </td>
+                                <td>{{ form_widget(form.startingtime) }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+            
+        {{ form_end(form) }}
+    </div>
+    
+{% endblock %}
