@@ -72,7 +72,7 @@ when@prod:
                 # Writes messages as JSON to stderr.
                 # Works well for container platforms like AWS, GCP, Kubernetes.
                 type: stream
-                path: php://stderr
+                path: "%kernel.logs_dir%/%kernel.environment%.log"
                 level: debug
                 formatter: monolog.formatter.json
 
@@ -88,4 +88,4 @@ when@prod:
                 # Goes to stderr.
                 type: stream
                 channels: [deprecation]
-                path: php://stderr
+                path: "%kernel.logs_dir%/deprecation.log"

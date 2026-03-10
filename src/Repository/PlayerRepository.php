@@ -2,7 +2,7 @@
 namespace App\Repository;
 
 define('LEAGUE_ENTITY', 'App\Entity\LeagueDE');
-define('NAME_ENTITY', 'App\Entity\FullNameDE');
+define('NAME_ENTITY', 'App\Entity\FullnameDE');
 define('PLAYER_ENTITY', 'App\Entity\PlayerDE');
 
 use App\Entity\AddressDE;
