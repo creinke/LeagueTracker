@@ -35,6 +35,9 @@ class UserDE implements UserInterface, PasswordAuthenticatedUserInterface {
 	#[ORM\Column(type: "string", length: 180, unique: true)]
 	private string|null $username;
 
+	#[ORM\Column(type: "string", length: 255, unique: true, nullable: true)]
+	private ?string $apiToken = null;
+
 	#[ORM\Version]
 	#[ORM\Column(name: "version", type: "integer", nullable: true)]
 	private ?int $version;
@@ -85,6 +88,15 @@ class UserDE implements UserInterface, PasswordAuthenticatedUserInterface {
 
 	public function getUserIdentifier(): string {
 		return (string) $this->username;
+	}
+
+	public function getApiToken(): ?string {
+		return $this->apiToken;
+	}
+
+	public function setApiToken(?string $apiToken): self {
+		$this->apiToken = $apiToken;
+		return $this;
 	}
 
 	public function getVersion(): ?int {

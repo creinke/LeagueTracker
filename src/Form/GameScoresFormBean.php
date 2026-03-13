@@ -23,7 +23,7 @@ class GameScoresFormBean {
      * public contructor
      */
     public function __construct(EventDE $event, GameDE $game) {
-    	$ninesPlayed = new ArrayCollection();;
+    	$ninesPlayed = new ArrayCollection();
     	$ninesPlayed[] = $event->getNine();
 
     	if ($event->getSecondnine() != null) {
@@ -46,7 +46,7 @@ class GameScoresFormBean {
         		$teamTwoPlayingPartners[] = $playerMatch->getPlayertwo();
         	}
     	}
-    	$this->playerScores = [];
+    	$this->playerScores = new ArrayCollection();
     	
     	if ($singlesMatch) {
     	    if ($matchPlay) {
@@ -75,7 +75,7 @@ class GameScoresFormBean {
     }
     
     /**
-     * @return int[]
+     * @return ArrayCollection
      */
     public function getPlayerScores() {
         return $this->playerScores;

@@ -3,14 +3,14 @@ namespace App\Repository;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Psr\Log\LoggerInterface;
 
 abstract class AbstractBaseRepository extends EntityRepository {
 	protected LoggerInterface $logger;
 
 	public function __construct(EntityManagerInterface $em, LoggerInterface $logger, string $entityClass) {
-		$metadata = $em->getClassMetadata($entityClass);
-		parent::__construct($em, $metadata);
+		parent::__construct($em, $em->getClassMetadata($entityClass));
 		$this->logger = $logger;
 	}
 

@@ -6,8 +6,6 @@ security:
 
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
-        users_in_memory: { memory: null }
-
         app_user_provider:
             entity:
                 class: App\Entity\UserDE
@@ -16,9 +14,15 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+        api:
+            pattern: ^/api
+            stateless: true
+            provider: app_user_provider
+            custom_authenticators:
+                - App\Security\ApiTokenAuthenticator
         main:
             lazy: true
-            provider: users_in_memory
+            provider: app_user_provider
             custom_authenticator:
                 - App\Security\LoginFormAuthenticator
             logout:

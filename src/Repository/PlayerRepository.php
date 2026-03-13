@@ -29,7 +29,7 @@ class PlayerRepository extends AbstractBaseRepository {
 
 	public function __construct(EntityManagerInterface $em, LoggerInterface $logger) {
 		parent::__construct($em, $logger, PlayerDE::class);
-    }
+	}
 
 	/**
 	 * Checks to make sure all address-required fields are set

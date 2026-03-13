@@ -26,7 +26,7 @@ class EventRepository extends AbstractBaseRepository {
 
 	public function __construct(EntityManagerInterface $em, LoggerInterface $logger) {
 		parent::__construct($em, $logger, EventDE::class);
-    }
+	}
 
     /**
      * Checks to make sure all event-required fields are set

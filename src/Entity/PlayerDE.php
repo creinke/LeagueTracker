@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
 
-#[ORM\Entity("App\Entity\PlayerDE")]
+#[ORM\Entity(repositoryClass: "App\Repository\PlayerRepository")]
 #[ORM\Table(name: "player")]
 #[ORM\Index( columns: ["league_id"], name: "fk_player_league_id" )]
 #[ORM\Index( columns: ["name_id"], name: "fk_player_name_id" )]

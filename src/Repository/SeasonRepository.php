@@ -36,7 +36,7 @@ class SeasonRepository extends AbstractBaseRepository {
      *
      * @return SeasonDE
      */
-    public function findById(int $id): SeasonDE {
+    public function findById(int $id): ?SeasonDE {
         return $this->findOneBy(array('id' => $id));
     }
 

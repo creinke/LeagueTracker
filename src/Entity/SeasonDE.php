@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
 use DateTime;
 
-#[ORM\Entity("App\Entity\SeasonDE")]
+#[ORM\Entity(repositoryClass: "App\Repository\SeasonRepository")]
 #[ORM\Table(name: "season")]
 #[ORM\Index( columns: ["league_id"], name: "fk_season_league_id" )]
 class SeasonDE {

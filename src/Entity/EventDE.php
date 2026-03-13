@@ -12,7 +12,7 @@ use App\Model\EventFormatType;
 use Exception;
 use Traversable;
 
-#[ORM\Entity("App\Entity\EventDE")]
+#[ORM\Entity(repositoryClass: "App\Repository\EventRepository")]
 #[ORM\Table(name: "event")]
 #[ORM\Index( columns: ["course_id"], name: "fk_event_course_id" )]
 #[ORM\Index( columns: ["nine_id"], name: "fk_event_nine_id" )]

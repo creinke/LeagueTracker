@@ -16,23 +16,4 @@ return [
         'path' => './assets/app.js',
         'entrypoint' => true,
     ],
-    'react' => [
-        'version' => '19.2.3',
-    ],
-    'react-dom' => [
-        'version' => '19.2.3',
-    ],
-    'react-dom/client' => [
-        'version' => '19.2.3',
-    ],
-    'scheduler' => [
-        'version' => '0.27.0',
-    ],
-    'mobile/MobileAppInitializer' => [
-        'path' => 'mobile/MobileAppInitializer.js',
-        'entrypoint' => true,
-    ],
-    'mobile/LeagueTrackerMobileApp' => [
-        'path' => 'mobile/LeagueTrackerMobileApp.js',
-    ],
 ];
