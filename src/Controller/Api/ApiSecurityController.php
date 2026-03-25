@@ -11,6 +11,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 class ApiSecurityController extends AbstractController {
     #[Route('/api/login', name: 'api_login', methods: ['POST'])]
     public function login(Request $request, UserRepository $userRepository, UserPasswordHasherInterface $passwordHasher): JsonResponse {
+        error_log('API Login attempt: ' . $request->getContent());
         $data = json_decode($request->getContent(), true);
         $user = $userRepository->findOneBy(['username' => $data['username'] ?? '']);
 

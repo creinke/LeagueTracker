@@ -107,9 +107,10 @@ class ScoreDE {
 		$this->setAdjustedStrokes($this->adjustStrokes($handicap, $scoresRecorded));
 		$adjustedStrokesTotal = $this->calculateAdjustedStrokesTotal();
 
-		$i = round((($adjustedStrokesTotal - $rating - $pcc) * (113 / $slope)) * 10, 0, PHP_ROUND_HALF_UP);
-		return (float) $i / 10;
-	}
+        $i = round((($adjustedStrokesTotal - $rating - $pcc) * (113 / $slope)) * 10);
+        $handicapDifferential = (float) $i / 10;
+        return $handicapDifferential;
+    }
 
 	private function calculateAdjustedStrokesTotal(): int {
 		$totalAdjustedStrokes = 0;
@@ -167,8 +168,8 @@ class ScoreDE {
 		$par = $tee->getPar();
 		$rating = $tee->getRating();
 
-		$handicap = round((($this->getCurrentHandicapIndex() * $slope) / 113) + ($rating - $par), 0, PHP_ROUND_HALF_UP);
-		return $handicap == -0 ? 0 : $handicap;
+        $handicap = round((($this->getCurrenthandicapindex() * $slope) / 113) + ($rating - $par));
+        return $handicap == -0 ? 0 : $handicap;
 	}
 
 	public function getHandicapDifferential(): ?float {

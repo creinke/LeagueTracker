@@ -313,7 +313,7 @@ class EventController extends AbstractController {
      */
 
 	#[Route('/event/resultslast', name: 'event_resultslast', methods: ['GET'])]
-	#[IsGranted('ROLE_ADMIN')]
+	#[IsGranted('ROLE_USER')]
 	public function lastEventResults(): Response {
         $event = $this->lastEvent();
         

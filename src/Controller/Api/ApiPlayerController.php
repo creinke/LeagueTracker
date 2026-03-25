@@ -1,11 +1,15 @@
 <?php
 namespace App\Controller\Api;
 
+use App\Entity\PlayerDE;
+use App\Entity\FullnameDE;
 use App\Repository\PlayerRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Doctrine\ORM\EntityManagerInterface;
 
 #[IsGranted('ROLE_USER')]
 class ApiPlayerController extends AbstractController {
@@ -47,6 +51,7 @@ class ApiPlayerController extends AbstractController {
             'generation' => $player->getGeneration(),
             'isDefunct' => $player->isDefunct(),
             'seedHandicapIndex' => $player->getSeedhandicapindex(),
+            'type' => $player->getType(),
             'email' => $player->getPersonalemailaddress(),
             'phone' => $player->getCellphonenumber(),
             'address' => $address ? [
@@ -57,5 +62,69 @@ class ApiPlayerController extends AbstractController {
                 'region' => $address->getRegion() ? $address->getRegion()->getName() : null,
             ] : null,
         ]);
+    }
+
+    #[Route('/api/player/create', name: 'api_player_create', methods: ['POST'])]
+    public function create(Request $request, PlayerRepository $playerRepository, EntityManagerInterface $em): JsonResponse {
+        $data = json_decode($request->getContent(), true);
+        $league = $this->getUser()->getLeague();
+
+        // Check for duplicate name
+        $nameData = [
+            'firstName' => $data['firstname'] ?? '',
+            'lastName' => $data['lastname'] ?? '',
+            'middleNameOrInitial' => $data['middlenameOrInitial'] ?? '',
+            'generation' => $data['generation'] ?? ''
+        ];
+        
+        $duplicate = $playerRepository->findPlayerByName($league->getId(), $nameData);
+        if (!empty($duplicate)) {
+            return new JsonResponse(['error' => 'A player with the same name already exists in this league'], 400);
+        }
+
+        $player = new PlayerDE($em);
+        $player->setLeague($league);
+        $this->mapDataToPlayer($player, $data);
+
+        $playerRepository->savePlayer($player);
+
+        return new JsonResponse(['id' => $player->getId(), 'success' => true]);
+    }
+
+    #[Route('/api/player/update/{id}', name: 'api_player_update', methods: ['PUT'])]
+    public function update(int $id, Request $request, PlayerRepository $playerRepository): JsonResponse {
+        $player = $playerRepository->findById($id);
+        if (!$player || $player->getLeague()->getId() !== $this->getUser()->getLeague()->getId()) {
+            return new JsonResponse(['error' => 'Player not found'], 404);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        $this->mapDataToPlayer($player, $data);
+        
+        if (isset($data['isDefunct'])) {
+            $player->setDefunct($data['isDefunct']);
+        }
+
+        $playerRepository->savePlayer($player);
+
+        return new JsonResponse(['success' => true]);
+    }
+
+    private function mapDataToPlayer(PlayerDE $player, array $data): void {
+        if (isset($data['firstname'])) $player->setFirstname($data['firstname']);
+        if (isset($data['lastname'])) $player->setLastname($data['lastname']);
+        if (isset($data['middlenameOrInitial'])) $player->setMiddlenameorinitial($data['middlenameOrInitial']);
+        if (isset($data['generation'])) $player->setGeneration($data['generation']);
+        if (isset($data['seedHandicapIndex'])) $player->setSeedhandicapindex((float)$data['seedHandicapIndex']);
+        if (isset($data['type'])) $player->setType($data['type']);
+        if (isset($data['email'])) $player->setPersonalemailaddress($data['email']);
+        if (isset($data['phone'])) $player->setCellphonenumber($data['phone']);
+
+        $fullname = $player->getName() ?? new FullnameDE();
+        $fullname->setFirstname($player->getFirstname());
+        $fullname->setLastname($player->getLastname());
+        $fullname->setMiddlenameorinitial($player->getMiddlenameorinitial());
+        $fullname->setGeneration($player->getGeneration());
+        $player->setName($fullname);
     }
 }

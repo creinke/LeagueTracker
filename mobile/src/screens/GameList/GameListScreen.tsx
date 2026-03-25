@@ -1,25 +1,41 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useCallback} from 'react';
 import {View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity, Alert} from 'react-native';
+import {useFocusEffect} from '@react-navigation/native';
 import GameService from '../../services/GameService';
-import {Game} from '../../types';
+import EventService from '../../services/EventService';
+import {Game, EventDetail} from '../../types';
 
 const GameListScreen = ({route, navigation}: any) => {
     const {eventId, eventNumber} = route.params;
     const [games, setGames] = useState<Game[]>([]);
+    const [event, setEvent] = useState<EventDetail | null>(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         navigation.setOptions({title: `Games - Event #${eventNumber}`});
-        loadGames();
-    }, [eventId]);
+    }, [eventNumber]);
 
-    const loadGames = async () => {
+    useFocusEffect(
+        useCallback(() => {
+            loadData();
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+        }, [eventId])
+    );
+
+    const loadData = async () => {
+        setError(null);
         try {
-            const data = await GameService.getGamesByEvent(eventId);
-            setGames(data);
-        } catch (error) {
-            console.error('Failed to load games', error);
-            Alert.alert('Error', 'Could not load games for this event.');
+            const [gamesData, eventData] = await Promise.all([
+                GameService.getGamesByEvent(eventId),
+                EventService.getEventDetail(eventId)
+            ]);
+            setGames(gamesData);
+            setEvent(eventData);
+        } catch (err: any) {
+            console.error('Failed to load data', err);
+            const message = err.response?.data?.error || err.message || 'Could not load games for this event.';
+            setError(message);
         } finally {
             setLoading(false);
         }
@@ -40,7 +56,13 @@ const GameListScreen = ({route, navigation}: any) => {
             </View>
 
             <View style={styles.playersContainer}>
-                {item.players.length >= 2 ? (
+                {item.teamNames && item.teamNames.length >= 2 && (item.teamNames[0] || item.teamNames[1]) ? (
+                    <>
+                        <Text style={styles.playerName}>{item.teamNames[0] || 'Team 1'}</Text>
+                        <Text style={styles.vs}>vs</Text>
+                        <Text style={styles.playerName}>{item.teamNames[1] || 'Team 2'}</Text>
+                    </>
+                ) : item.players.length >= 2 ? (
                     <>
                         <Text style={styles.playerName}>{item.players[0].name}</Text>
                         <Text style={styles.vs}>vs</Text>
@@ -61,12 +83,14 @@ const GameListScreen = ({route, navigation}: any) => {
                     <Text style={styles.actionButtonText}>{item.isRecorded ? 'View Scores' : 'Enter Scores'}</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity
-                    style={[styles.actionButton, styles.subButton]}
-                    onPress={() => navigation.navigate('Substitution', {gameId: item.id})}
-                >
-                    <Text style={styles.subButtonText}>Change Players</Text>
-                </TouchableOpacity>
+                {item.type !== 'TEAM' && (
+                    <TouchableOpacity
+                        style={[styles.actionButton, styles.subButton]}
+                        onPress={() => navigation.navigate('Substitution', {gameId: item.id})}
+                    >
+                        <Text style={styles.subButtonText}>Change Players</Text>
+                    </TouchableOpacity>
+                )}
             </View>
         </View>
     );
@@ -75,8 +99,37 @@ const GameListScreen = ({route, navigation}: any) => {
         return <ActivityIndicator style={styles.centered} size="large"/>;
     }
 
+    if (error) {
+        return (
+            <View style={styles.centered}>
+                <Text style={styles.errorText}>{error}</Text>
+                <TouchableOpacity style={styles.retryButton} onPress={loadData}>
+                    <Text style={styles.retryButtonText}>Retry</Text>
+                </TouchableOpacity>
+            </View>
+        );
+    }
+
     return (
         <View style={styles.container}>
+            {event && (
+                <View style={styles.eventInfo}>
+                    <Text style={styles.eventTimeText}>
+                        Event Date/Time: {event.startDateTime ? (
+                            new Date(event.startDateTime).toLocaleDateString([], {
+                                weekday: 'short',
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric'
+                            }) + ' ' +
+                            new Date(event.startDateTime).toLocaleTimeString([], {
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            })
+                        ) : 'TBD'}
+                    </Text>
+                </View>
+            )}
             <FlatList
                 data={games}
                 renderItem={renderGameItem}
@@ -93,7 +146,20 @@ const GameListScreen = ({route, navigation}: any) => {
 };
 
 const styles = StyleSheet.create({
-    container: {flex: 1, backgroundColor: '#f5f5f5'},
+    container: {flex: 1, backgroundColor: '#f5f5f5', width: '100%'},
+    eventInfo: {
+        backgroundColor: '#fff',
+        padding: 15,
+        marginBottom: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
+        alignItems: 'center',
+    },
+    eventTimeText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#007AFF',
+    },
     listContent: {padding: 15},
     centered: {flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 50},
     gameItem: {
@@ -140,7 +206,6 @@ const styles = StyleSheet.create({
     actionButtonText: {color: '#007AFF', fontWeight: 'bold'},
     actionsContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
         marginTop: 10,
     },
     subButton: {
@@ -152,6 +217,9 @@ const styles = StyleSheet.create({
         marginTop: 0,
     },
     subButtonText: {color: '#666', fontSize: 14},
+    errorText: {fontSize: 16, color: '#FF3B30', textAlign: 'center', marginBottom: 20, paddingHorizontal: 20},
+    retryButton: {backgroundColor: '#007AFF', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 5},
+    retryButtonText: {color: '#fff', fontWeight: 'bold'},
 });
 
 export default GameListScreen;

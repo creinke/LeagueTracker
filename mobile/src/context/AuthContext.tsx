@@ -1,6 +1,7 @@
 import React, {createContext, useState, useEffect, useContext, ReactNode} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {User, League} from '../types';
+import {setApiToken} from '../api/client';
 
 interface AuthContextData {
     user: User | null;
@@ -29,6 +30,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({children}) => {
                 setUser(JSON.parse(storagedUser));
                 setToken(storagedToken);
                 setLeague(JSON.parse(storagedLeague));
+                setApiToken(storagedToken);
             }
             setLoading(false);
         }
@@ -40,6 +42,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({children}) => {
         setUser(userData);
         setToken(apiToken);
         setLeague(leagueData);
+        setApiToken(apiToken);
 
         await AsyncStorage.setItem('user', JSON.stringify(userData));
         await AsyncStorage.setItem('apiToken', apiToken);
@@ -51,6 +54,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({children}) => {
         setUser(null);
         setToken(null);
         setLeague(null);
+        setApiToken(null);
     }
 
     return (

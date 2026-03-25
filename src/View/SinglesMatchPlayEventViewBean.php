@@ -290,7 +290,7 @@ class SinglesMatchPlayEventViewBean {
         }
         $firstNineHandicap = $firstNineScore->getHandicap();
         $handicapIndex = $firstNineScore->getCurrenthandicapindex() * 2;
-        $eighteenHoleHandicap = round((($handicapIndex * $slope) / 113) + ($rating - $par),0, PHP_ROUND_HALF_UP);
+        $eighteenHoleHandicap = round((($handicapIndex * $slope) / 113) + ($rating - $par));
         
         if ($this->ninesPlayed == 2) {
             if ($eighteenHoleHandicap & 1) {
@@ -516,13 +516,13 @@ class SinglesMatchPlayEventViewBean {
                             for ($holdHandicapIndex = 0; $holdHandicapIndex < 2; $holdHandicapIndex++) {
                                 $hole = $holeHandicaps[$holdHandicapIndex] - 1;
                                 
-                                if ($hole > 0) {
+                                if ($hole >= 0) {
                                     if ($this->players[$j]['netScore'][$hole] < $this->players[$i]['netScore'][$hole]) {
                                         $swap = true;
                                         $this->players[$i]['tieBreaker'] = null;
                                         
                                         $nineName = $holdHandicapIndex == 0 ? $this->course['firstNineName'] : $this->course['secondNineName'];
-                                        $this->players[$j]['tieBreaker'] = $nineName . ' #' . $hole;
+                                        $this->players[$j]['tieBreaker'] = $nineName . ' #' . ($hole + 1);
                                         break;
                                     }
                                 }
@@ -579,13 +579,13 @@ class SinglesMatchPlayEventViewBean {
                             for ($holdHandicapIndex = 0; $holdHandicapIndex < 2; $holdHandicapIndex++) {
                                 $hole = $holeHandicaps[$holdHandicapIndex] - 1;
                                 
-                                if ($hole > 0) {
+                                if ($hole >= 0) {
                                     if ($this->players[$j]['score'][$hole] < $this->players[$i]['score'][$hole]) {
                                         $swap = true;
                                         $this->players[$i]['tieBreaker'] = null;
                                         
                                         $nineName = $holdHandicapIndex == 0 ? $this->course['firstNineName'] : $this->course['secondNineName'];
-                                        $this->players[$j]['tieBreaker'] = $nineName . ' #' . $hole;
+                                        $this->players[$j]['tieBreaker'] = $nineName . ' #' . ($hole + 1);
                                         break;
                                     }
                                 }

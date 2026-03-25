@@ -113,7 +113,7 @@ class PlayerController extends AbstractController {
             if (empty($playermatch)) {
                 $scoreRepository = new ScoreRepository($this->em, $this->logger);
                 $scores = $scoreRepository->findPlayerScores($player, new DateTime());
-                
+
                 foreach($scores as $score) {
                     $scoreRepository->removeScore($score);
                 }
@@ -197,16 +197,16 @@ class PlayerController extends AbstractController {
         $slope = null;
         $par = null;
         $rating = null;
-        
+
         $bag = $request->request;
 
         if ($bag->count() > 0) {
             $slope = intval($bag->get('slope'));
             $par = intval($bag->get('par'));
             $rating = floatval($bag->get('rating'));
-            
+
             if ($slope > 0 && $par > 0 && $rating > 0) {
-                $handicap = round((($currentHandicapIndex * $slope) / 113) + ($rating - $par), 0, PHP_ROUND_HALF_UP);;
+                $handicap = round((($currentHandicapIndex * $slope) / 113) + ($rating - $par));
             }
         }
         $playerHandicapViewBean = new PlayerHandicapViewBean($player, $currentHandicapIndex, $handicap, $scores, $handicapRelevantScores);
@@ -314,7 +314,7 @@ class PlayerController extends AbstractController {
 
         $playersFormBean = new PlayersFormBean();
         $playersFormBean->populate($this->em, $league);
-        
+
         $form = $this-> buildPlayersForm($playersFormBean);
         $form->handleRequest($request);
 

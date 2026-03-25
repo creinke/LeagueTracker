@@ -116,6 +116,10 @@ class PlayerDE {
 		return $this->name;
 	}
 
+	public function getFullname(): string {
+		return $this->getName()?->getFullname() ?? '';
+	}
+
 	public function getOtheremailaddress(): ?string {
 		return $this->getEmailAddress(EmailType::OTHER);
 	}

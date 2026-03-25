@@ -5,6 +5,7 @@ namespace App\Tests\Controller\Api;
 use App\Entity\EventDE;
 use App\Entity\GameDE;
 use App\Entity\UserDE;
+use App\Repository\GameRepository;
 
 class ApiGameControllerTest extends ApiTestCase {
     public function testGameListByEvent(): void {
@@ -26,6 +27,7 @@ class ApiGameControllerTest extends ApiTestCase {
             $this->assertArrayHasKey('id', $data[0]);
             $this->assertArrayHasKey('players', $data[0]);
             $this->assertArrayHasKey('isRecorded', $data[0]);
+            $this->assertArrayHasKey('teamNames', $data[0]);
         }
     }
 
@@ -81,6 +83,7 @@ class ApiGameControllerTest extends ApiTestCase {
         $playerScore = $initialData['playerScores'][0];
 
         $payload = [
+            'type' => 'REGULAR',
             'playerScores' => [
                 [
                     'playerId' => $playerScore['playerId'],
@@ -96,6 +99,45 @@ class ApiGameControllerTest extends ApiTestCase {
         $data = $this->getJsonResponse($client);
         $this->assertTrue($data['success']);
     }
+
+    public function testSaveScoresRegularGame(): void {
+        $client = $this->createAuthenticatedClient('sgl-admin');
+
+        $user = $this->entityManager->getRepository(UserDE::class)->findOneBy(['username' => 'sgl-admin']);
+        $leagueId = $user->getLeague()->getId();
+
+        $gameRepository = $this->entityManager->getRepository(GameDE::class);
+        $game = $gameRepository->find(1551);
+
+        if (!$game) {
+            $this->markTestSkipped('No suitable game found for testing.');
+        }
+
+        $this->request($client, 'GET', '/api/game/scores/1551');
+        $initialData = $this->getJsonResponse($client);
+
+        if (empty($initialData['playerScores'])) {
+            $this->markTestSkipped('No player scores available for this game.');
+        }
+
+        $initialData['playerScores'][0]['strokes'] = array_fill(0, 9, 7);
+        $initialData['playerScores'][1]['strokes'] = array_fill(0, 9, 0);
+        $initialData['playerScores'][2]['strokes'] = array_fill(0, 9, 7);
+        $initialData['playerScores'][3]['strokes'] = array_fill(0, 9, 6);
+
+        $payload = [
+            'type' => 'REGULAR',
+            'playerScores' => $initialData['playerScores'],
+        ];
+
+        $this->request($client, 'POST', '/api/game/scores/1551', [], [], [], json_encode($payload));
+        $this->assertResponseIsSuccessful();
+        $data = $this->getJsonResponse($client);
+
+        $this->assertArrayHasKey('success', $data);
+        $this->assertTrue($data['success']);
+    }
+
 
     public function testGameRosterGet(): void {
         $client = $this->createAuthenticatedClient();

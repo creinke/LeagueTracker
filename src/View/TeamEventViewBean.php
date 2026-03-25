@@ -27,7 +27,7 @@ class TeamEventViewBean {
     public int $ninesPlayed;
     public array $teams;
     public bool $withHandicapping;
-    public bool $withHandicapPercent;
+    public int $withHandicapPercent;
 
 	/**
 	 * @throws Exception
@@ -126,9 +126,9 @@ class TeamEventViewBean {
                     $slope = $tee->getSlope();
                     $rating = $tee->getRating();
                     $par = $tee->getPar();
-                    $teamHandicapIndex = (float) $teamAdjustedHandicapIndex * ($slope / 113) + ($rating - $par);
-	                $team['handicap'] = (int) round($teamHandicapIndex * 2, 0, PHP_ROUND_HALF_UP);
-
+                    $teamHandicapIndex = $teamAdjustedHandicapIndex * ($slope / 113) + ($rating - $par);
+                    $team['handicap'] = round($teamHandicapIndex * 2);
+                    
                     $score = $team['score'];
                     $firstNineNetScores = $this->teamNetScore($team['firstNineScores'], $event->getNine(), $event->getTee()->getName(), $teamHandicapIndex);
                     $firstNineTotalNetScore = $firstNineTotalTeamNetScore = array_sum($firstNineNetScores);
@@ -433,7 +433,7 @@ class TeamEventViewBean {
         
         if ($event->isScramble($event->getFormat())) {
             $slope = $event->getTee()->getSlope();
-            $handicap = (int) round(($currentHandicapIndex * $slope) / 113, 0, PHP_ROUND_HALF_UP);
+            $handicap = round(($currentHandicapIndex * $slope) / 113);
             
             $player = [
                 'name' => $p->getPlayer()->getName()->getFullname(),
@@ -469,7 +469,7 @@ class TeamEventViewBean {
             $rating = $firstNineTee->getRating() + $secondNineTee->getRating();
         }
         $handicapIndex = $firstNineScore->getCurrenthandicapindex() * 2;
-        $eighteenHoleHandicap = (int) round((($handicapIndex * $slope) / 113) + ($rating - $par), 0, PHP_ROUND_HALF_UP);
+        $eighteenHoleHandicap = round((($handicapIndex * $slope) / 113) + ($rating - $par));
         
         if ($this->ninesPlayed == 2) {
             if ($eighteenHoleHandicap & 1) {
@@ -581,13 +581,13 @@ class TeamEventViewBean {
                             for ($holdHandicapIndex = 0; $holdHandicapIndex < 2; $holdHandicapIndex++) {
                                 $hole = $holeHandicaps[$holdHandicapIndex] - 1;
                                 
-                                if ($hole > 0) {
+                                if ($hole >= 0) {
                                     if ($this->teams[$j]['netScore'][$hole] < $this->teams[$i]['netScore'][$hole]) {
                                         $swap = true;
                                         $this->teams[$i]['tieBreaker'] = null;
                                         
                                         $nineName = $holdHandicapIndex == 0 ? $this->course['firstNineName'] : $this->course['secondNineName'];
-                                        $this->teams[$j]['tieBreaker'] = $nineName . ' #' . $hole;
+                                        $this->teams[$j]['tieBreaker'] = $nineName . ' #' . ($hole + 1);
                                         break;
                                     }
                                 }
@@ -644,13 +644,13 @@ class TeamEventViewBean {
                             for ($holdHandicapIndex = 0; $holdHandicapIndex < 2; $holdHandicapIndex++) {
                                 $hole = $holeHandicaps[$holdHandicapIndex] - 1;
                                 
-                                if ($hole > 0) {
+                                if ($hole >= 0) {
                                     if ($this->teams[$j]['netScore'][$hole] < $this->teams[$i]['netScore'][$hole]) {
                                         $swap = true;
                                         $this->teams[$i]['tieBreaker'] = null;
                                         
                                         $nineName = $holdHandicapIndex == 0 ? $this->course['firstNineName'] : $this->course['secondNineName'];
-                                        $this->teams[$j]['tieBreaker'] = $nineName . ' #' . $hole;
+                                        $this->teams[$j]['tieBreaker'] = $nineName . ' #' . ($hole + 1);
                                         break;
                                     }
                                 }
@@ -707,13 +707,13 @@ class TeamEventViewBean {
                             for ($holdHandicapIndex = 0; $holdHandicapIndex < 2; $holdHandicapIndex++) {
                                 $hole = $holeHandicaps[$holdHandicapIndex] - 1;
                                 
-                                if ($hole > 0) {
+                                if ($hole >= 0) {
                                     if ($this->teams[$j]['score'][$hole] <= $this->teams[$i]['score'][$hole]) {
                                         $swap = true;
                                         $this->teams[$i]['tieBreaker'] = null;
                                         
                                         $nineName = $holdHandicapIndex == 0 ? $this->course['firstNineName'] : $this->course['secondNineName'];
-                                        $this->teams[$j]['tieBreaker'] = $nineName . ' #' . $hole;
+                                        $this->teams[$j]['tieBreaker'] = $nineName . ' #' . ($hole + 1);
                                         break;
                                     }
                                 }

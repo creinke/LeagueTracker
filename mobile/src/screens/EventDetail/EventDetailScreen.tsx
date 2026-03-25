@@ -64,7 +64,9 @@ const EventDetailScreen = ({route, navigation}: any) => {
 
             <View style={styles.section}>
                 <Text style={styles.label}>Date & Time</Text>
-                <Text style={styles.value}>{new Date(event.startDateTime).toLocaleString()}</Text>
+                <Text style={styles.value}>
+                    {new Date(event.startDateTime).toLocaleString()}
+                </Text>
             </View>
 
             <View style={styles.section}>
@@ -86,15 +88,10 @@ const EventDetailScreen = ({route, navigation}: any) => {
             </TouchableOpacity>
 
             <TouchableOpacity
-                style={[styles.button, event.isRegistered ? styles.unregisterButton : styles.registerButton]}
-                onPress={handleToggleRegistration}
-                disabled={submitting}
+                style={[styles.button, styles.resultsButton]}
+                onPress={() => navigation.navigate('EventResults', {eventId: event.id, eventNumber: event.eventNumber})}
             >
-                {submitting ? (
-                    <ActivityIndicator color="#fff"/>
-                ) : (
-                    <Text style={styles.buttonText}>{event.isRegistered ? 'Unregister' : 'Register'}</Text>
-                )}
+                <Text style={styles.buttonText}>Show Results</Text>
             </TouchableOpacity>
         </ScrollView>
     );
@@ -117,9 +114,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-    registerButton: {backgroundColor: '#34C759'},
     viewGamesButton: {backgroundColor: '#007AFF', marginBottom: 10},
-    unregisterButton: {backgroundColor: '#FF3B30'},
+    resultsButton: {backgroundColor: '#34C759'},
     buttonText: {color: '#fff', fontSize: 18, fontWeight: 'bold'},
 });
 

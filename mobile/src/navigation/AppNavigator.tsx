@@ -11,9 +11,12 @@ import SeasonListScreen from '../screens/SeasonList/SeasonListScreen';
 import SeasonDetailScreen from '../screens/SeasonList/SeasonDetailScreen';
 import EventListScreen from '../screens/EventList/EventListScreen';
 import EventDetailScreen from '../screens/EventDetail/EventDetailScreen';
+import EventResultsScreen from '../screens/EventResults/EventResultsScreen';
 import GameListScreen from '../screens/GameList/GameListScreen';
 import ScoreEntryScreen from '../screens/GameList/ScoreEntryScreen';
 import SubstitutionScreen from '../screens/GameList/SubstitutionScreen';
+import PlayerFormScreen from '../screens/PlayerList/PlayerFormScreen';
+import HelpScreen from '../screens/Help/HelpScreen';
 
 const Stack = createStackNavigator();
 
@@ -36,15 +39,19 @@ export default function AppNavigator() {
                     <Stack.Screen name="PlayerList" component={PlayerListScreen} options={{title: 'Players'}}/>
                     <Stack.Screen name="PlayerDetail" component={PlayerDetailScreen}
                                   options={{title: 'Player Detail'}}/>
+                    <Stack.Screen name="PlayerForm" component={PlayerFormScreen}/>
                     <Stack.Screen name="SeasonList" component={SeasonListScreen} options={{title: 'Seasons'}}/>
                     <Stack.Screen name="SeasonDetail" component={SeasonDetailScreen}
                                   options={{title: 'Season Detail'}}/>
                     <Stack.Screen name="EventList" component={EventListScreen} options={{title: 'Events'}}/>
                     <Stack.Screen name="EventDetail" component={EventDetailScreen} options={{title: 'Event Detail'}}/>
+                    <Stack.Screen name="EventResults" component={EventResultsScreen}/>
                     <Stack.Screen name="GameList" component={GameListScreen} options={{title: 'Games'}}/>
                     <Stack.Screen name="ScoreEntry" component={ScoreEntryScreen}/>
                     <Stack.Screen name="Substitution" component={SubstitutionScreen}
                                   options={{title: 'Substitute Players'}}/>
+                    <Stack.Screen name="Help" component={HelpScreen}
+                                  options={{title: 'Help'}}/>
                 </>
             ) : (
                 <Stack.Screen name="Login" component={LoginScreen} options={{headerShown: false}}/>

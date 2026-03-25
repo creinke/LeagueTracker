@@ -32,8 +32,9 @@ const EventListScreen = ({route, navigation}: any) => {
             <View style={styles.eventInfo}>
                 <Text style={styles.eventNumber}>Event #{item.eventNumber}</Text>
                 <Text style={styles.eventDescription}>{item.description}</Text>
-                <Text
-                    style={styles.eventMeta}>{new Date(item.startDateTime).toLocaleDateString()} - {item.format}</Text>
+                <Text style={styles.eventMeta}>
+                    {new Date(item.startDateTime).toLocaleDateString()} - {item.format}
+                </Text>
             </View>
         </TouchableOpacity>
     );
@@ -63,7 +64,7 @@ const EventListScreen = ({route, navigation}: any) => {
 };
 
 const styles = StyleSheet.create({
-    container: {flex: 1, backgroundColor: '#f5f5f5'},
+    container: {flex: 1, backgroundColor: '#f5f5f5', width: '100%'},
     centered: {flex: 1, justifyContent: 'center', alignItems: 'center'},
     sectionHeader: {
         backgroundColor: '#e0e0e0',

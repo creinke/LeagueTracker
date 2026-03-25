@@ -37,7 +37,7 @@ abstract class ApiTestCase extends WebTestCase {
         $userRepository = $this->entityManager->getRepository(\App\Entity\UserDE::class);
         $user = $userRepository->findOneBy(['username' => $username]);
 
-        if ( ! $user) {
+        if (!$user) {
             throw new \RuntimeException("Test user {$username} not found.");
         }
 

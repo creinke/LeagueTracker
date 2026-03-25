@@ -1,27 +1,48 @@
-  <IfModule mod_rewrite.c>
-      RewriteEngine On
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    Options -MultiViews
+    DirectoryIndex index.php index.html
 
-      # Test rule to confirm processing (temporary - remove after testing)
-      RewriteRule ^test-htaccess$ - [F]  # This should forbid /test-htaccess
+    # Simple test rule to confirm .htaccess is being processed.
+    RewriteRule ^test-htaccess$ - [F]
 
-      # Determine the RewriteBase automatically and set it as environment variable.
-      RewriteCond %{REQUEST_URI}::$1 ^(/.+)/(.*)::\2$
-      RewriteRule ^(.*) - [E=BASE:%1]
+    # Handle CORS preflight requests for API calls early.
+    RewriteCond %{REQUEST_METHOD} OPTIONS
+    RewriteRule ^ - [R=204,L]
 
-      # If the requested filename exists, simply serve it.
-      # We only want to let Apache serve files and not directories.
-      RewriteCond %{REQUEST_FILENAME} -f
-      RewriteRule .? - [L]
+    # Determine the RewriteBase automatically and set it as environment variable.
+    RewriteCond %{REQUEST_URI}::$1 ^(/.+)/(.*)::\2$
+    RewriteRule ^(.*) - [E=BASE:%1]
 
-      # Skip redirect for local development hosts
-      RewriteCond %{HTTP_HOST} !^(leaguetracker\.local|localhost)$ [NC]
+    # If the requested filename exists as a file or directory, serve it directly.
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
 
-      # Apache redirect www to non-www and HTTP to HTTPS (only if not local)
-      RewriteCond %{HTTPS} off [OR]
-      RewriteCond %{HTTP_HOST} ^www\. [NC]
-      RewriteRule ^ https://premiergolfleaguetracker.com%{REQUEST_URI} [L,NE,R=301]
+    # Handle PWA assets that are nested in JS bundles but flat on disk
+    RewriteRule ^pwa/assets/.*/([^/]+\.[a-f0-9]+\.(png|jpg|jpeg|gif|svg|webp))$ pwa/assets/$1 [L,NC]
+    RewriteRule ^pwa/assets/.*/([a-f0-9]{32})$ pwa/assets/$1 [L,NC]
 
-      # Rewrite all other queries to the front controller.
-      RewriteRule .? %{ENV:BASE}/index.php [L]
+    # Skip redirect for local development hosts, staging, localhost, and LAN IP.
+    RewriteCond %{HTTP_HOST} !^(leaguetracker\.local|staging\.local|localhost|192\.168\.4\.76)(:\d+)?$ [NC]
 
-  </IfModule>
+    # Redirect non-local requests to canonical production HTTPS host.
+    RewriteCond %{HTTPS} off [OR]
+    RewriteCond %{HTTP_HOST} ^www\. [NC]
+    RewriteRule ^ https://premiergolfleaguetracker.com%{REQUEST_URI} [L,NE,R=301]
+
+    # Pass the Authorization header through to PHP for bearer-token auth.
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule ^ - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # Route all other requests to Symfony's front controller.
+    RewriteRule ^ %{ENV:BASE}/index.php [L]
+</IfModule>
+
+<IfModule mod_headers.c>
+    # Basic CORS support for local web/PWA/API development.
+    # Safe for local hosts and LAN testing. Consider tightening for production if needed.
+    Header always set Access-Control-Allow-Origin "*"
+    Header always set Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+    Header always set Access-Control-Allow-Headers "Content-Type, Authorization"
+</IfModule>

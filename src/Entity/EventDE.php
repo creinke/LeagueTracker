@@ -73,6 +73,7 @@ class EventDE {
 		$this->setId((int) null);
 		$this->setVersion(1);
 		$this->setGames(new PersistentCollection($em, new ClassMetadata('App\Entity\GameDE'), new ArrayCollection()));
+		$this->setTeamgames(new PersistentCollection($em, new ClassMetadata('App\Entity\TeamgameDE'), new ArrayCollection()));
 		$this->setRegistrants(new PersistentCollection($em, new ClassMetadata('App\Entity\PlayerDE'), new ArrayCollection()));
 	}
 

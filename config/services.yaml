@@ -8,7 +8,7 @@ parameters:
 
 services:
     Monolog\Logger:
-        alias: 'monolog.logger.debug'
+        alias: 'logger'
         public: true
 
     Monolog\Logger $doctrineLogger:

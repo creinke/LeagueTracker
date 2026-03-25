@@ -21,16 +21,21 @@ class ApiTokenAuthenticator extends AbstractAuthenticator {
     }
 
     public function authenticate(Request $request): Passport {
-        $apiToken = substr($request->headers->get('Authorization'), 7);
+        $authorizationHeader = $request->headers->get('Authorization');
+        error_log('API Auth header: ' . $authorizationHeader);
+        $apiToken = substr($authorizationHeader, 7);
         if (false === $apiToken || '' === $apiToken) {
+            error_log('API Auth: No token provided');
             throw new CustomUserMessageAuthenticationException('No API token provided');
         }
 
         return new SelfValidatingPassport(new UserBadge($apiToken, function($token) {
             $user = $this->userRepository->findOneBy(['apiToken' => $token]);
             if (!$user) {
+                error_log('API Auth: Invalid token ' . substr($token, 0, 10) . '...');
                 throw new CustomUserMessageAuthenticationException('Invalid API token');
             }
+            error_log('API Auth: Success for user ' . $user->getUsername());
             return $user;
         }));
     }

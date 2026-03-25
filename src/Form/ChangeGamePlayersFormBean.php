@@ -14,12 +14,14 @@ class ChangeGamePlayersFormBean {
      * public contructor
      */
     public function __construct(LeagueDE $league, array $players) {
+        $this->players = new ArrayCollection();
+
         foreach($players as $player) {
             $id = $player->getId();
             
             foreach($league->getPlayers() as $leaguePlayer) {
                 if ($id == $leaguePlayer->getId()) {
-                    $this->players[] = $leaguePlayer;
+                    $this->players->add($leaguePlayer);
                     break;
                 }
             }

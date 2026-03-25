@@ -43,18 +43,6 @@ class HomeController extends AbstractController {
     }
 
     /**
-     * Payment route
-     * @return Response
-     */
-    #[Route('/payment', name: 'payment', methods: 'get')]
-    public function payment(): Response {
-        return $this->render(view: 'payment/payments.html.twig',
-            parameters: array (
-                'title' => 'League Payment')
-            );
-    }
-    
-    /**
      * Help route
      * @return Response
      */

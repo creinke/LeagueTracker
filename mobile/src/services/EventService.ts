@@ -1,5 +1,5 @@
 import client from '../api/client';
-import {SessionWithEvents, EventDetail} from '../types';
+import {SessionWithEvents, EventDetail, EventResults} from '../types';
 
 interface RegisterResponse {
     success: boolean;
@@ -22,8 +22,23 @@ const toggleRegistration = async (id: number): Promise<RegisterResponse> => {
     return response.data;
 };
 
+const getEventResults = async (id: number): Promise<EventResults> => {
+    const response = await client.get<EventResults>(`/event/results/${id}`);
+    return response.data;
+};
+
+const getShortcuts = async (): Promise<{
+    nextEvent: { id: number; eventNumber: number; description: string } | null;
+    lastEvent: { id: number; eventNumber: number; description: string } | null;
+}> => {
+    const response = await client.get(`/event/shortcuts`);
+    return response.data;
+};
+
 export default {
     getEventsBySeason,
     getEventDetail,
     toggleRegistration,
+    getEventResults,
+    getShortcuts,
 };

@@ -1,26 +1,16 @@
-  <IfModule mod_rewrite.c>
-      RewriteEngine On
-      RewriteRule ^test-htaccess$ - [F]  # This forbids access to /test-htaccess
+<IfModule mod_rewrite.c>
+    RewriteEngine On
 
-      # Determine the RewriteBase automatically and set it as environment variable.
-      RewriteCond %{REQUEST_URI}::$1 ^(/.+)/(.*)::\2$
-      RewriteRule ^(.*) - [E=BASE:%1]
+    # If the request is already targeting the public directory, leave it alone.
+    RewriteCond %{REQUEST_URI} ^/public/ [NC]
+    RewriteRule ^ - [L]
 
-      # If the requested filename exists, simply serve it.
-      # We only want to let Apache serve files and not directories.
-      RewriteCond %{REQUEST_FILENAME} -f
-      RewriteRule .? - [L]
+    # If the request points to an existing file or directory in the project root,
+    # serve it directly and do not rewrite it.
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
 
-      # Skip redirect for local development hosts
-      RewriteCond %{HTTP_HOST} !^(leaguetracker\.local|localhost)$ [NC]  # Add this line to exclude local hosts
-
-      # Apache redirect www to non-www and HTTP to HTTPS (only if not local)
-      RewriteCond %{HTTPS} off [OR]
-      RewriteCond %{HTTP_HOST} ^www\. [NC]
-      RewriteRule ^ https://premiergolfleaguetracker.com%{REQUEST_URI} [L,NE,R=301]
-
-      # Rewrite all other queries to the front controller.
-      RewriteRule .? %{ENV:BASE}/index.php [L]
-
-  </IfModule>
-
+    # Otherwise, route the request into the public directory.
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>

@@ -8049,24 +8049,26 @@ CREATE TABLE IF NOT EXISTS `user` (
   `roles` json NOT NULL,
   `password` varchar(255) NOT NULL,
   `version` int DEFAULT '1',
+  `api_token` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `unique_username` (`username`)
-) ENGINE=MyISAM AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb3;
-
+  UNIQUE KEY `unique_username` (`username`),
+  UNIQUE KEY `unique_api_tokem` (`api_token`)
+) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb3;
 --
 -- Dumping data for table `user`
 --
 
-INSERT INTO `user` (`id`, `username`, `league_id`, `roles`, `password`, `version`) VALUES
-(1, 'member', 1, '[\"ROLE_USER\"]', '$argon2i$v=19$m=1024,t=2,p=2$cTBFTEpRalJ6d3JDdWtOYQ$5Q7prM9yVHjsyiUmpvRRweOxgCA/rHZYtKDbfrsCB/c', 1),
-(2, 'super', 1, '[\"ROLE_USER\", \"ROLE_ADMIN\", \"ROLE_SUPER\"]', '$argon2i$v=19$m=1024,t=2,p=2$WFdPTkJYSERNbkl1Y3k4Zg$mEtLmIKHMq/Jq5uxsLtBbxli2+XK3rUcBmukrUsfC0w', 1),
-(3, 'sgl-admin', 1, '[\"ROLE_USER\", \"ROLE_ADMIN\"]', '$argon2i$v=19$m=1024,t=2,p=2$RWIwU2JBZU4zTTFRTUcvRQ$BatAtu3jNQPPhhlhYNIsIpHlSXK/gCyrvEN/7Kxm9+o', 1),
-(4, 'tpgl_member', 2, '[\"ROLE_USER\"]', '$argon2i$v=19$m=1024,t=2,p=2$RFZMbTdFR1RsaFZMczU5Mw$r05+OE7DiOmw4jixqvA7mJBhIpJfcF2dCaXaCe48Phk', 1),
-(5, 'tpgl_admin', 2, '[\"ROLE_USER\", \"ROLE_ADMIN\"]', '$argon2i$v=19$m=1024,t=2,p=2$VXRWdENwdmIzc3M4N3ZDaQ$vUXoiL2xNnBHj3qS0VmiqT81Y24xnFip/vHxBjOMkB8', 1),
-(6, 'sample_user', 3, '[\"ROLE_USER\", \"ROLE_SAMPLE\"]', '$argon2i$v=19$m=1024,t=2,p=2$YVRiakYxa0hUUEI4Qm1XNQ$3Bg2KM6apnCNkb1ZPdQWcrqF3W+rIVy6dnhyKSolO1E', 1),
-(7, 'sample_admin', 3, '[\"ROLE_USER\", \"ROLE_ADMIN\", \"ROLE_SAMPLE\"]', '$argon2i$v=19$m=1024,t=2,p=2$YnVaU1d1TjVXbGNrenVpMw$YYngrFsW+VrlyX5j45sz0enQoY/9bTegsbj1v2pyE2I', 1),
-(8, 'sample3_user', 4, '[\"ROLE_USER\"]', '$argon2i$v=19$m=1024,t=2,p=2$ckFTOU4xZU9RdVhNUEtDaA$lhnwDQVPte3SGdlusBrd+qahWbaKrJ/XdEo0NfZLwy0', 1),
-(9, 'sample3_admin', 4, '[\"ROLE_USER\", \"ROLE_ADMIN\"]', '$argon2i$v=19$m=1024,t=2,p=2$VXg0Q0tpV2VWSEppOHRLdA$Sn1TcTKfTIgBfGTrRPQJ/rqNLX35AfEnzTAIn8ATJVs', 1);
+INSERT INTO `user` (`id`, `username`, `league_id`, `roles`, `password`, `version`, `api_token`) VALUES
+(1, 'member', 1, '[\"ROLE_USER\"]', '$argon2i$v=19$m=1024,t=2,p=2$cTBFTEpRalJ6d3JDdWtOYQ$5Q7prM9yVHjsyiUmpvRRweOxgCA/rHZYtKDbfrsCB/c', 1, NULL),
+(2, 'super', 1, '[\"ROLE_USER\", \"ROLE_ADMIN\", \"ROLE_SUPER\"]', '$argon2i$v=19$m=1024,t=2,p=2$WFdPTkJYSERNbkl1Y3k4Zg$mEtLmIKHMq/Jq5uxsLtBbxli2+XK3rUcBmukrUsfC0w', 1, NULL),
+(3, 'sgl-admin', 1, '[\"ROLE_USER\", \"ROLE_ADMIN\"]', '$argon2i$v=19$m=1024,t=2,p=2$RWIwU2JBZU4zTTFRTUcvRQ$BatAtu3jNQPPhhlhYNIsIpHlSXK/gCyrvEN/7Kxm9+o', 1, NULL),
+(4, 'tpgl_member', 2, '[\"ROLE_USER\"]', '$argon2i$v=19$m=1024,t=2,p=2$RFZMbTdFR1RsaFZMczU5Mw$r05+OE7DiOmw4jixqvA7mJBhIpJfcF2dCaXaCe48Phk', 1, NULL),
+(5, 'tpgl_admin', 2, '[\"ROLE_USER\", \"ROLE_ADMIN\"]', '$argon2i$v=19$m=1024,t=2,p=2$VXRWdENwdmIzc3M4N3ZDaQ$vUXoiL2xNnBHj3qS0VmiqT81Y24xnFip/vHxBjOMkB8', 1, NULL),
+(6, 'sample_user', 3, '[\"ROLE_USER\", \"ROLE_SAMPLE\"]', '$argon2i$v=19$m=1024,t=2,p=2$YVRiakYxa0hUUEI4Qm1XNQ$3Bg2KM6apnCNkb1ZPdQWcrqF3W+rIVy6dnhyKSolO1E', 1, NULL),
+(7, 'sample_admin', 3, '[\"ROLE_USER\", \"ROLE_ADMIN\", \"ROLE_SAMPLE\"]', '$argon2i$v=19$m=1024,t=2,p=2$YnVaU1d1TjVXbGNrenVpMw$YYngrFsW+VrlyX5j45sz0enQoY/9bTegsbj1v2pyE2I', 1, NULL),
+(8, 'sample3_user', 4, '[\"ROLE_USER\"]', '$argon2i$v=19$m=1024,t=2,p=2$ckFTOU4xZU9RdVhNUEtDaA$lhnwDQVPte3SGdlusBrd+qahWbaKrJ/XdEo0NfZLwy0', 1, NULL),
+(9, 'sample3_admin', 4, '[\"ROLE_USER\", \"ROLE_ADMIN\"]', '$argon2i$v=19$m=1024,t=2,p=2$VXg0Q0tpV2VWSEppOHRLdA$Sn1TcTKfTIgBfGTrRPQJ/rqNLX35AfEnzTAIn8ATJVs', 1, NULL)
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

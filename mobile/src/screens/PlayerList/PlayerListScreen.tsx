@@ -1,5 +1,6 @@
-import React, {useEffect, useState} from 'react';
-import {View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator} from 'react-native';
+import React, {useEffect, useState, useCallback} from 'react';
+import {View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, Button} from 'react-native';
+import {useFocusEffect} from '@react-navigation/native';
 import PlayerService from '../../services/PlayerService';
 import {Player} from '../../types';
 
@@ -7,11 +8,34 @@ export default function PlayerListScreen({navigation}: any) {
     const [players, setPlayers] = useState<Player[]>([]);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
+    const loadPlayers = useCallback(() => {
         PlayerService.getPlayers()
             .then(setPlayers)
             .finally(() => setLoading(false));
     }, []);
+
+    useEffect(() => {
+        loadPlayers();
+    }, [loadPlayers]);
+
+    useFocusEffect(
+        useCallback(() => {
+            loadPlayers();
+        }, [loadPlayers])
+    );
+
+    useEffect(() => {
+        navigation.setOptions({
+            headerRight: () => (
+                <View style={{marginRight: 15}}>
+                    <Button
+                        title="New"
+                        onPress={() => navigation.navigate('PlayerForm', {title: 'Create Player'})}
+                    />
+                </View>
+            ),
+        });
+    }, [navigation]);
 
     if (loading) {
         return <ActivityIndicator size="large" style={styles.centered}/>;
@@ -23,13 +47,21 @@ export default function PlayerListScreen({navigation}: any) {
                 data={players}
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={({item}) => (
-                    <TouchableOpacity
-                        style={styles.item}
-                        onPress={() => navigation.navigate('PlayerDetail', {id: item.id})}
-                    >
-                        <Text style={styles.name}>{item.firstname} {item.lastname}</Text>
-                        <Text>Handicap Index: {item.seedHandicapIndex}</Text>
-                    </TouchableOpacity>
+                    <View style={styles.itemContainer}>
+                        <TouchableOpacity
+                            style={styles.itemInfo}
+                            onPress={() => navigation.navigate('PlayerDetail', {id: item.id})}
+                        >
+                            <Text style={styles.name}>{item.firstname} {item.lastname}</Text>
+                            <Text>Handicap Index: {item.seedHandicapIndex}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.editButton}
+                            onPress={() => navigation.navigate('PlayerForm', {id: item.id, title: 'Edit Player'})}
+                        >
+                            <Text style={styles.editButtonText}>Edit</Text>
+                        </TouchableOpacity>
+                    </View>
                 )}
             />
         </View>
@@ -39,6 +71,20 @@ export default function PlayerListScreen({navigation}: any) {
 const styles = StyleSheet.create({
     container: {flex: 1, backgroundColor: '#fff'},
     centered: {flex: 1, justifyContent: 'center', alignItems: 'center'},
-    item: {padding: 15, borderBottomWidth: 1, borderBottomColor: '#eee'},
+    itemContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 15,
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee'
+    },
+    itemInfo: {flex: 1},
     name: {fontSize: 18, fontWeight: 'bold'},
+    editButton: {
+        paddingVertical: 5,
+        paddingHorizontal: 15,
+        backgroundColor: '#007AFF',
+        borderRadius: 5,
+    },
+    editButtonText: {color: '#fff', fontWeight: 'bold'},
 });

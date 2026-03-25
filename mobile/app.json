@@ -1,33 +1,59 @@
 {
-  "expo": {
-    "name": "LeagueTracker Mobile",
-    "slug": "leaguetracker-mobile",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
-    "extra": {
-      "apiUrl": "https://leaguetracker7.local/api"
+    "expo": {
+        "name": "LeagueTracker Mobile",
+        "slug": "leaguetracker-mobile",
+        "version": "1.0.0",
+        "orientation": "portrait",
+        "userInterfaceStyle": "light",
+        "assetBundlePatterns": [
+            "**/*"
+        ],
+        "ios": {
+            "supportsTablet": true
+        },
+        "extra": {
+            "apiUrl": "http://192.168.4.76/api"
+        },
+        "icon": "./assets/icon-512.png",
+        "themeColor": "#1E7F3C",
+        "web": {
+            "favicon": "./assets/favicon-48.png",
+            "bundler": "metro",
+            "config": {
+                "pwa": {
+                    "manifest": {
+                        "name": "League Tracker",
+                        "short_name": "LeagueTracker",
+                        "description": "League management and scoring app",
+                        "display": "standalone",
+                        "background_color": "#ffffff",
+                        "theme_color": "#1E7F3C",
+                        "icons": [
+                            {
+                                "src": "./assets/icon-192.png",
+                                "sizes": "192x192",
+                                "type": "image/png"
+                            },
+                            {
+                                "src": "./assets/icon-512.png",
+                                "sizes": "512x512",
+                                "type": "image/png"
+                            },
+                            {
+                                "src": "./assets/maskable-512.png",
+                                "sizes": "512x512",
+                                "type": "image/png",
+                                "purpose": "maskable"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        "splash": {
+            "image": "./assets/splash-2048.png",
+            "resizeMode": "contain",
+            "backgroundColor": "#1E7F3C"
+        }
     }
-  }
 }

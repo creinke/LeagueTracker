@@ -26,6 +26,7 @@ export interface Player {
 export interface PlayerDetail extends Player {
     middlenameOrInitial?: string;
     generation?: string;
+    type?: string;
     email?: string;
     phone?: string;
     address?: {
@@ -60,12 +61,16 @@ export interface EventDetail extends Event {
 
 export interface Game {
     id: number;
+    type?: 'REGULAR' | 'TEAM';
     startingTime: string;
     isRecorded: boolean;
     players: {
         id: number;
         name: string;
+        isTeam?: boolean;
+        teamNumber?: number;
     }[];
+    teamNames?: (string | null)[];
 }
 
 export interface HoleInfo {
@@ -88,17 +93,29 @@ export interface TeeInfo {
 export interface PlayerScore {
     playerId: number;
     playerName: string;
+    matchId?: number | null;
     isPlayed: boolean;
+    isDuplicate?: boolean;
     currentTeeId: number;
     availableTees: TeeInfo[];
     strokes: (number | null)[];
 }
 
+export interface TeamGroup {
+    name: string | null;
+    players: PlayerScore[];
+    teamScore?: (number | null)[];
+}
+
 export interface ScoreEntryDetails {
     gameId: number;
     isRecorded: boolean;
+    type: 'REGULAR' | 'TEAM';
+    isScramble: boolean;
     nines: NineInfo[];
-    playerScores: PlayerScore[];
+    playerScores?: PlayerScore[]; // For REGULAR
+    teamOne?: TeamGroup;          // For TEAM
+    teamTwo?: TeamGroup;          // For TEAM
 }
 
 export interface Season {
@@ -114,4 +131,125 @@ export interface SeasonDetail extends Season {
         name: string;
         startDate: string;
     }[];
+}
+
+export interface PlayerResult {
+    id: number;
+    name: string;
+    place?: number | null;
+    totalScore?: number;
+    totalNetScore?: number;
+    netScore?: number[];
+    score?: number[];
+    skins?: string | null;
+    matchPoints?: number;
+    sessionPoints?: number;
+    seasonPoints?: number;
+}
+
+export interface PlayerDetailResult {
+    name: string;
+    handicap: number;
+    firstNineScores: number[];
+    firstNineNetScores: number[];
+    firstNineTotalScore: number;
+    firstNineTotalNetScore: number;
+    secondNineScores: number[];
+    secondNineNetScores: number[];
+    secondNineTotalScore: number;
+    secondNineTotalNetScore: number;
+}
+
+export interface TeamResult {
+    id: number;
+    name: string;
+    teamName: string;
+    players: string[] | PlayerDetailResult[];
+    playerNames?: string[];
+    gross: number;
+    net: number;
+    place: number;
+    totalScore: number;
+    totalNetScore: number;
+    tieBreaker: string;
+    firstNineScores: number[];
+    firstNineNetScores: number[];
+    firstNineTotalTeamScore: number;
+    firstNineTotalTeamNetScore: number;
+    firstNineTotalScore: number; // For Better Ball/Standard
+    firstNineTotalNetScore: number; // For Better Ball/Standard
+    secondNineScores: (number | string)[];
+    secondNineNetScores: (number | string)[];
+    secondNineTotalTeamScore: number;
+    secondNineTotalTeamNetScore: number;
+    secondNineTotalScore: number;
+    secondNineTotalNetScore: number;
+    handicap?: number; // For Scramble
+}
+
+export interface PlayerMatchResult {
+    playerName: string;
+    nineName: string;
+    handicap: number;
+    holeStrokes: number[];
+    adjustedNetStrokes: number[];
+    holePoints: number[];
+    holeStrokesTotal: number;
+    adjustedHoleStrokesTotal: number;
+    netStrokesTotal: number;
+    totalHolePoints: number;
+    netPoints: number;
+    totalPoints: number;
+}
+
+export interface TeamMatchResult {
+    teamOneName: string;
+    teamOnePlayerPoints: number;
+    teamOneNetPoints: number;
+    teamOneTotalPoints: number;
+    teamTwoName: string;
+    teamTwoPlayerPoints: number;
+    teamTwoNetPoints: number;
+    teamTwoTotalPoints: number;
+}
+
+export interface StandingResult {
+    teamName: string;
+    points: number;
+    totalPoints: number;
+    pointsBehind: number;
+    games?: {
+        opponent: string;
+        points: number;
+        opponentPoints: number;
+        result: string;
+    }[];
+}
+
+export interface MatchupResult {
+    teamOne: string;
+    teamOnePoints: number;
+    teamTwo: string;
+    teamTwoPoints: number;
+}
+
+export interface EventResults {
+    eventId: number;
+    description: string;
+    format: string;
+    resultType: 'SINGLES_STROKE' | 'SINGLES_MATCH' | 'TEAM_EVENT' | 'TEAM_STANDINGS';
+    displayNet?: boolean;
+    displayTotal?: boolean;
+    scramble?: boolean;
+    isLowTeamNet?: boolean;
+    withHandicapping?: boolean;
+    firstNineName?: string | null;
+    secondNineName?: string | null;
+    players?: PlayerResult[];
+    teams?: TeamResult[];
+    teamResults?: TeamMatchResult[];
+    teamMatches?: PlayerMatchResult[][][];
+    ninesPlayed?: number | { name: string }[];
+    standings?: StandingResult[];
+    matchups?: MatchupResult[];
 }

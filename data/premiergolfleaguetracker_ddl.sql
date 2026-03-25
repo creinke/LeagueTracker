@@ -619,9 +619,11 @@ CREATE TABLE IF NOT EXISTS `user` (
   `roles` json NOT NULL,
   `password` varchar(255) NOT NULL,
   `version` int DEFAULT '1',
+  `api_token` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `unique_username` (`username`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+  UNIQUE KEY `unique_username` (`username`),
+  UNIQUE KEY `unique_api_tokem` (`api_token`)
+) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4;
 
 COMMIT;
 

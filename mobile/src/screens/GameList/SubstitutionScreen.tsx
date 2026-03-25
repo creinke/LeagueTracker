@@ -7,6 +7,9 @@ import {
     FlatList,
     ActivityIndicator,
     Alert,
+    Modal,
+    TextInput,
+    ScrollView,
 } from 'react-native';
 import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
@@ -32,8 +35,11 @@ const SubstitutionScreen: React.FC = () => {
     const [saving, setSaving] = useState(false);
     const [currentGamePlayers, setCurrentGamePlayers] = useState<PlayerRosterItem[]>([]);
     const [leagueRoster, setLeagueRoster] = useState<PlayerRosterItem[]>([]);
+    const [filteredRoster, setFilteredRoster] = useState<PlayerRosterItem[]>([]);
     const [selectedPlayers, setSelectedPlayers] = useState<number[]>([]);
-    const [activeIndex, setActiveIndex] = useState<number | null>(null);
+    const [pickingForIndex, setPickingForIndex] = useState<number | null>(null);
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
         fetchRoster();
@@ -45,6 +51,7 @@ const SubstitutionScreen: React.FC = () => {
             const data = await GameService.getRoster(gameId);
             setCurrentGamePlayers(data.currentGamePlayers);
             setLeagueRoster(data.leagueRoster);
+            setFilteredRoster(data.leagueRoster);
             setSelectedPlayers(data.currentGamePlayers.map(p => p.id));
         } catch (error) {
             console.error('Error fetching roster:', error);
@@ -54,22 +61,45 @@ const SubstitutionScreen: React.FC = () => {
         }
     };
 
+    const handleSearch = (text: string) => {
+        setSearchQuery(text);
+        if (text.trim() === '') {
+            setFilteredRoster(leagueRoster);
+        } else {
+            const filtered = leagueRoster.filter(player =>
+                player.name.toLowerCase().includes(text.toLowerCase())
+            );
+            setFilteredRoster(filtered);
+        }
+    };
+
+    const openPicker = (index: number) => {
+        setPickingForIndex(index);
+        setSearchQuery('');
+        setFilteredRoster(leagueRoster);
+        setIsModalVisible(true);
+    };
+
     const handleSelectPlayer = (playerId: number) => {
-        if (activeIndex === null) return;
+        if (pickingForIndex === null) return;
 
         const newSelected = [...selectedPlayers];
-        newSelected[activeIndex] = playerId;
+        newSelected[pickingForIndex] = playerId;
         setSelectedPlayers(newSelected);
-        setActiveIndex(null);
+        setIsModalVisible(false);
+        setPickingForIndex(null);
     };
 
     const handleSave = async () => {
         try {
             setSaving(true);
             const result = await GameService.substitutePlayers(gameId, selectedPlayers);
-            Alert.alert('Success', result.message, [
-                {text: 'OK', onPress: () => navigation.goBack()}
-            ]);
+            if (result.success) {
+                // Automatically navigate back after successful substitution
+                navigation.goBack();
+            } else {
+                Alert.alert('Error', result.message || 'Failed to substitute players.');
+            }
         } catch (error) {
             console.error('Error substituting players:', error);
             Alert.alert('Error', 'Failed to substitute players.');
@@ -88,34 +118,69 @@ const SubstitutionScreen: React.FC = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Current Players in Game</Text>
-            <View style={styles.currentPlayersContainer}>
-                {currentGamePlayers.map((player, index) => {
-                    const selectedPlayerId = selectedPlayers[index];
-                    const selectedPlayer = leagueRoster.find(p => p.id === selectedPlayerId);
-                    const isChanging = activeIndex === index;
+            <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.scrollContent}>
+                <Text style={styles.title}>Current Players in Game</Text>
+                <View style={styles.currentPlayersContainer}>
+                    {selectedPlayers.map((playerId, index) => {
+                        const selectedPlayer = leagueRoster.find(p => p.id === playerId);
 
-                    return (
-                        <TouchableOpacity
-                            key={index}
-                            style={[styles.playerSlot, isChanging && styles.activeSlot]}
-                            onPress={() => setActiveIndex(isChanging ? null : index)}
-                        >
-                            <Text style={styles.slotLabel}>Position {index + 1}:</Text>
-                            <Text style={styles.playerName}>
-                                {selectedPlayer ? selectedPlayer.name : 'Unassigned'}
-                            </Text>
-                            <Text style={styles.changeText}>[Tap to Change]</Text>
+                        return (
+                            <TouchableOpacity
+                                key={index}
+                                style={styles.playerSlot}
+                                onPress={() => openPicker(index)}
+                            >
+                                <View style={styles.slotInfo}>
+                                    <Text style={styles.playerName}>
+                                        {selectedPlayer ? selectedPlayer.name : 'Unassigned'}
+                                    </Text>
+                                </View>
+                                <Text style={styles.changeText}>[Tap to Change]</Text>
+                            </TouchableOpacity>
+                        );
+                    })}
+                </View>
+
+                <View style={styles.footer}>
+                    <Text style={styles.warning}>
+                        Note: Saving substitutions will reset any scores entered for this game.
+                    </Text>
+                    <TouchableOpacity
+                        style={[styles.saveButton, saving && styles.disabledButton]}
+                        onPress={handleSave}
+                        disabled={saving}
+                    >
+                        {saving ? (
+                            <ActivityIndicator color="#fff"/>
+                        ) : (
+                            <Text style={styles.saveButtonText}>Save Substitutions</Text>
+                        )}
+                    </TouchableOpacity>
+                </View>
+            </ScrollView>
+
+            <Modal
+                visible={isModalVisible}
+                animationType="slide"
+                onRequestClose={() => setIsModalVisible(false)}
+            >
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalHeader}>
+                        <Text style={styles.modalTitle}>Select Player</Text>
+                        <TouchableOpacity onPress={() => setIsModalVisible(false)}>
+                            <Text style={styles.closeText}>Cancel</Text>
                         </TouchableOpacity>
-                    );
-                })}
-            </View>
+                    </View>
 
-            {activeIndex !== null && (
-                <View style={styles.rosterContainer}>
-                    <Text style={styles.rosterTitle}>Select Replacement Player:</Text>
+                    <TextInput
+                        style={styles.searchInput}
+                        placeholder="Search players..."
+                        value={searchQuery}
+                        onChangeText={handleSearch}
+                    />
+
                     <FlatList
-                        data={leagueRoster}
+                        data={filteredRoster}
                         keyExtractor={(item) => item.id.toString()}
                         renderItem={({item}) => (
                             <TouchableOpacity
@@ -124,36 +189,24 @@ const SubstitutionScreen: React.FC = () => {
                             >
                                 <Text style={styles.rosterItemText}>{item.name}</Text>
                                 {selectedPlayers.includes(item.id) && (
-                                    <Text style={styles.alreadySelected}>[Selected]</Text>
+                                    <Text style={styles.alreadySelected}>[In Game]</Text>
                                 )}
                             </TouchableOpacity>
                         )}
+                        ListEmptyComponent={
+                            <Text style={styles.emptyText}>No players found.</Text>
+                        }
                     />
                 </View>
-            )}
-
-            <View style={styles.footer}>
-                <Text style={styles.warning}>
-                    Note: Changing players will reset any scores entered for this game.
-                </Text>
-                <TouchableOpacity
-                    style={[styles.saveButton, saving && styles.disabledButton]}
-                    onPress={handleSave}
-                    disabled={saving}
-                >
-                    {saving ? (
-                        <ActivityIndicator color="#fff"/>
-                    ) : (
-                        <Text style={styles.saveButtonText}>Save Substitutions</Text>
-                    )}
-                </TouchableOpacity>
-            </View>
+            </Modal>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {flex: 1, padding: 16, backgroundColor: '#fff'},
+    container: {flex: 1, backgroundColor: '#fff'},
+    scrollContainer: {flex: 1},
+    scrollContent: {padding: 16, paddingBottom: 40},
     centered: {flex: 1, justifyContent: 'center', alignItems: 'center'},
     title: {fontSize: 18, fontWeight: 'bold', marginBottom: 16},
     currentPlayersContainer: {marginBottom: 24},
@@ -162,27 +215,54 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#ddd',
         borderRadius: 8,
-        marginBottom: 8,
+        marginBottom: 10,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        backgroundColor: '#f9f9f9',
+    },
+    slotInfo: {
+        flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
     },
     activeSlot: {borderColor: '#007AFF', backgroundColor: '#F0F8FF'},
-    slotLabel: {fontWeight: 'bold', marginRight: 8},
-    playerName: {flex: 1, fontSize: 16},
-    changeText: {fontSize: 12, color: '#007AFF'},
+    playerName: {flex: 1, fontSize: 16, fontWeight: '500'},
+    changeText: {fontSize: 12, color: '#007AFF', fontWeight: 'bold', minWidth: 90, textAlign: 'right'},
+    modalContainer: {flex: 1, padding: 20, backgroundColor: '#fff'},
+    modalHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 20,
+        paddingTop: 40,
+    },
+    modalTitle: {fontSize: 22, fontWeight: 'bold'},
+    closeText: {fontSize: 16, color: '#007AFF'},
+    searchInput: {
+        height: 45,
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderRadius: 8,
+        paddingHorizontal: 12,
+        marginBottom: 16,
+        fontSize: 16,
+    },
     rosterContainer: {flex: 1, borderTopWidth: 1, borderTopColor: '#eee', paddingTop: 16},
     rosterTitle: {fontSize: 16, fontWeight: 'bold', marginBottom: 8},
     rosterItem: {
-        paddingVertical: 12,
+        paddingVertical: 15,
         paddingHorizontal: 8,
         borderBottomWidth: 1,
         borderBottomColor: '#f0f0f0',
         flexDirection: 'row',
         justifyContent: 'space-between',
+        alignItems: 'center',
     },
-    rosterItemText: {fontSize: 16},
-    alreadySelected: {fontSize: 12, color: '#888'},
-    footer: {marginTop: 'auto', paddingVertical: 16},
+    rosterItemText: {fontSize: 17},
+    alreadySelected: {fontSize: 12, color: '#888', fontStyle: 'italic'},
+    emptyText: {textAlign: 'center', marginTop: 30, color: '#888', fontSize: 16},
+    footer: {marginTop: 20, paddingVertical: 16, borderTopWidth: 1, borderTopColor: '#eee'},
     warning: {color: '#FF3B30', fontSize: 12, textAlign: 'center', marginBottom: 16},
     saveButton: {
         backgroundColor: '#007AFF',
