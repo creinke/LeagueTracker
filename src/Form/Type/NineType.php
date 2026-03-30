@@ -9,12 +9,12 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class NineType extends AbstractType {
-    public function buildForm(FormBuilderInterface $builder, array $options) {
+    public function buildForm(FormBuilderInterface $builder, array $options): void {
         $builder->add('name', TextType::class, array('required' => true, 'attr' => array('class' => 'form-control')))
             ->add('tees', CollectionType::class, ['entry_type' => TeeType::class, 'entry_options' => ['label' => false]]);
     }
 
-    public function configureOptions(OptionsResolver $resolver) {
+    public function configureOptions(OptionsResolver $resolver): void {
         $resolver->setDefaults([
             'data_class' => NineDE::class
         ]);

@@ -9,7 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class HoleType extends AbstractType {
-    public function buildForm(FormBuilderInterface $builder, array $options) {
+    public function buildForm(FormBuilderInterface $builder, array $options): void {
         $builder->add('handicap', NumberType::class, array('required' => false, 'attr' => array('class' => 'form-control')))
             ->add('holenumber', NumberType::class, array('required' => false, 'attr' => array('class' => 'form-control')))
             ->add('length', NumberType::class, array('required' => false, 'attr' => array('class' => 'form-control')))
@@ -17,7 +17,7 @@ class HoleType extends AbstractType {
             ->add('par', NumberType::class, array('required' => false, 'attr' => array('class' => 'form-control')));
     }
 
-    public function configureOptions(OptionsResolver $resolver) {
+    public function configureOptions(OptionsResolver $resolver): void {
         $resolver->setDefaults([
             'data_class' => HoleDE::class
         ]);

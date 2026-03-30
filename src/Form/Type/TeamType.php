@@ -18,7 +18,7 @@ class TeamType extends AbstractType {
         $this->entityManager = $entityManager;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options) {
+    public function buildForm(FormBuilderInterface $builder, array $options): void {
         $playerChoices = array();
         $league = $_SESSION['league'];
         $playerChoices[' '] = NULL;
@@ -33,7 +33,7 @@ class TeamType extends AbstractType {
         ;
     }
 
-    public function configureOptions(OptionsResolver $resolver) {
+    public function configureOptions(OptionsResolver $resolver): void {
         $resolver->setDefaults([
             'data_class' => TeamDE::class
         ]);

@@ -15,13 +15,13 @@ class RegionType extends AbstractType {
         $this->entityManager = $entityManager;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options) {
+    public function buildForm(FormBuilderInterface $builder, array $options): void {
         $builder->add('code', TextType::class, array('label' => 'Region', 'required' => true, 'attr' => array('class' => 'form-control')))
             ->add('countryName', TextType::class, array('label' => 'Country', 'required' => true, 'attr' => array('class' => 'form-control')))
         ;
     }
 
-    public function configureOptions(OptionsResolver $resolver) {
+    public function configureOptions(OptionsResolver $resolver): void {
         $resolver->setDefaults([
             'data_class' => RegionDE::class
         ]);

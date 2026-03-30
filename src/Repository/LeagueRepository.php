@@ -112,7 +112,7 @@ class LeagueRepository extends AbstractBaseRepository {
 	 * @return LeagueDE
 	 * @throws Exception
 	 */
-    public function save(array $leagueData, LeagueDE $league = NULL) : LeagueDE {
+    public function save(array $leagueData, ?LeagueDE $league = NULL) : LeagueDE {
         $this->checkLeagueData($leagueData);
         $league = $this->setLeagueData($leagueData, $league);
 
@@ -152,7 +152,7 @@ class LeagueRepository extends AbstractBaseRepository {
 	 *
 	 * @return LeagueDE $league
 	 */
-    protected function setLeagueData(array $leagueData, LeagueDE $league = NULL): LeagueDE {
+    protected function setLeagueData(array $leagueData, ?LeagueDE $league = NULL): LeagueDE {
         $league ??= new LeagueDE($this->getEntityManager());
 
         $league->setName($leagueData['name']);

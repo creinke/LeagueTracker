@@ -165,7 +165,7 @@ class EventRepository extends AbstractBaseRepository {
     }
 
 	/**
-	 * Find first event by event type and format type with at least one game
+	 * Find the first event by event type and format type with at least one game
 	 *
 	 * @param int $eventType The event type (1-5 corresponding to EventType constants)
 	 * @param int $formatType The format type (1-6 corresponding to EventFormatType constants)
@@ -228,7 +228,7 @@ public function findFirstByEventTypeAndFormat(int $eventType, int $formatType): 
 	}
 
 	/**
-	 * Find first team event with at least one teamgame
+	 * Find a first team event with at least one teamgame
 	 *
 	 * @return EventDE|null First EventDE entity matching the criteria or null if not found
 	 * @throws NonUniqueResultException
@@ -252,7 +252,7 @@ public function findFirstByEventTypeAndFormat(int $eventType, int $formatType): 
 	}
 
 	/**
-	 * Find first team event by format type with at least one teamgame
+	 * Find a first team event by format type with at least one teamgame
 	 *
 	 * @param int $formatType The format type (2-5 corresponding to team EventFormatType constants)
 	 *
@@ -309,7 +309,7 @@ public function findFirstByEventTypeAndFormat(int $eventType, int $formatType): 
         $playerMatch->setPlayerscores(new PersistentCollection($this->getEntityManager(), new ClassMetadata('App\Entity\ScoreDE'), new ArrayCollection()));
         
         $playerRepository = new PlayerRepository($this->getEntityManager(),$this->getLogger());
-        $scoreRepository = new ScoreRepository($this->getEntityManager(),$this->getLogger());;
+        $scoreRepository = new ScoreRepository($this->getEntityManager(),$this->getLogger());
 
         $league = $event->getSession()->getSeason()->getLeague();
         $teeName = $event->getTee()->getName();
@@ -559,7 +559,7 @@ public function findFirstByEventTypeAndFormat(int $eventType, int $formatType): 
         $event->setEventtype(EventType::toOrdinal($eventData['type']));
         $event->setFormat(EventFormatType::toOrdinal($eventData['format']));
 
-        $courseRepository = new CourseRepository($this->getEntityManager(), $this->getLogger());;
+        $courseRepository = new CourseRepository($this->getEntityManager(), $this->getLogger());
         $course = $courseRepository->findCourseByName($eventData['venu']);
 
         if ($course) {
@@ -604,7 +604,7 @@ public function findFirstByEventTypeAndFormat(int $eventType, int $formatType): 
 	 * @return GameDE Entity\GameDE $game
 	 * @throws Exception
 	 */
-    protected function setGameData(EventDE $event, array $gameData, GameDE $game = NULL): GameDE {
+    protected function setGameData(EventDE $event, array $gameData, ?GameDE $game = NULL): GameDE {
         if (!$game) {
             $game = new GameDE($this->getEntityManager());
         }
@@ -684,7 +684,7 @@ public function findFirstByEventTypeAndFormat(int $eventType, int $formatType): 
 	 *
 	 * @return TeammatchDE Entity\TeammatchDE $teammatch
 	 */
-    protected function setTeamMatchData(array $teamMatchData, TeammatchDE $teammatch = NULL): TeammatchDE {
+    protected function setTeamMatchData(array $teamMatchData, ?TeammatchDE $teammatch = NULL): TeammatchDE {
         $teammatch ??= new TeammatchDE();
 
         // $teammatch->setTeamone($teamone);

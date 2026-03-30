@@ -5,14 +5,14 @@ use App\Entity\PlayerDE;
 use App\Entity\TeamDE;
 use App\Form\TeamsFormBean;
 use App\Form\Type\TeamType;
-use App\Model\DoctrineTrait;
 use App\Repository\LeagueRepository;
 use App\Repository\PlayerRepository;
 use App\Repository\TeamRepository;
 use App\Repository\TeammatchRepository;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\PersistentCollection;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
@@ -39,13 +39,13 @@ class TeamController extends AbstractController {
 		$this->logger = $logger;
 	}
 
-	/**
-	 * @param TeamDE $team
-	 * @param $editForm
-	 *
-	 * @return FormInterface
-	 */
-	private function buildForm(TeamDE $team, $editForm = false) : FormInterface {
+    /**
+     * @param TeamDE $team
+     * @param bool $editForm
+     *
+     * @return FormInterface
+     */
+	private function buildForm(TeamDE $team, bool $editForm = false) : FormInterface {
         $playerChoices = array();
         $league = $team->getLeague();
         $playerChoices[' '] = NULL;
@@ -123,7 +123,7 @@ class TeamController extends AbstractController {
 	 */
 	#[Route('/team/edit/{id}', name: 'team_edit', methods: ['GET', 'POST'])]
 	#[IsGranted('ROLE_ADMIN')]
-    public function edit(Request $request, $id) {
+    public function edit(Request $request, $id): RedirectResponse|Response {
         $user = $this->getUser();
         $league = $user->getLeague();
 
@@ -219,7 +219,7 @@ class TeamController extends AbstractController {
                 $league = $leagueRepository->findById($league->getId());
                 $team->setLeague($league);
 
-	            $playersCollection = new ArrayCollection();
+                $playersCollection = new PersistentCollection($this->em, new ClassMetadata('App\Entity\PlayerDE'), new ArrayCollection());
 	            foreach ($players as $player) {
 		            $playerToAdd = $playerRepository->find($player->getId());
 		            if ($playerToAdd) {

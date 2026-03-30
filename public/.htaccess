@@ -24,7 +24,7 @@
     RewriteRule ^pwa/assets/.*/([a-f0-9]{32})$ pwa/assets/$1 [L,NC]
 
     # Skip redirect for local development hosts, staging, localhost, and LAN IP.
-    RewriteCond %{HTTP_HOST} !^(leaguetracker\.local|staging\.local|localhost|192\.168\.4\.76)(:\d+)?$ [NC]
+    RewriteCond %{HTTP_HOST} !^(leaguetracker7\.local|staging\.local|localhost|192\.168\.4\.76)(:\d+)?$ [NC]
 
     # Redirect non-local requests to canonical production HTTPS host.
     RewriteCond %{HTTPS} off [OR]

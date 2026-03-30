@@ -10,7 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 class GameType extends AbstractType {
-    public function buildForm(FormBuilderInterface $builder, array $options) {
+    public function buildForm(FormBuilderInterface $builder, array $options): void {
         $builder
             ->add('name', TextType::class, array('label' => 'Name', 'required' => true, 'attr' => array('class' => 'form-control')))
             ->add('startdate', DateType::class, array('label' => 'Start Date', 'required' => true, 'widget' => 'single_text', 'attr' => array('class' => 'form-control')))
@@ -18,7 +18,7 @@ class GameType extends AbstractType {
             ->add('sessions', CollectionType::class, ['entry_type' => SessionType::class, 'entry_options' => ['label' => false]]);
     }
 
-    public function configureOptions(OptionsResolver $resolver) {
+    public function configureOptions(OptionsResolver $resolver): void {
         $resolver->setDefaults([
             'data_class' => GameDE::class
         ]);

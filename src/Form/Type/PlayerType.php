@@ -17,7 +17,7 @@ class PlayerType extends AbstractType {
         $this->entityManager = $entityManager;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options) {
+    public function buildForm(FormBuilderInterface $builder, array $options): void {
 
         $builder->add('firstname', TextType::class, array('label' => 'First Name', 'required' => false, 'attr' => array('class' => 'form-control', 'style' => 'height: 2.1em;')))
             ->add('middlenameorinitial', TextType::class, array('label' => 'Middle Name or Initial', 'required' => false, 'attr' => array('class' => 'form-control', 'style' => 'height: 2.1em;')))
@@ -30,7 +30,7 @@ class PlayerType extends AbstractType {
         ;
     }
 
-    public function configureOptions(OptionsResolver $resolver) {
+    public function configureOptions(OptionsResolver $resolver): void {
         $resolver->setDefaults([
             'data_class' => PlayerDE::class
         ]);

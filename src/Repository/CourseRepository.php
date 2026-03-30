@@ -368,7 +368,7 @@ use Psr\Log\LoggerInterface;
 	  *
 	  * @return TeeDE $tee
 	  */
-    protected function setTeeData(array $teeData, NineDE $nine, TeeDE $tee = NULL): TeeDE {
+    protected function setTeeData(array $teeData, NineDE $nine, ?TeeDE $tee = NULL): TeeDE {
         $tee ??= new TeeDE($this->getEntityManager());
 
         $tee->setName($teeData['name']);
@@ -389,7 +389,7 @@ use Psr\Log\LoggerInterface;
 	  *
 	  * @return PersistentCollection of Entity\TeeDE
 	  */
-    protected function setTeesData(array $teesData, NineDE $nine, PersistentCollection $tees = NULL): PersistentCollection {
+    protected function setTeesData(array $teesData, NineDE $nine, ?PersistentCollection $tees = NULL): PersistentCollection {
         $tees ??= new PersistentCollection($this->getEntityManager(), new ClassMetadata('App\Entity\TeeDE'), new ArrayCollection());
 
         foreach($teesData as $teeData) {

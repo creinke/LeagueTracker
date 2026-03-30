@@ -43,9 +43,9 @@ class EventType extends AbstractType {
      * {@inheritDoc}
      * @see \Symfony\Component\Form\AbstractType::buildForm()
      */
-    public function buildForm(FormBuilderInterface $builder, array $options) {
-        $courses = $_SESSION['courses'];
-    	$sessions = $_SESSION['sessions'];
+    public function buildForm(FormBuilderInterface $builder, array $options): void {
+        $courses = $options['courses'];
+    	$sessions = $options['sessions'];
 		
         $eventTypeChoices = array();
         $eventTypes = \App\Model\EventType::values();
@@ -112,7 +112,7 @@ class EventType extends AbstractType {
         });
  
         $formModifier =
-            function (FormInterface $form, CourseDE $course = null) {
+            function (FormInterface $form, ?CourseDE $course = null) {
             	$nineChoices = array();
             	$em = $this->em;
             	$nineChoices[' '] = new NineDE($em);
@@ -146,11 +146,16 @@ class EventType extends AbstractType {
         );
     }
 
-    public function configureOptions(OptionsResolver $resolver) {
+    public function configureOptions(OptionsResolver $resolver): void {
         $resolver->setDefaults(
             [
-            	'data_class' => EventDE::class
+            	'data_class' => EventDE::class,
+            	'courses' => [],
+            	'sessions' => []
             ]
         );
+        $resolver->setRequired(['courses', 'sessions']);
+        $resolver->setAllowedTypes('courses', 'array');
+        $resolver->setAllowedTypes('sessions', 'array');
     }
 }

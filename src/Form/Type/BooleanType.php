@@ -14,7 +14,7 @@ class BooleanType extends AbstractType {
      *
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options) {
+    public function buildForm(FormBuilderInterface $builder, array $options): void {
         $builder->addModelTransformer(new BooleanTypeToBooleanTransformer());
     }
 
@@ -22,7 +22,7 @@ class BooleanType extends AbstractType {
      *
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver) {
+    public function configureOptions(OptionsResolver $resolver): void {
         $resolver->setDefaults(array(
             'compound' => false
         ));

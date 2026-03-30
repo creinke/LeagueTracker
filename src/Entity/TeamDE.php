@@ -2,7 +2,6 @@
 namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -34,7 +33,7 @@ class TeamDE {
 	#[ORM\JoinColumn(name: "team_id", referencedColumnName: "id")]
 	#[ORM\InverseJoinColumn(name: "player_id", referencedColumnName: "id", unique: true)]
 	#[ORM\OrderBy(["seedhandicapindex" => "ASC"])]
-	private Collection $players;
+	private PersistentCollection $players;
 
 	#[ORM\Version]
 	#[ORM\Column(name: "version", type: "integer", nullable: true)]
@@ -86,11 +85,11 @@ class TeamDE {
 		$this->teamnumber = $teamnumber;
 	}
 
-	public function getPlayers(): Collection {
+	public function getPlayers(): PersistentCollection {
 		return $this->players;
 	}
 
-	public function setPlayers(Collection $players): void {
+	public function setPlayers(PersistentCollection $players): void {
 		$this->players = $players;
 	}
 

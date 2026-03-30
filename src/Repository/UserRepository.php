@@ -83,7 +83,7 @@ class UserRepository extends AbstractBaseRepository {
 	 * @return UserDE
 	 * @throws Exception
 	 */
-    public function save(array $userData, LeagueDE $league, UserDE $user = NULL): UserDE {
+    public function save(array $userData, LeagueDE $league, ?UserDE $user = NULL): UserDE {
         $this->checkUserData($userData);
         $user = $this->setUserData($userData, $league, $user);
 
@@ -144,7 +144,7 @@ class UserRepository extends AbstractBaseRepository {
 	 *
 	 * @return UserDE $user
 	 */
-    protected function setUserData(array $userData, LeagueDE $league, UserDE $user = NULL): UserDE {
+    protected function setUserData(array $userData, LeagueDE $league, ?UserDE $user = NULL): UserDE {
 	    $user ??= new UserDE($this->getEntityManager());
 
         $user->setUsername($userData['username']);

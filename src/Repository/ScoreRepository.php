@@ -28,7 +28,7 @@ class ScoreRepository extends AbstractBaseRepository {
 	 * @return array $result
 	 * @throws Exception
 	 */
-    public function calculatePlayerHandicapIndex(PlayerDE $player, DateTime $timestamp, array $s = NULL) : array {
+    public function calculatePlayerHandicapIndex(PlayerDE $player, DateTime $timestamp, ?array $s = NULL) : array {
         if ($s == NULL) {
             $s = $this->findPlayerScores($player, $timestamp);
         }

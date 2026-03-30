@@ -186,7 +186,7 @@ class SeasonRepository extends AbstractBaseRepository {
 	 *
 	 * @return SeasonDE|null $season
 	 */
-    protected function setSeasonData(array $seasonData, LeagueDE $league, SeasonDE $season = NULL): ?SeasonDE {
+    protected function setSeasonData(array $seasonData, LeagueDE $league, ?SeasonDE $season = NULL): ?SeasonDE {
         if (!$season) {
             $season = new SeasonDE($this->getEntityManager());
         }

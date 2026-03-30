@@ -294,7 +294,7 @@ class PlayerRepository extends AbstractBaseRepository {
 	 * @return ?PlayerDE
 	 * @throws Exception
 	 */
-    public function save(array $playerData, LeagueDE $league, PlayerDE $player = NULL): ?PlayerDE {
+    public function save(array $playerData, LeagueDE $league, ?PlayerDE $player = NULL): ?PlayerDE {
         $this->checkPlayerData($playerData);
         $player = $this->setPlayerData($playerData, $league, $player);
 

@@ -15,7 +15,7 @@ class AddressType extends AbstractType {
         $this->entityManager = $entityManager;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options) {
+    public function buildForm(FormBuilderInterface $builder, array $options): void {
         $builder->add('addressline1', TextType::class, array('label' => 'Address Line One', 'required' => true, 'attr' => array('class' => 'form-control')))
             ->add('addressline2', TextType::class, array('label' => 'Address Line Two', 'required' => false, 'attr' => array('class' => 'form-control')))
             ->add('city', TextType::class, array('label' => 'City', 'required' => true, 'attr' => array('class' => 'form-control')))
@@ -24,7 +24,7 @@ class AddressType extends AbstractType {
         ;
     }
 
-    public function configureOptions(OptionsResolver $resolver) {
+    public function configureOptions(OptionsResolver $resolver): void {
         $resolver->setDefaults([
             'data_class' => AddressDE::class
         ]);

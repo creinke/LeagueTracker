@@ -13,7 +13,7 @@ use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 
 class ScoreType extends AbstractType {
-    public function buildForm(FormBuilderInterface $builder, array $options) {
+    public function buildForm(FormBuilderInterface $builder, array $options): void {
         $builder
             ->add('strokes', CollectionType::class, ['entry_type' => NumberType::class, 'entry_options' => ['attr' => ['style' => 'height: 2.5em; width: 2.7em; color: black;']],'required' => true]);
 
@@ -29,7 +29,7 @@ class ScoreType extends AbstractType {
             });
     }
 
-    public function configureOptions(OptionsResolver $resolver) {
+    public function configureOptions(OptionsResolver $resolver): void {
         $resolver->setDefaults([
             'data_class' => ScoreBean::class
         ]);

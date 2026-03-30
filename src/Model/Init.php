@@ -29,7 +29,7 @@ class Init {
 	 *
 	 * @throws ORMException
 	 */
-	public function __construct(array $params = null) {
+	public function __construct(?array $params = null) {
 		$default = [
 			'entityDirs' => [
 				__DIR__ . '/../Entity',
@@ -117,7 +117,7 @@ class Init {
 		// You can implement error handling/logging here.
 	}
 
-	public function setParams($params1, $params2 = null): void {
+	public function setParams(array $params1, ?array $params2 = null): void {
 		$this->params = $params2 ? array_merge($params1, $params2) : $params1;
 	}
 

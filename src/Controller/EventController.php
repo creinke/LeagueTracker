@@ -52,19 +52,25 @@ class EventController extends AbstractController {
 		$this->logger = $logger;
 	}
 
-	/**
-	 * Build event form
-	 *
-	 * @param EventForm $eventForm
-	 * @param bool $edit
-	 *
-	 * @return FormInterface
-	 */
-    private function buildEventForm(EventForm $eventForm, bool $edit) : FormInterface {
+    /**
+     * Build event form
+     *
+     * @param EventForm $eventForm
+     * @param bool $edit
+     * @param array $courses
+     * @param array $sessions
+     *
+     * @return FormInterface
+     */
+    private function buildEventForm(EventForm $eventForm, bool $edit, array $courses, array $sessions) : FormInterface {
         $disableSaveButton = in_array('ROLE_SAMPLE', $this->getUser()->getRoles());
-        
+
         $builder = $this->createFormBuilder($eventForm)
-            ->add('event', EventType::class, ['label' => false])
+            ->add('event', EventType::class, [
+                'label' => false,
+                'courses' => $courses,
+                'sessions' => $sessions
+            ])
             ->add('save', SubmitType::class, ['label' => 'Save Event', 'disabled' => $disableSaveButton, 'attr' => ['class' => 'btn btn-primary mt-3', 'style' => 'margin-top: 2em;']]);
 
         $form = $builder->getForm();
@@ -215,7 +221,7 @@ class EventController extends AbstractController {
         $eventForm = new EventForm();
         $eventForm->setEvent($event);
 
-        $form = $this->buildEventForm($eventForm, true);
+        $form = $this->buildEventForm($eventForm, true, $courses, $sessions);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -381,7 +387,7 @@ class EventController extends AbstractController {
         $eventForm = new EventForm();
         $eventForm->setEvent($event);
 
-        $form = $this->buildEventForm($eventForm, false);
+        $form = $this->buildEventForm($eventForm, false, $courses, $sessions);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
