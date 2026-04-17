@@ -26,7 +26,8 @@ class ConfigTestCommand extends Command {
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output): int	{
-		$appEnv = $_ENV['APP_ENV'] ?? ($_SERVER['APP_ENV'] ?? null);
+        /** @noinspection DuplicatedCode */
+        $appEnv = $_ENV['APP_ENV'] ?? ($_SERVER['APP_ENV'] ?? null);
 		$databaseUrl = $_ENV['DATABASE_URL'] ?? ($_SERVER['DATABASE_URL'] ?? null);
 
 		// Print these out so that you know what environment the application is running in.
@@ -53,7 +54,8 @@ class ConfigTestCommand extends Command {
 		$output->writeln( "\t\t" . 'Courses:');
 		$courses = $league->getCourses();
 
-		if ($courses === null) {
+        /** @noinspection PhpConditionAlreadyCheckedInspection */
+        if ($courses === null) {
 			$output->writeln("\t\t\t" . 'No courses associated with league!');
 		} else {
 			foreach ( $courses as $course ) {
@@ -118,7 +120,8 @@ class ConfigTestCommand extends Command {
 		$output->writeln( "\t\t" . 'Players:');
 		$players = $league->getPlayers();
 
-		if ($players === null) {
+        /** @noinspection PhpConditionAlreadyCheckedInspection */
+        if ($players === null) {
 			$output->writeln("\t\t\t" . 'No players associated with this league!');
 		} else {
 			foreach ($players as $player) {
@@ -127,7 +130,8 @@ class ConfigTestCommand extends Command {
 
 				if (!empty( $player->getAddress())) {
 					$address = $player->getAddress();
-					$region->$address->getRegion();
+                    /** @noinspection PhpUndefinedVariableInspection */
+                    $region->$address->getRegion();
 					$output->writeln("\t\t\t\t" . 'Address: ' . $address->getAddressline1() . ' ' . $address->getAddressline2() . ' ' . $address->getCity() . ' ' . $region->getName() . ' ' . $region->getCountry()->getName() . ' ' . $address->getPostalcode());
 				}
 				if (!empty($player->getEmailAddresses())) {
@@ -152,7 +156,8 @@ class ConfigTestCommand extends Command {
 		$output->writeln("\t\t" . 'Teams:');
 		$teams = $league->getTeams();
 
-		if ($teams === null) {
+        /** @noinspection PhpConditionAlreadyCheckedInspection */
+        if ($teams === null) {
 			$output->writeln("\t\t\t" . 'No teams associated with this league!');
 		} else {
 			foreach ($teams as $team) {
@@ -164,7 +169,8 @@ class ConfigTestCommand extends Command {
 		$output->writeln( "\t\t" . 'Seasons:');
 		$seasons = $league->getSeasons();
 
-		if ($seasons === null) {
+        /** @noinspection PhpConditionAlreadyCheckedInspection */
+        if ($seasons === null) {
 			$output->writeln("\t\t\t" . 'No seasons associated with this league!');
 		} else {
 			foreach ($seasons as $season) {

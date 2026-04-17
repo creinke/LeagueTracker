@@ -9,7 +9,7 @@ use Doctrine\ORM\Tools\Setup;
 use stdClass;
 
 class Base {
-	const CACHE_NAMESPACE = 'Doctrine\Common\Cache\\';
+	const string CACHE_NAMESPACE = 'Doctrine\Common\Cache\\';
 
 	protected mixed $cache;
 	protected EntityManager $em;

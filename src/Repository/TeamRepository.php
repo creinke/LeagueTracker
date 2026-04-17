@@ -5,9 +5,8 @@ use App\Entity\LeagueDE;
 use App\Entity\PlayerDE;
 use App\Entity\TeamDE;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\PersistentCollection;
 use Exception;
 use Psr\Log\LoggerInterface;
 
@@ -70,11 +69,12 @@ class TeamRepository extends AbstractBaseRepository {
             $qb = $this->createQueryBuilder('team');
 
             $expr = $qb->expr()->eq('team.league', '?1');
-            $qb->setParameters(array(1 => $leagueId));
+            $qb->setParameter(1, $leagueId);
 
             $qb->where($expr)
                 ->orderBy('team.teamnumber', 'ASC');
 
+            /** @noinspection PhpUnnecessaryLocalVariableInspection */
             $queryResult = $qb->getQuery()->getResult();
             // echo $qb->getQuery()->getSql();
             return $queryResult;
@@ -144,11 +144,11 @@ class TeamRepository extends AbstractBaseRepository {
 	 *
 	 * @param array $teamsData new or modified list of team data
 	 *
-	 * @return PersistentCollection of Entity\TeamDE
+	 * @return Collection of Entity\TeamDE
 	 * @throws Exception
 	 */
-    public function saveAll(array $teamsData, LeagueDE $league): PersistentCollection {
-        $teams = new PersistentCollection($this->getEntityManager(), new ClassMetadata('App\Entity\TeamDE'), new ArrayCollection());
+    public function saveAll(array $teamsData, LeagueDE $league): Collection {
+        $teams = new ArrayCollection();
 
         foreach($teamsData as $teamData) {
             $team = $this->save($teamData, $league);
@@ -197,13 +197,13 @@ class TeamRepository extends AbstractBaseRepository {
 	 *
 	 * @param int $leagueId
 	 * @param array $playersData array of player data
-	 * @param ?PersistentCollection $players of Entity\PlayerDE
+	 * @param ?Collection $players of Entity\PlayerDE
 	 *
-	 * @return PersistentCollection|null of Entity\PlayerDE
+	 * @return Collection|null of Entity\PlayerDE
 	 * @throws Exception
 	 */
-    protected function setPlayersData(int $leagueId, array $playersData, ?PersistentCollection $players = NULL): ?PersistentCollection {
-        $players ??= new PersistentCollection($this->getEntityManager(), new ClassMetadata('App\Entity\PlayerDE'), new ArrayCollection());
+    protected function setPlayersData(int $leagueId, array $playersData, ?Collection $players = NULL): ?Collection {
+        $players ??= new ArrayCollection();
 
         foreach($playersData as $playerData) {
             $players[] = $this->setPlayerData($leagueId, $playerData);
@@ -222,8 +222,9 @@ class TeamRepository extends AbstractBaseRepository {
 	 * @throws Exception
 	 */
     protected function setTeamData(array $teamData, LeagueDE $league, ?TeamDE $team = NULL): ?TeamDE {
-        $team ??= new TeamDE($this->getEntityManager());
+        $team ??= new TeamDE();
 
+        /** @noinspection PhpTernaryExpressionCanBeReplacedWithConditionInspection */
         $team->setDefunct($teamData['defunct'] == "true" ? true : false);
         $team->setName($teamData['name']);
         $team->setTeamnumber($teamData['teamNumber']);

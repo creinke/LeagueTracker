@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controller;
 
 use App\Entity\CourseDE;
@@ -29,8 +30,9 @@ use App\Repository\ScoreRepository;
 use App\Repository\TeammatchRepository;
 use App\Repository\TeamRepository;
 use App\Utility\Pairings;
+use DateMalformedStringException;
 use Doctrine\ORM\EntityManager;
-use \DateTime;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Psr\Log\LoggerInterface;
@@ -51,22 +53,22 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class SeasonController extends AbstractController {
-	private EntityManagerInterface $em;
-	private LoggerInterface $logger;
+    private EntityManagerInterface $em;
+    private LoggerInterface $logger;
 
-	public function __construct(EntityManagerInterface $em, LoggerInterface $logger) {
-		$this->em = $em;
-		$this->logger = $logger;
-	}
+    public function __construct(EntityManagerInterface $em, LoggerInterface $logger) {
+        $this->em = $em;
+        $this->logger = $logger;
+    }
 
-	/**
-	 * Build create schedule form
-	 *
-	 * @param CreateScheduleFormBean $view
-	 * @param LeagueDE $league
-	 *
-	 * @return FormInterface
-	 */
+    /**
+     * Build create a schedule form
+     *
+     * @param CreateScheduleFormBean $view
+     * @param LeagueDE $league
+     *
+     * @return FormInterface
+     */
     private function buildCreateScheduleForm(CreateScheduleFormBean $view, LeagueDE $league) : FormInterface {
         $course = $league->getCourses()[0];
         $nines = $course->getNines();
@@ -128,8 +130,10 @@ class SeasonController extends AbstractController {
      * @return FormInterface
      */
     private function buildNewSeasonForm(SeasonDE $season) : FormInterface {
+        /** @noinspection DuplicatedCode */
         $disableSaveButton = in_array('ROLE_SAMPLE', $this->getUser()->getRoles());
 
+        /** @noinspection PhpUnnecessaryLocalVariableInspection */
         $form = $this->createFormBuilder($season)
             ->add('name', TextType::class, array('label' => 'Name', 'required' => true, 'attr' => array('class' => 'form-control')))
             ->add('startdate', DateType::class, array('label' => 'Start Date', 'required' => true, 'widget' => 'single_text', 'attr' => array('class' => 'form-control')))
@@ -142,11 +146,11 @@ class SeasonController extends AbstractController {
     }
 
 
-	/**
-	 * @param SeasonForm $seasonForm
-	 *
-	 * @return FormInterface
-	 */
+    /**
+     * @param SeasonForm $seasonForm
+     *
+     * @return FormInterface
+     */
     private function buildSeasonForm(SeasonForm $seasonForm) : FormInterface {
         $disableSaveButton = in_array('ROLE_SAMPLE', $this->getUser()->getRoles());
         $options = [];
@@ -178,24 +182,25 @@ class SeasonController extends AbstractController {
         return $form;
     }
 
-	/**
-	 * @param int $eventNumber
-	 * @param int $eventType
-	 * @param int $eventFormat
-	 * @param int $playersPerTeam
-	 * @param int $teamsOrPlayersPerGame
-	 * @param int $gameFormat
-	 * @param SessionDE $session
-	 * @param NineDE $nine
-	 * @param TeeDE $tee
-	 * @param DateTime $eventDateAndTime
-	 * @param int $minutesBetweenGames
-	 * @param array $pairings
-	 *
-	 * @return EventDE
-	 */
-    private function createNewEvent(int $eventNumber, int $eventType, int $eventFormat, int $playersPerTeam, int $teamsOrPlayersPerGame, int $gameFormat, SessionDE &$session, NineDE $nine, TeeDE $tee, \DateTime $eventDateAndTime, int $minutesBetweenGames, array $pairings) : EventDE {
-        $event = new EventDE($this->em);
+    /**
+     * @param int $eventNumber
+     * @param int $eventType
+     * @param int $eventFormat
+     * @param int $playersPerTeam
+     * @param int $teamsOrPlayersPerGame
+     * @param int $gameFormat
+     * @param SessionDE $session
+     * @param NineDE $nine
+     * @param TeeDE $tee
+     * @param DateTime $eventDateAndTime
+     * @param int $minutesBetweenGames
+     * @param array $pairings
+     *
+     * @return EventDE
+     * @throws DateMalformedStringException
+     */
+    private function createNewEvent(int $eventNumber, int $eventType, int $eventFormat, int $playersPerTeam, int $teamsOrPlayersPerGame, int $gameFormat, SessionDE &$session, NineDE $nine, TeeDE $tee, DateTime $eventDateAndTime, int $minutesBetweenGames, array $pairings) : EventDE {
+        $event = new EventDE();
         $event->setEventnumber($eventNumber);
         $event->setEventtype($eventType);
         $event->setPlayersperteam($playersPerTeam);
@@ -214,12 +219,12 @@ class SeasonController extends AbstractController {
             $gameDateAndTime = clone $teeDateAndTime;
             
             if (EventType::isTeamMatch($eventType)) {
-                $game = SeasonController::createNewTeamMatchGame(new GameDE($this->em), $event, $this->em, $this->logger, $pairings[$gameNumber], $gameDateAndTime, $gameFormat);
+                $game = SeasonController::createNewTeamMatchGame(new GameDE(), $event, $this->em, $this->logger, $pairings[$gameNumber], $gameDateAndTime, $gameFormat);
             } else {
                 if (EventFormatType::isStrokePlay($eventFormat)) {
-                    $game = SeasonController::createNewSinglesGame(new GameDE($this->em), $event, $this->em, $this->logger, $pairings[$gameNumber], $gameDateAndTime, $gameFormat);
+                    $game = SeasonController::createNewSinglesGame(new GameDE(), $event, $this->em, $this->logger, $pairings[$gameNumber], $gameDateAndTime, $gameFormat);
                 } else {
-                    $game = SeasonController::createNewSinglesTeamMatchGame(new GameDE($this->em), $event, $this->em, $this->logger, $pairings[$gameNumber], $gameDateAndTime, $gameFormat);
+                    $game = SeasonController::createNewSinglesTeamMatchGame(new GameDE(), $event, $this->em, $this->logger, $pairings[$gameNumber], $gameDateAndTime, $gameFormat);
                 }
             }
             $event->getGames()->add($game);
@@ -228,17 +233,18 @@ class SeasonController extends AbstractController {
         return $event;
     }
 
-	/**
-	 * @param GameDE $game
-	 * @param EventDE $event
-	 * @param EntityManager $em
-	 * @param array $pairings
-	 * @param \DateTime $gameDateAndTime
-	 * @param int $gameFormat
-	 *
-	 * @return GameDE
-	 */
-    public static function createNewSinglesGame(GameDE $game, EventDE $event, EntityManagerInterface $em, LoggerInterface $logger, array $pairings, \DateTime $gameDateAndTime, int $gameFormat): GameDE {
+    /**
+     * @param GameDE $game
+     * @param EventDE $event
+     * @param EntityManager $em
+     * @param LoggerInterface $logger
+     * @param array $pairings
+     * @param DateTime $gameDateAndTime
+     * @param int $gameFormat
+     *
+     * @return GameDE
+     */
+    public static function createNewSinglesGame(GameDE $game, EventDE $event, EntityManagerInterface $em, LoggerInterface $logger, array $pairings, DateTime $gameDateAndTime, int $gameFormat): GameDE {
         $game->setFormat($gameFormat);
         $game->setStartingtime($gameDateAndTime);
         $game->setEvent($event);
@@ -252,17 +258,18 @@ class SeasonController extends AbstractController {
         return $game;
     }
 
-	/**
-	 * @param GameDE $game
-	 * @param EventDE $event
-	 * @param EntityManager $em
-	 * @param array $pairings
-	 * @param \DateTime $gameDateAndTime
-	 * @param int $gameFormat
-	 *
-	 * @return GameDE
-	 */
-    public static function createNewSinglesTeamMatchGame(GameDE $game, EventDE $event, EntityManagerInterface $em, LoggerInterface $logger, array $pairings, \DateTime $gameDateAndTime, int $gameFormat): GameDE {
+    /**
+     * @param GameDE $game
+     * @param EventDE $event
+     * @param EntityManager $em
+     * @param LoggerInterface $logger
+     * @param array $pairings
+     * @param DateTime $gameDateAndTime
+     * @param int $gameFormat
+     *
+     * @return GameDE
+     */
+    public static function createNewSinglesTeamMatchGame(GameDE $game, EventDE $event, EntityManagerInterface $em, LoggerInterface $logger, array $pairings, DateTime $gameDateAndTime, int $gameFormat): GameDE {
         $game->setFormat($gameFormat);
         $game->setStartingtime($gameDateAndTime);
         $game->setEvent($event);
@@ -287,17 +294,18 @@ class SeasonController extends AbstractController {
         return $game;
     }
 
-	/**
-	 * @param GameDE $game
-	 * @param EventDE $event
-	 * @param EntityManager $em
-	 * @param array $pairings
-	 * @param \DateTime $gameDateAndTime
-	 * @param int $gameFormat
-	 *
-	 * @return GameDE
-	 */
-    public static function createNewTeamMatchGame(GameDE $game, EventDE $event, EntityManagerInterface $em, LoggerInterface $logger, array $pairings, \DateTime $gameDateAndTime, int $gameFormat): GameDE {
+    /**
+     * @param GameDE $game
+     * @param EventDE $event
+     * @param EntityManager $em
+     * @param LoggerInterface $logger
+     * @param array $pairings
+     * @param DateTime $gameDateAndTime
+     * @param int $gameFormat
+     *
+     * @return GameDE
+     */
+    public static function createNewTeamMatchGame(GameDE $game, EventDE $event, EntityManagerInterface $em, LoggerInterface $logger, array $pairings, DateTime $gameDateAndTime, int $gameFormat): GameDE {
         $game->setFormat($gameFormat);
         $game->setStartingtime($gameDateAndTime);
         $game->setEvent($event);
@@ -312,7 +320,8 @@ class SeasonController extends AbstractController {
         $game->getTeammatches()->add($teamMatch);
         
         $playerRepository = new PlayerRepository($em, $logger);
-        
+
+        /** @noinspection DuplicatedCode */
         for ($playerIndex = 0; $playerIndex < $teamOne->getPlayers()->count(); $playerIndex++) {
             $playerOne = $playerRepository->find($teamOne->getPlayers()->get($playerIndex)->getId());
             $playerTwo = $playerRepository->find($teamTwo->getPlayers()->get($playerIndex)->getId());
@@ -327,15 +336,15 @@ class SeasonController extends AbstractController {
         return $game;
     }
 
-	/**
-	 * @param Request $request
-	 * @param $id
-	 *
-	 * @return RedirectResponse
-	 * @throws Exception
-	 */
-	#[Route('/season/delete/{id}', name: 'season_delete', methods: ['DELETE'])]
-	#[IsGranted('ROLE_ADMIN')]
+    /**
+     * @param Request $request
+     * @param $id
+     *
+     * @return RedirectResponse
+     * @throws Exception
+     */
+    #[Route('/season/delete/{id}', name: 'season_delete', methods: ['DELETE'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function delete(Request $request, $id): RedirectResponse {
         $seasonRepository = new SeasonRepository($this->em, $this->logger);
         $season = $seasonRepository->find($id);
@@ -383,26 +392,24 @@ class SeasonController extends AbstractController {
         return $this->redirectToRoute('season_list');
     }
 
-	/**
-	 * @param Request $request
-	 * @param $id
-	 *
-	 * @return RedirectResponse|Response
-	 * @throws Exception
-	 */
-	#[Route('/season/edit/{id}', name: 'season_edit', methods: ['GET', 'POST'])]
-	#[IsGranted('ROLE_ADMIN')]
+    /**
+     * @param Request $request
+     * @param $id
+     *
+     * @return RedirectResponse|Response
+     * @throws Exception
+     */
+    #[Route('/season/edit/{id}', name: 'season_edit', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function edit(Request $request, $id): RedirectResponse|Response {
         $user = $this->getUser();
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         $league = $user->getLeague();
         $_SESSION['league'] = $league;
 
         $courseRepository = new CourseRepository($this->em, $this->logger);
         $courses = $courseRepository->findCoursesByLeagueId($league->getId());
         $_SESSION['courses'] = $courses;
-
-        $courseRepository = new CourseRepository($this->em, $this->logger);
-        $courses = $courseRepository->findCoursesByLeagueId($league->getId());
 
         $seasonRepository = new SeasonRepository($this->em, $this->logger);
         $season = $seasonRepository->find($id);
@@ -450,15 +457,16 @@ class SeasonController extends AbstractController {
                 'form' => $form->createView()));
     }
 
-	/**
-	 * @param Request $request
-	 *
-	 * @return RedirectResponse|Response
-	 */
-	#[Route('/season/generate', name: 'season_generate', methods: ['GET', 'POST'])]
-	#[IsGranted('ROLE_ADMIN')]
+    /**
+     * @param Request $request
+     *
+     * @return RedirectResponse|Response
+     */
+    #[Route('/season/generate', name: 'season_generate', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function generate(Request $request): RedirectResponse|Response {
         $user = $this->getUser();
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         $league = $user->getLeague();
         $leagueId = $league->getId();
 
@@ -488,13 +496,13 @@ class SeasonController extends AbstractController {
                 'form' => $form->createView()));
     }
 
-	/**
-	 * @param CreateScheduleFormBean $view
-	 * @param LeagueDE $league
-	 *
-	 * @return SeasonDE
-	 * @throws Exception
-	 */
+    /**
+     * @param CreateScheduleFormBean $view
+     * @param LeagueDE $league
+     *
+     * @return SeasonDE
+     * @throws Exception
+     */
     private function generateSeason(CreateScheduleFormBean $view, LeagueDE $league) : SeasonDE {
         $courseRepository = new CourseRepository($this->em, $this->logger);
         $course = $courseRepository->find($league->getCourses()[0]->getId());
@@ -506,7 +514,8 @@ class SeasonController extends AbstractController {
         $eventDateAndTime = clone $view->getSeasonStartingDateAndTime();
         $eventType = $view->getEventType();
         $eventFormat = $view->getEventFormat();
-        
+
+        /** @noinspection PhpCastIsUnnecessaryInspection */
         $numberOfSessions = intval($view->getNumberOfSessions());
         $numberOfWeeks = $view->getNumberOfWeeks();
         $playersPerTeam = $view->getPlayersPerTeam();
@@ -522,7 +531,7 @@ class SeasonController extends AbstractController {
         }
         $numberOfEventsPerSession = intval($numberOfEvents / $numberOfSessions);
         
-        $season = new SeasonDE($this->em);
+        $season = new SeasonDE();
         $season->setName($view->getSeasonName());
         $season->setStartdate(clone $eventDateAndTime);
         $season->setLeague($league);
@@ -533,6 +542,7 @@ class SeasonController extends AbstractController {
             $teams = $league->getCurrentlyActiveTeams();
             $pairings = Pairings::generateTeanMatchPairings($teams, $numberOfEvents);
         } else {
+            $players = [];
             $playerRepository = new PlayerRepository($this->em, $this->logger);
             $p = $playerRepository->findAllPlayers($league->getId());
             
@@ -552,7 +562,7 @@ class SeasonController extends AbstractController {
         $currentPairingOffset = -1;
 
         for ($sessionNumber = 0; $sessionNumber < $numberOfSessions; $sessionNumber++) {
-            $session = new SessionDE($this->em);
+            $session = new SessionDE();
             $session->setStartdate(clone $eventDateAndTime);
             $session->setSeason($season);
 
@@ -575,6 +585,7 @@ class SeasonController extends AbstractController {
                 if (++$currentPairingOffset == sizeof($pairings)) {
                     $currentPairingOffset = 0;
                 }
+                /** @noinspection DuplicatedCode */
                 $tee = $this->findTeeByName($nextNine, $teeName);
                 $event = $this->createNewEvent($eventNumber + 1, $eventType, $eventFormat, $playersPerTeam, $teamsOrPlayersPerGame, $gameFormat, $session, $nextNine, $tee, clone $eventDateAndTime, $view->getMinutesBetweenGames(), $pairings[$currentPairingOffset]);
                 $event->setSession($session);
@@ -584,6 +595,7 @@ class SeasonController extends AbstractController {
                 $nextNine = $this->nextNine($nines, $nextNine);
             }
             for (; $eventNumber < $numberOfEventsPerSession + $numberOfPositionEventsPerSession; $eventNumber++) {
+                /** @noinspection DuplicatedCode */
                 $type = EventType::toOrdinal(EventType::POSITION_MATCH);
                 $tee = $this->findTeeByName($nextNine, $teeName);
                 $event = $this->createNewEvent($eventNumber + 1, $type, $eventFormat, $playersPerTeam, $teamsOrPlayersPerGame, $gameFormat, $session, $nextNine, $tee, clone $eventDateAndTime, $view->getMinutesBetweenGames(), $pairings[$currentPairingOffset]);
@@ -595,6 +607,7 @@ class SeasonController extends AbstractController {
             }
             if ($numberOfSessions == 2 && $sessionNumber == 1) {
                 for (; $eventNumber < $numberOfEventsPerSession + $numberOfPositionEventsPerSession + $numberOfPlayoffEvents; $eventNumber++) {
+                    /** @noinspection DuplicatedCode */
                     $type = EventType::toOrdinal(EventType::PLAYOFF_MATCH);
                     $tee = $this->findTeeByName($nextNine, $teeName);
                     $event = $this->createNewEvent($eventNumber + 1, $type, $eventFormat, $playersPerTeam, $teamsOrPlayersPerGame, $gameFormat, $session, $nextNine, $tee, clone $eventDateAndTime, $view->getMinutesBetweenGames(), $pairings[$currentPairingOffset]);
@@ -610,6 +623,7 @@ class SeasonController extends AbstractController {
             $session->setEnddate(clone $sessionEndDateAndTime);
             $season->getSessions()->add($session);
         }
+        /** @noinspection PhpUndefinedVariableInspection */
         $season->setEnddate(clone $sessionEndDateAndTime);
         return $season;
     }
@@ -628,13 +642,15 @@ class SeasonController extends AbstractController {
         return null;
     }
 
-	/**
-	 * @param $id
-	 *
-	 * @return object|null
-	 */
-	private function findEvent(int $id) : ?EventDE {
+    /**
+     * @param int $id
+     *
+     * @return object|null
+     * @noinspection PhpUnusedPrivateMethodInspection
+     */
+    private function findEvent(int $id) : ?EventDE {
         $eventRepository = new EventRepository($this->em, $this->logger);
+        /** @noinspection PhpUnnecessaryLocalVariableInspection */
         $e = $eventRepository->find($id);
         return $e;
     }
@@ -669,13 +685,14 @@ class SeasonController extends AbstractController {
         return null;
     }
 
-	/**
-	 * @return Response
-	 * @throws Exception
-	 */
-	#[Route('/season/list', name: 'season_list', methods: ['GET'])]
-	#[IsGranted('ROLE_USER')]
+    /**
+     * @return Response
+     * @throws Exception
+     */
+    #[Route('/season/list', name: 'season_list', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function list(): Response {
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         $league = $this->getUser()->getLeague();
         $leagueId = $league->getId();
         $leagueName = $league->getName();
@@ -691,14 +708,16 @@ class SeasonController extends AbstractController {
             );
     }
 
-	/**
-	 * @return Response
-	 * @throws Exception
-	 */
-	#[Route('/season/new', name: 'season_new', methods: ['GET', 'POST'])]
-	#[IsGranted('ROLE_ADMIN')]
+    /**
+     * @param Request $request
+     *
+     * @return Response
+     * @throws Exception
+     */
+    #[Route('/season/new', name: 'season_new', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function new(Request $request): Response {
-        $season = new  SeasonDE($this->em, $this->logger);
+        $season = new SeasonDE();
 
         $form = $this-> buildNewSeasonForm($season);
         $form->handleRequest($request);
@@ -706,6 +725,7 @@ class SeasonController extends AbstractController {
         if ($form->isSubmitted() && $form->isValid()) {
             $season = $form->getData();
 
+            /** @noinspection PhpPossiblePolymorphicInvocationInspection */
             $league = $this->getUser()->getLeague();
             $leagueId = $league->getId();
             $league = new LeagueRepository($this->em, $this->logger);
@@ -745,26 +765,26 @@ class SeasonController extends AbstractController {
         }
     }
 
-	/**
-	 * @param $id
-	 *
-	 * @return Response
-	 */
-	#[Route('/season/view/{id}', name: 'season_view', methods: ['GET'])]
-	#[IsGranted('ROLE_USER')]
+    /**
+     * @param $id
+     *
+     * @return Response
+     */
+    #[Route('/season/view/{id}', name: 'season_view', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function view($id): Response {
         $seasonRepository = new SeasonRepository($this->em, $this->logger);
         $season = $seasonRepository->find($id);
 
-		if ($season == null) {
-			return $this->render('error/error.html.twig',
-				['title' => 'Error', 'e' => 'There are no seasons that match the criteria specified.'] );
-		} else {
-			return $this->render('season/view.html.twig',
-				array(
-					'title' => 'Season',
-					'season' => $season)
-			);
-		}
+        if ($season == null) {
+            return $this->render('error/error.html.twig',
+                ['title' => 'Error', 'e' => 'There are no seasons that match the criteria specified.'] );
+        } else {
+            return $this->render('season/view.html.twig',
+                array(
+                    'title' => 'Season',
+                    'season' => $season)
+            );
+        }
     }
 }

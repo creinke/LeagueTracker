@@ -13,7 +13,7 @@ use Psr\Log\LoggerInterface;
 class GameRepository extends AbstractBaseRepository {
 
     public function __construct(EntityManagerInterface $em, LoggerInterface $logger) {
-        parent::__construct($em, $logger, GameDE::class);;
+        parent::__construct($em, $logger, GameDE::class);
     }
 
 	/**
@@ -44,7 +44,8 @@ class GameRepository extends AbstractBaseRepository {
 	 * @param GameDE $game
 	 *
 	 * @throws Exception
-	 */
+     * @noinspection PhpParameterByRefIsNotUsedAsReferenceInspection
+     */
     public function reorderPlayerMatchesIfNecessary(EventDE $event, GameDE &$game): void {
     	$scoreRepository = new ScoreRepository($this->getEntityManager(), $this->getLogger());
     	
@@ -114,7 +115,9 @@ class GameRepository extends AbstractBaseRepository {
 	 *
 	 * @return void
 	 * @throws Exception
-	 */
+     * @noinspection PhpUnused
+     * @noinspection PhpParameterByRefIsNotUsedAsReferenceInspection
+     */
 	public function reversePlayerMatchesIfNecessary(EventDE $event, GameDE &$game): void {
         $scoreRepository = new ScoreRepository($this->getEntityManager(), $this->getLogger());
         $playermatchRepository = new PlayermatchRepository($this->getEntityManager(), $this->getLogger());
@@ -123,6 +126,7 @@ class GameRepository extends AbstractBaseRepository {
         $playerMatchOne = $playerMatches[0];
         $playerMatchTwo = $playerMatches[1];
 
+        /** @noinspection DuplicatedCode */
         $playerOne = $playerMatchOne->getPlayerone();
         $playerOneScore = $playerMatchOne->getPlayeronescore();
         $playerOneHandicapIndex = $scoreRepository->calculatePlayerHandicapIndex($playerOne, $event->getStartdateandtime())['currentHandicapIndex'];
@@ -131,6 +135,7 @@ class GameRepository extends AbstractBaseRepository {
         $playerTwoScore = $playerMatchOne->getPlayertwoscore();
         $playerTwoHandicapIndex = $scoreRepository->calculatePlayerHandicapIndex($playerTwo, $event->getStartdateandtime())['currentHandicapIndex'];
 
+        /** @noinspection DuplicatedCode */
         $playerThree = $playerMatchTwo->getPlayerone();
         $playerThreeScore = $playerMatchTwo->getPlayeronescore();
         $playerThreeHandicapIndex = $scoreRepository->calculatePlayerHandicapIndex($playerThree, $event->getStartdateandtime())['currentHandicapIndex'];

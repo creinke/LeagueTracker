@@ -38,11 +38,11 @@
                 </div>
             </div>
             
-            <div class="table-responsive" style="width=100%;">
+            <div class="table-responsive" style="width: 100%;">
                 <table class="table" style="width: 100%;">
                 	<thead>
                     	<tr>
-                        	<th>Start Date and Time</th>
+                            <th>Start Date and Time</th>
                             {% if not singlesMatch %} 
                             	<th>Match</th>
                             {% endif %}
@@ -64,7 +64,7 @@
                                 {% set teamMatch = game.teammatches[0] %}
                                 {% set teamOne = teamMatch.teamone %}
                                 {% set teamTwo = teamMatch.teamtwo %}
-                                <td>{{ teamOne.name }} vs </br>{{ teamTwo.name }}</td>
+                                <td>{{ teamOne.name }} vs <br/>{{ teamTwo.name }}</td>
                             {% endif %}
                             <td>{{ event.eventtypeString }}</td>
                             <td>{{ event.formatString }}</td>

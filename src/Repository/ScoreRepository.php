@@ -2,8 +2,6 @@
 namespace App\Repository;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use App\Entity\PlayerDE;
 use App\Entity\ScoreDE;
 use DateTime;
@@ -72,7 +70,7 @@ class ScoreRepository extends AbstractBaseRepository {
     }
 
     /**
-     * Checks to make sure all score required fields are set
+     * Checks to make sure all score-required fields are set
      * This is also where to perform secondary filtering/sanitization of data
      *
      * @param array $scoreData
@@ -96,7 +94,8 @@ class ScoreRepository extends AbstractBaseRepository {
 	 *
 	 * @return mixed ScoreDEs for player specified
 	 * @throws Exception
-	 */
+     * @noinspection PhpUnused
+     */
     public function findAllPlayerScores(PlayerDE $player, DateTime $timestamp): mixed {
         try {
             // Crete QB instance and statement
@@ -104,12 +103,15 @@ class ScoreRepository extends AbstractBaseRepository {
             $qb->where($qb->expr()->eq('score.player', '?1'))
                 ->andWhere($qb->expr()->lt('score.timestamp', '?2'))
                 ->orderBy('score.timestamp', 'DESC')
-                ->setParameters(array(1 => $player->getId(), 2 => $timestamp));
+                ->setParameter(1, $player->getId())
+                ->setParameter(2, $timestamp);
             
             // echo $qb->getQuery()->getSql();
+            /** @noinspection PhpUnnecessaryLocalVariableInspection */
             $queryResult = $qb->getQuery()->getResult();
             return $queryResult;
         } catch (Exception $e) {
+            /** @noinspection PhpExceptionImmediatelyRethrownInspection */
             throw $e;
         }
     }
@@ -130,12 +132,15 @@ class ScoreRepository extends AbstractBaseRepository {
                 ->andWhere($qb->expr()->eq('score.partialscore', '0'))
                 ->andWhere($qb->expr()->lt('score.timestamp', '?2'))
                 ->orderBy('score.timestamp', 'DESC')
-                ->setParameters(array(1 => $player->getId(), 2 => $timestamp));
+                ->setParameter(1, $player->getId())
+                ->setParameter(2, $timestamp);
 
             // echo $qb->getQuery()->getSql();
+            /** @noinspection PhpUnnecessaryLocalVariableInspection */
             $queryResult = $qb->getQuery()->getResult();
             return $queryResult;
         } catch (Exception $e) {
+            /** @noinspection PhpExceptionImmediatelyRethrownInspection */
             throw $e;
         }
     }
@@ -193,10 +198,12 @@ class ScoreRepository extends AbstractBaseRepository {
     }
 
     /**
-     * @param array $n
+     * @param string $n
+     *
      * @return string of packed hexidecimal integers
+     * @noinspection PhpUnusedPrivateMethodInspection
      */
-    private function pack(array $n): string {
+    private function pack(string $n): string {
         $a = explode(', ', $n);
         $l = sizeof($a);
 
@@ -290,8 +297,9 @@ class ScoreRepository extends AbstractBaseRepository {
 
     /**
      * @param string $s packed integer string
+     *
      * @return number[] of unpacked integers
-     */
+     * @noinspection PhpUnusedPrivateMethodInspection*/
     private function unpack(string $s): array {
         $a = array();
         $l = strlen($s);

@@ -94,7 +94,8 @@ class GameResultsViewBean {
                             $playerOneAdjustedNetStrokes[] = $playerOneAdjustedNetHoleStrokes;
                             $playerTwoAdjustedNetHoleStrokes = $playerTwoScore->calculateAdjustedNetStrokes($playerTwoHoleStrokes, $holenumber, $playerTwoAdjustedHandicap);
                             $playerTwoAdjustedNetStrokes[] = $playerTwoAdjustedNetHoleStrokes;
-        
+
+                            /** @noinspection DuplicatedCode */
                             if ($playerOneAdjustedNetHoleStrokes < $playerTwoAdjustedNetHoleStrokes) {
                                 $playerOneHolePoints[$holenumber] = 1;
                                 $playerTwoHolePoints[$holenumber] = 0;
@@ -116,6 +117,7 @@ class GameResultsViewBean {
                             }
                         }
                     }
+                    /** @noinspection DuplicatedCode */
                     if ($playerOneNetStrokes < $playerTwoNetStrokes) {
                         $playerOneTotalPoints += 1;
                         $playerOneNetPoints = 1;
@@ -150,7 +152,8 @@ class GameResultsViewBean {
                 $playerMatches[] = $playerTwoMatchResults;
             }
             $this->teamMatches[] = $playerMatches;
-            
+
+            /** @noinspection DuplicatedCode */
             if ($teamOneNetStrokes < $teamTwoNetStrokes) {
                 $teamOneTotalPoints += 1;
                 $teamOneNetPoints = 1;
@@ -173,7 +176,8 @@ class GameResultsViewBean {
     public function getNinesPlayed() : array {
         return $this->ninesPlayed;
     }
-    
+
+    /** @noinspection PhpUnused */
     public function getPlayerResults() : array {
         return $this->playerResuts;
     }
@@ -186,18 +190,22 @@ class GameResultsViewBean {
         return $this->teamResults;
     }
 
+    /** @noinspection PhpUnused */
     public function setNinesPlayed(array $ninesPlayed): void {
         $this->ninesPlayed = $ninesPlayed;
     }
-    
+
+    /** @noinspection PhpUnused */
     public function setPlayerResults(array $playerResuts): void {
         $this->playerResuts = $playerResuts;
     }
-    
+
+    /** @noinspection PhpUnused */
     public function setTeamMatches($teamMatches): void {
         $this->teamMatches = $teamMatches;
     }
-    
+
+    /** @noinspection PhpUnused */
     public function setTeamResults(array $teamResults): void {
         $this->teamResults = $teamResults;
     }

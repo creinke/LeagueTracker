@@ -2,6 +2,7 @@
 namespace App\Form;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use DateTime;
 
 class SeasonFormBean {
     public function __construct() {
@@ -9,49 +10,49 @@ class SeasonFormBean {
         $this->sessions = new ArrayCollection();
     }
 
-    private $enddate;
-    private $events;
-    private $name;
-    private $sessions; 
-    private $startdate;
+    private DateTime $enddate;
+    private ArrayCollection$events;
+    private string $name;
+    private ArrayCollection $sessions;
+    private DateTime $startdate;
 
-    public function getEnddate() {
+    public function getEnddate(): DateTime {
         return $this->enddate;
     }
 
-    public function getEvents() {
+    public function getEvents(): ArrayCollection {
         return $this->events;
     }
 
-    public function getName() {
+    public function getName(): string {
         return $this->name;
     }
 
-    public function getSessions() {
+    public function getSessions(): ArrayCollection {
         return $this->sessions;
     }
     
-    public function getStartdate() {
+    public function getStartdate(): DateTime {
         return $this->startdate;
     }
 
-    public function setEnddate($enddate) {
+    public function setEnddate(DateTime $enddate): void {
         $this->enddate = $enddate;
     }
 
-    public function setEvents($events) {
+    public function setEvents(ArrayCollection $events): void {
         $this->events = $events;
     }
 
-    public function setName($name) {
+    public function setName(string $name) {
         $this->name = $name;
     }
 
-    public function setSessions($sessions) {
+    public function setSessions(ArrayCollection $sessions): void {
         $this->sessions = $sessions;
     }
     
-    public function setStartdate($startdate) {
+    public function setStartdate(DateTime $startdate): void {
         $this->startdate = $startdate;
     }
 }

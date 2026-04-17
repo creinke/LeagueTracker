@@ -10,8 +10,7 @@ use App\Repository\CourseRepository;
 use App\Repository\RegionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\PersistentCollection;
+use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -34,10 +33,11 @@ class AddCourseCommand extends Command {
 	}
 
 	/**
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output): int	{
-		$appEnv = $_ENV['APP_ENV'] ?? ($_SERVER['APP_ENV'] ?? null);
+        /** @noinspection DuplicatedCode */
+        $appEnv = $_ENV['APP_ENV'] ?? ($_SERVER['APP_ENV'] ?? null);
 		$databaseUrl = $_ENV['DATABASE_URL'] ?? ($_SERVER['DATABASE_URL'] ?? null);
 
 		// Print these out so that you know what environment the application is running in.
@@ -53,13 +53,14 @@ class AddCourseCommand extends Command {
             exit ('Unable to open CSV file ./data/' . $courseName . '.csv');
         }
 
-        $nines = new PersistentCollection($this->em, new ClassMetadata('App\Entity\NineDE'), new ArrayCollection());
-        $tees = new PersistentCollection($this->em, new ClassMetadata('App\Entity\TeeDE'), new ArrayCollection());
-        $holes = new PersistentCollection($this->em, new ClassMetadata('App\Entity\HoleDE'), new ArrayCollection());
+        $nines = new ArrayCollection();
+        $tees = new ArrayCollection();
+        $holes = new ArrayCollection();
 
+        /** @noinspection PhpRedundantOptionalArgumentInspection */
         while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
             if ($data[0] == 'course') {
-                $course = new CourseDE($this->em);
+                $course = new CourseDE();
                 $course->setName($data[1]);
                 $course->setWebsite($data[2]);
 
@@ -75,26 +76,31 @@ class AddCourseCommand extends Command {
                 $address->setPostalcode($data[8]);
                 $course->setAddress($address);
             } else if ($data[0] == 'endcourse') {
+                /** @noinspection PhpUndefinedVariableInspection */
                 $course->setNines($nines);
                 $courseRepository = new CourseRepository($this->em, $this->logger);
                 $courseRepository->saveCourse($course);
             } else if ($data[0] == 'nine') {
-                $nine = new NineDE($this->em);
+                $nine = new NineDE();
                 $nine->setName($data[1]);
+                /** @noinspection PhpUndefinedVariableInspection */
                 $nine->setCourse($course);
                 $nines->add($nine);
             } else if ($data[0] == 'endnine') {
+                /** @noinspection PhpUndefinedVariableInspection */
                 $nine->setTees($tees);
             } else if ($data[0] == 'tee') {
-                $tee = new TeeDE($this->em, $this->logger);
+                $tee = new TeeDE();
                 $tee->setName($data[1]);
                 $tee->setPar($data[2]);
                 $tee->setRating($data[3]);
                 $tee->setLength($data[4]);
                 $tee->setSlope($data[5]);
+                /** @noinspection PhpUndefinedVariableInspection */
                 $tee->setNine($nine);
                 $tees->add($tee);
             } else if ($data[0] == 'endtee') {
+                /** @noinspection PhpUndefinedVariableInspection */
                 $tee->setHoles($holes);
             } else if ($data[0] == 'hole') {
                 $hole = new HoleDE();
@@ -104,6 +110,7 @@ class AddCourseCommand extends Command {
                 $hole->setPar($data[2]);
                 $hole->setHandicap($data[3]);
                 $hole->setLength($data[4]);
+                /** @noinspection PhpUndefinedVariableInspection */
                 $hole->setTee($tee);
                 $holes->add($hole);
             }

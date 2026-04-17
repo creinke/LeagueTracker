@@ -71,7 +71,7 @@ fi
 
 # Fix permissions if needed
 echo "Fixing permissions..."
-chown -R www-data:www-data "${LIVE_DIR}"
+chown -R kurt:www-data "${LIVE_DIR}"
 chmod -R u=rwX,g=rX,o=rX "${LIVE_DIR}"
 
 echo "Deployment complete."

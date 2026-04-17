@@ -6,11 +6,11 @@ use App\Utility\EnumTrait;
 abstract class EventType {
     use EnumTrait;
 
-    const LEAGUE_MATCH = "LEAGUE MATCH";
-    const POSITION_MATCH = "POSITION MATCH";
-    const PLAYOFF_MATCH = "PLAYOFF MATCH";
-    const TEAM_EVENT = "TEAM EVENT";
-    const SINGLES_MATCH = "SINGLES MATCH";
+    const string LEAGUE_MATCH = "LEAGUE MATCH";
+    const string POSITION_MATCH = "POSITION MATCH";
+    const string PLAYOFF_MATCH = "PLAYOFF MATCH";
+    const string TEAM_EVENT = "TEAM EVENT";
+    const string SINGLES_MATCH = "SINGLES MATCH";
     
     private static array $enum = array( 1 => "LEAGUE MATCH", 2 => "POSITION MATCH", 3 => "PLAYOFF MATCH", 4 => "TEAM EVENT", 5 => "SINGLES MATCH");
 

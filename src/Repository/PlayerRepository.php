@@ -14,10 +14,9 @@ use App\Entity\PlayerDE;
 use App\Model\EmailType;
 use App\Model\PhonenumberType;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Driver\Statement;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\PersistentCollection;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr\Join;
 use Exception;
 use Psr\Log\LoggerInterface;
@@ -196,7 +195,7 @@ class PlayerRepository extends AbstractBaseRepository {
             $qb = $this->createQueryBuilder('player');
 
             $expr = $qb->expr()->eq('player.league', '?1');
-            $qb->setParameters(array(1 => $leagueId));
+            $qb->setParameter(1, $leagueId);
 
             // Implement join
             $qb->addSelect('name')    // Adds Name entities to result set
@@ -234,7 +233,11 @@ class PlayerRepository extends AbstractBaseRepository {
                 $qb->expr()->like('name.middlenameorinitial', '?4'),
                 $qb->expr()->like('name.generation', '?5'));
 
-            $qb->setParameters(array(1 => $leagueId, 2 => $nameData['firstName'], 3 => $nameData['lastName'], 4 => $nameData['middleNameOrInitial'], 5 => $nameData['generation']));
+            $qb->setParameter(1, $leagueId)
+                ->setParameter(2, $nameData['firstName'])
+                ->setParameter(3, $nameData['lastName'])
+                ->setParameter(4, $nameData['middleNameOrInitial'])
+                ->setParameter(5, $nameData['generation']);
 
             // Implement join
             $qb->addSelect('name')    // Adds Name entities to result set
@@ -315,11 +318,11 @@ class PlayerRepository extends AbstractBaseRepository {
 	 * @param array $playersData new or modified list of player data
 	 * @param LeagueDE $league
 	 *
-	 * @return PersistentCollection
+	 * @return Collection
 	 * @throws Exception
 	 */
-    public function saveAll(array $playersData, LeagueDE $league): PersistentCollection {
-        $players = new PersistentCollection($this->getEntityManager(), new ClassMetadata('App\Entity\PlayerDE'), new ArrayCollection());
+    public function saveAll(array $playersData, LeagueDE $league): Collection {
+        $players = new ArrayCollection();
 
         foreach($playersData as $playerData) {
             $player = $this->save($playerData, $league);
@@ -391,12 +394,12 @@ class PlayerRepository extends AbstractBaseRepository {
 
 	/**
 	 * @param array $emailsData array of email data
-	 * @param ?PersistentCollection|null $emails of EmailDE
+	 * @param ?Collection|null $emails of EmailDE
 	 *
-	 * @return PersistentCollection of EmailDE
+	 * @return Collection of EmailDE
 	 */
-    protected function setEmailsData(array $emailsData, ?PersistentCollection $emails = NULL): PersistentCollection {
-        $emails ??= new PersistentCollection($this->getEntityManager(), new ClassMetadata('App\Entity\EmailDE'), new ArrayCollection());
+    protected function setEmailsData(array $emailsData, ?Collection $emails = NULL): Collection {
+        $emails ??= new ArrayCollection();
 
         foreach($emailsData as $emailData) {
             $emails[] = $this->setEmailData($emailData);
@@ -442,12 +445,12 @@ class PlayerRepository extends AbstractBaseRepository {
 
 	/**
 	 * @param array $phonenumbersData array of phonenumber data
-	 * @param ?PersistentCollection|null $phonenumbers of Entity\PhonenumberDE
+	 * @param ?Collection|null $phonenumbers of Entity\PhonenumberDE
 	 *
-	 * @return PersistentCollection of Entity\PhonenumberDE
+	 * @return Collection of Entity\PhonenumberDE
 	 */
-    protected function setPhonenumbersData(array $phonenumbersData, ?PersistentCollection $phonenumbers = NULL): PersistentCollection {
-        $phonenumbers ??= new PersistentCollection($this->getEntityManager(), new ClassMetadata('App\Entity\PhonenumberDE'), new ArrayCollection());
+    protected function setPhonenumbersData(array $phonenumbersData, ?Collection $phonenumbers = NULL): Collection {
+        $phonenumbers ??= new ArrayCollection();
 
         foreach($phonenumbersData as $phonenumberData) {
             $phonenumbers[] = $this->setPhonenumberData($phonenumberData);
@@ -464,8 +467,9 @@ class PlayerRepository extends AbstractBaseRepository {
      * @return PlayerDE $player
      */
     protected function setPlayerData(array $playerData, LeagueDE $league, ?PlayerDE $player = NULL): PlayerDE {
-        $player ??= new PlayerDE($this->getEntityManager());
+        $player ??= new PlayerDE();
 
+        /** @noinspection PhpTernaryExpressionCanBeReplacedWithConditionInspection */
         $player->setDefunct($playerData['defunct'] == "true" ? true : false);
         $player->setName($this->setNameData($playerData['name']));
         // $player->setPlayernumber($playerData['playerNumber']);

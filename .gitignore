@@ -6,6 +6,7 @@
 .env.local.php
 .env.*.local
 /src/data/*
+/src/data/proxy/
 !/src/data/.gitkeep
 
 /config/secrets/prod/prod.decrypt.private.php

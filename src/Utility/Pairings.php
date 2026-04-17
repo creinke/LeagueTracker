@@ -2,15 +2,19 @@
 namespace App\Utility;
     
 use App\Entity\PlayerDE;
-use \Exception;
+use Exception;
+use Random\RandomException;
 
 class Pairings {
-    static private function addToPlayedTables(array $team, int $randomTeamIndex, int $event, array &$playersPlayingInEvent, array &$teamsPlayedInAllEvents) {
+    static private function addToPlayedTables(array $team, int $randomTeamIndex, int $event, array &$playersPlayingInEvent, array &$teamsPlayedInAllEvents): void {
         $playersPlayingInEvent[strval($team[0]->getId())] = true;
         $playersPlayingInEvent[strval($team[1]->getId())] = true;
         $teamsPlayedInAllEvents[strval($randomTeamIndex)] = $event;
     }
-    
+
+    /**
+     * @throws Exception
+     */
     static private function findRandomTeam(PlayerDE $oddPlayerOne, PlayerDE $oddPlayerTwo, array $seedTeams, ?int &$randomTeamIndex) {
         for ($i = 0; $i < sizeof($seedTeams); $i++) {
             $team = $seedTeams[$i];
@@ -28,7 +32,7 @@ class Pairings {
         throw new Exception("Unable to find team: " . Pairings::teamName($undefinedTeam) . PHP_EOL);
     }
     
-    static public function generateRandomSinglesPairings(array $players, int $numberOfEvents, int $playersPerGame) {
+    static public function generateRandomSinglesPairings(array $players, int $numberOfEvents, int $playersPerGame): array {
         $numberOfPlayers = sizeof($players);
         $gamesPerEvent = intval(($numberOfPlayers + ($playersPerGame - 1)) / $playersPerGame);
         $gamesInAllEvents = [];
@@ -63,8 +67,11 @@ class Pairings {
         }
         return $gamesInAllEvents;
     }
-    
-    static public function generateRandomTeamPairings(array $players, int $numberOfEvents, int $matchesPerGame) {
+
+    /**
+     * @throws Exception
+     */
+    static public function generateRandomTeamPairings(array $players, int $numberOfEvents, int $matchesPerGame): array {
         $seedTeams = array();
         
         for ($i = 0, $max = count($players); $i < $max; $i++) {
@@ -128,11 +135,14 @@ class Pairings {
         }
         return $gamesInAllEvents;
     }
-    
+
     /**
-     * @param int $teams
+     * @param array $teams
+     * @param int $numberOfEvents
+     *
+     * @return array
      */
-    static public function generateTeanMatchPairings(array $teams, int $numberOfEvents) {
+    static public function generateTeanMatchPairings(array $teams, int $numberOfEvents): array {
         $numberOfTeams = sizeof($teams);
         $gamesPerEvent = intval(($numberOfTeams + 1) / 2);
         $tableOne = array();
@@ -206,7 +216,10 @@ class Pairings {
         }
         return $gamesInAllEvents;
     }
-    
+
+    /**
+     * @throws RandomException
+     */
     static private function nextBestRandomTeamSelection(array $seedTeams, int $numberOfSeedTeams, int $event, array &$playersPlayingInEvent, array &$teamsPlayedInAllEvents, &$repeatingTeams) {
         $retries = 0;
         
@@ -229,7 +242,7 @@ class Pairings {
      * @param array $tableOne
      * @param array $tableTwo
      */
-    private static function shiftTables(array &$tableOne, array &$tableTwo) {
+    private static function shiftTables(array &$tableOne, array &$tableTwo): void {
         $tableLength = sizeof($tableOne);
         $tableTwoSlotOneContents = $tableTwo[0];
         
@@ -244,14 +257,14 @@ class Pairings {
         $tableOne[1] = $tableTwoSlotOneContents;
     }
     
-    static private function teamPlayersPlaying(array $randomTeam, array $playersPlayingInEvent) {
+    static private function teamPlayersPlaying(array $randomTeam, array $playersPlayingInEvent): bool {
         $playerOneId = strval($randomTeam[0]->getId());
         $playerTwoId = strval($randomTeam[1]->getId());
         
         return array_key_exists($playerOneId, $playersPlayingInEvent) || array_key_exists($playerTwoId, $playersPlayingInEvent);
     }
     
-    static private function teamsPlaying(array $seedTeams, int $randomTeamIndex, array $teamsPlayedInAllEvents) {
+    static private function teamsPlaying(array $seedTeams, int $randomTeamIndex, array $teamsPlayedInAllEvents): bool {
         if (array_key_exists(strval($randomTeamIndex), $teamsPlayedInAllEvents)) {
             $team = $seedTeams[$randomTeamIndex];
             $event = $teamsPlayedInAllEvents[strval($randomTeamIndex)];
@@ -259,7 +272,7 @@ class Pairings {
         return array_key_exists(strval($randomTeamIndex), $teamsPlayedInAllEvents);
     }
     
-    static private function teamName(array $team) {
+    static private function teamName(array $team): string {
         $playerOne = $team[0];
         $playerTwo = $team[1];
         $playerOneName = $playerOne->getName()->getFullname();

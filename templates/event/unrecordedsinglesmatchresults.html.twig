@@ -15,14 +15,17 @@
         
         <li>
 
+        {% set loopIndex = 0 %}
         {% for playerMatch in playerMatches %}
             {% set players = playerMatch.matchPlayers %}
         
     		{% for player in players %}
-    		    {% if loop.index0 != 0 %}
-                    , 
+    		    {% if loopIndex != 0 %}
+                    , {{ player.name.lastname }}
+                {% else %}
+                    {{ player.name.lastname }}
                 {% endif %}
-                {{ player.name.lastname }}
+                {% set loopIndex = loopIndex + 1 %}
             {% endfor %}
         {% endfor %}
             		

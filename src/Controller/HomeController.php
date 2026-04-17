@@ -1,4 +1,6 @@
 <?php
+/** @noinspection PhpPropertyOnlyWrittenInspection */
+
 namespace App\Controller;
 
 use Doctrine\ORM\EntityManagerInterface;
@@ -8,19 +10,19 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 class HomeController extends AbstractController {
-	private EntityManagerInterface $em;
-	private LoggerInterface $logger;
+    private EntityManagerInterface $em;
+    private LoggerInterface $logger;
 
-	public function __construct(EntityManagerInterface $em, LoggerInterface $logger) {
-		$this->em = $em;
-		$this->logger = $logger;
-	}
+    public function __construct(EntityManagerInterface $em, LoggerInterface $logger) {
+        $this->em = $em;
+        $this->logger = $logger;
+    }
 
-	/**
-	 * Access denied route
-	 * @return Response
-	 */
-	#[Route('/accessdenied', name: 'accessdenied', methods: ['GET'])]
+    /**
+     * Access denied route
+     * @return Response
+     */
+    #[Route('/accessdenied', name: 'accessdenied', methods: ['GET'])]
     public function accessDenied(): Response {
         return $this->render(view: 'security/accessdenied.html.twig',
             parameters: array(
@@ -34,7 +36,7 @@ class HomeController extends AbstractController {
      */
     #[Route('/', name: 'home', methods: 'get')]
     public function home(): Response {
-		$this->logger->info('Home page accessed');
+        $this->logger->info('Home page accessed');
 
         return $this->render(view: 'home/index.html.twig',
             parameters: array (

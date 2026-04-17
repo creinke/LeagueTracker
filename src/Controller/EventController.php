@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Entity\EventDE;
 use App\Entity\LeagueDE;
 use App\Entity\PlayerDE;
-use App\Form\EventForm;
+use App\Form\EventFormBean;
 use App\Form\Type\EventType;
 use App\Form\PlayersFormBean;
 use App\Model\EventFormatType;
@@ -22,10 +22,9 @@ use App\View\SinglesStrokePlayEventViewBean;
 use App\View\SinglesStrokePlaySeasonStandingsViewBean;
 use App\View\TeamEventViewBean;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\ORMException;
-use Doctrine\ORM\PersistentCollection;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -44,25 +43,25 @@ use DateTime;
  * Controller associated with the implementation of CRUD methods affecting Event Entities.
  */
 class EventController extends AbstractController {
-	private EntityManagerInterface $em;
-	private LoggerInterface $logger;
+    private EntityManagerInterface $em;
+    private LoggerInterface $logger;
 
-	public function __construct(EntityManagerInterface $em, LoggerInterface $logger) {
-		$this->em = $em;
-		$this->logger = $logger;
-	}
+    public function __construct(EntityManagerInterface $em, LoggerInterface $logger) {
+        $this->em = $em;
+        $this->logger = $logger;
+    }
 
     /**
      * Build event form
      *
-     * @param EventForm $eventForm
+     * @param EventFormBean $eventForm
      * @param bool $edit
      * @param array $courses
      * @param array $sessions
      *
      * @return FormInterface
      */
-    private function buildEventForm(EventForm $eventForm, bool $edit, array $courses, array $sessions) : FormInterface {
+    private function buildEventForm(EventFormBean $eventForm, bool $edit, array $courses, array $sessions) : FormInterface {
         $disableSaveButton = in_array('ROLE_SAMPLE', $this->getUser()->getRoles());
 
         $builder = $this->createFormBuilder($eventForm)
@@ -87,20 +86,19 @@ class EventController extends AbstractController {
         return $form;
     }
 
-	/**
-	 * Build registration form
-	 *
-	 * @param LeagueDE $league
-	 * @param EventDE $event
-	 *
-	 * @return FormInterface
-	 */
+    /**
+     * Build registration form
+     *
+     * @param LeagueDE $league
+     * @param EventDE $event
+     *
+     * @return FormInterface
+     */
     private function buildEventRegistrationForm(LeagueDE $league, EventDE $event) : FormInterface {
         $formbean = new PlayersFormBean();
-        $formbean->setPlayers(new PersistentCollection($this->em, new ClassMetadata('App\Entity\PlayerDE'), new ArrayCollection()));
         $players = [];
         $formbean->setPlayers($players);
-        
+
         $playerChoices = array();
         foreach($league->getPlayers() as $player) {
             $player->registered = $this->playerRegistered($event, $player);
@@ -117,24 +115,25 @@ class EventController extends AbstractController {
                 }])
             ->add('register', SubmitType::class, array('label' => 'Register Players',
                 'disabled' => $disableGenerateButton, 'attr' => array('class' => 'btn btn-primary mt-3', 'style' => 'margin-top: 2em;')));
-                        
+
+        /** @noinspection PhpUnnecessaryLocalVariableInspection */
         $form = $builder->getForm();
         return $form;
     }
 
 
-	/**
-	 * @param PersistentCollection $games
-	 * @param DateTime $eventDateAndTime
-	 *
-	 * @return PersistentCollection
-	 */
-	public static function changeGameTimes(PersistentCollection $games, DateTime $eventDateAndTime): PersistentCollection {
+    /**
+     * @param Collection $games
+     * @param DateTime $eventDateAndTime
+     *
+     * @return Collection
+     */
+    public static function changeGameTimes(Collection $games, DateTime $eventDateAndTime): Collection {
         $numberOfGames = $games->count();
         $gameDateAndTime = clone $eventDateAndTime;
         $newGameDateAndTimes = [];
 
-        $s = $gameDateAndTime->format('Y-m-d H:i:s');
+        $gameDateAndTime->format('Y-m-d H:i:s');
 
         for ($gameNumber = 0; $gameNumber < $numberOfGames; $gameNumber++) {
             $game = $games->get($gameNumber);
@@ -147,7 +146,7 @@ class EventController extends AbstractController {
                 $gameDateAndTime = clone $gameDateAndTime;
                 $gameDateAndTime->add($interval);
 
-                $s = $gameDateAndTime->format('Y-m-d H:i:s');
+                $gameDateAndTime->format('Y-m-d H:i:s');
             }
         }
         for ($gameNumber = 0; $gameNumber < $numberOfGames; $gameNumber++) {
@@ -158,19 +157,19 @@ class EventController extends AbstractController {
         return $games;
     }
 
-	/**
-	 * Deletes the event referenced by the $id parameter.
-	 *
-	 * @param Request $request
-	 * @param int $id
-	 *
-	 * @return RedirectResponse
-	 * @throws ORMException
-	 * @throws Exception
-	 */
-	#[Route('/event/delete/{id}', name: 'event_delete', methods: ['DELETE'])]
-	#[IsGranted('ROLE_ADMIN')]
-	public function delete(Request $request, int $id): RedirectResponse {
+    /**
+     * Deletes the event referenced by the $id parameter.
+     *
+     * @param Request $request
+     * @param int $id
+     *
+     * @return RedirectResponse
+     * @throws ORMException
+     * @throws Exception
+     */
+    #[Route('/event/delete/{id}', name: 'event_delete', methods: ['DELETE'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function delete(Request $request, int $id): RedirectResponse {
         $eventRepository = new EventRepository($this->em, $this->logger);
         $event = $eventRepository->find($id);
         
@@ -188,37 +187,36 @@ class EventController extends AbstractController {
         return $this->redirectToRoute('event_list', $parameters);
     }
 
-	/**
-	 * Edits the event referenced by the $id parameter.
-	 *
-	 * @param Request $request
-	 * @param int $id
-	 *
-	 * @return RedirectResponse|Response
-	 * @throws Exception
-	 */
-	#[Route('/event/edit/{id}', name: 'event_edit', methods: ['GET', 'POST'])]
-	#[IsGranted('ROLE_ADMIN')]
+    /**
+     * Edits the event referenced by the $id parameter.
+     *
+     * @param Request $request
+     * @param int $id
+     *
+     * @return RedirectResponse|Response
+     * @throws Exception
+     */
+    #[Route('/event/edit/{id}', name: 'event_edit', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function edit(Request $request, int $id): RedirectResponse|Response {
         $user = $this->getUser();
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         $league = $user->getLeague();
         $_SESSION['league'] = $league;
 
         $courseRepository = new CourseRepository($this->em, $this->logger);
         $courses = $courseRepository->findCoursesByLeagueId($league->getId());
-        $_SESSION['courses'] = $courses;
 
         $eventRepository = new EventRepository($this->em, $this->logger);
         $event = $eventRepository->find($id);
         $eventType = $event->getEventtype();
         $singlesMatch = \App\Model\EventType::isSinglesMatch($event->getEventtype());
-        
+
         $sessionRepository = new SessionRepository($this->em, $this->logger);
         $season = $event->getSession()->getSeason();
         $sessions = $sessionRepository->findSessionsBySeasonId($season->getId());
-        $_SESSION['sessions'] = $sessions;
 
-        $eventForm = new EventForm();
+        $eventForm = new EventFormBean();
         $eventForm->setEvent($event);
 
         $form = $this->buildEventForm($eventForm, true, $courses, $sessions);
@@ -265,8 +263,10 @@ class EventController extends AbstractController {
      */
     private function lastEvent() : ?EventDE {
         $user = $this->getUser();
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         $league = $user->getLeague();
         $dateTime =  new DateTime();
+        /** @noinspection PhpRedundantOptionalArgumentInspection */
         $dateTime->setTime(0, 0, 0, 0);
         $lastEvent = null;
         
@@ -296,15 +296,17 @@ class EventController extends AbstractController {
      */
     private function nextEvent()  : ?EventDE {
         $user = $this->getUser();
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         $league = $user->getLeague();
         $dateTime =  new DateTime();
+        /** @noinspection PhpRedundantOptionalArgumentInspection */
         $dateTime->setTime(0, 0, 0, 0);
-        $nextEvent = null;
-        
+
         foreach($league->getSeasons() as $season) {
             foreach($season->getSessions() as $session) {
                 foreach($session->getEvents() as $event) {
                     if ($event->getStartdateandtime() > $dateTime) {
+                        /** @noinspection PhpUnnecessaryLocalVariableInspection */
                         $nextEvent = $event;
                         return $nextEvent;
                     }
@@ -318,9 +320,9 @@ class EventController extends AbstractController {
      * @return Response
      */
 
-	#[Route('/event/resultslast', name: 'event_resultslast', methods: ['GET'])]
-	#[IsGranted('ROLE_USER')]
-	public function lastEventResults(): Response {
+    #[Route('/event/resultslast', name: 'event_resultslast', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
+    public function lastEventResults(): Response {
         $event = $this->lastEvent();
         
         if ($event == null) {
@@ -332,15 +334,15 @@ class EventController extends AbstractController {
         }
     }
 
-	/**
-	 * @param int $id
-	 *
-	 * @return Response
-	 */
+    /**
+     * @param int $id
+     *
+     * @return Response
+     */
 
-	#[Route('/event/list/{id}', name: 'event_list', methods: ['GET'])]
-	#[IsGranted('ROLE_USER')]
-	public function list(int $id): Response {
+    #[Route('/event/list/{id}', name: 'event_list', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
+    public function list(int $id): Response {
         $seasonRepository = new SeasonRepository($this->em, $this->logger);
         $season = $seasonRepository->findById($id);
         $leagueName = $season->getLeague()->getName();
@@ -353,38 +355,37 @@ class EventController extends AbstractController {
             );
     }
 
-	/**
-	 *
-	 * @param Request $request
-	 * @param int $id session id
-	 *
-	 * @return Response
-	 * @throws Exception
-	 */
-	#[Route('/event/new/{id}', name: 'event_new', methods: ['GET', 'POST'])]
-	#[IsGranted('ROLE_ADMIN')]
-	public function new(Request $request, int $id): Response {
+    /**
+     *
+     * @param Request $request
+     * @param int $id session id
+     *
+     * @return Response
+     * @throws Exception
+     */
+    #[Route('/event/new/{id}', name: 'event_new', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function new(Request $request, int $id): Response {
         $user = $this->getUser();
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         $league = $user->getLeague();
         $_SESSION['league'] = $league;
 
         $courseRepository = new CourseRepository($this->em, $this->logger);
         $courses = $courseRepository->findCoursesByLeagueId($league->getId());
-        $_SESSION['courses'] = $courses;
 
         $sessionRepository = new SessionRepository($this->em, $this->logger);
         $session = $sessionRepository->findById($id);
         $season = $session->getSeason();
         $sessions = $sessionRepository->findSessionsBySeasonId($season->getId());
-        $_SESSION['sessions'] = $sessions;
 
-        $event = new EventDE($this->em);
+        $event = new EventDE();
         $event->setCourse($courses[0]);
         $event->setSession($session);
         $event->setNine($event->getCourse()->getNines()[0]);
         $event->setTee($event->getNine()->getTees()[0]);
 
-        $eventForm = new EventForm();
+        $eventForm = new EventFormBean();
         $eventForm->setEvent($event);
 
         $form = $this->buildEventForm($eventForm, false, $courses, $sessions);
@@ -396,7 +397,7 @@ class EventController extends AbstractController {
             if ($event->getSecondnine()->getId() == null) {
                 $event->setSecondnine(NULL);
             }
-            $eventRepository = new EventRepository($this->em, $this->logger);;
+            $eventRepository = new EventRepository($this->em, $this->logger);
             $eventRepository->saveEvent($event);
 
             $parameters = array('id' => $season->getId());
@@ -425,23 +426,23 @@ class EventController extends AbstractController {
         return false;            
     }
 
-	/**
-	 * @param Request $request
-	 * @param $id int id
-	 *
-	 * @return RedirectResponse|Response
-	 * @throws Exception
-	 */
-	public function register(Request $request, int $id): RedirectResponse|Response {
+    /**
+     * @param Request $request
+     * @param $id int id
+     *
+     * @return RedirectResponse|Response
+     * @throws Exception
+     */
+    #[Route('/event/register/{id}', name: 'event_register', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function register(Request $request, int $id): RedirectResponse|Response {
         $user = $this->getUser();
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         $league = $user->getLeague();
         
         $eventRepository = new EventRepository($this->em, $this->logger);
         $event = $eventRepository->find($id);
         $season = $event->getSession()->getSeason();
-        
-        $eventType = $event->getEventtype();
-        $eventFormat = $event->getFormat();
         
         $form = $this->buildEventRegistrationForm($league, $event);
         $form->handleRequest($request);
@@ -457,7 +458,7 @@ class EventController extends AbstractController {
             foreach($players as $player) {
                 $formRegistrantKeys[$player->getId()] = $player;
             }
-            $playerRepository = new PlayerRepository($this->em, $this->logger);;
+            $playerRepository = new PlayerRepository($this->em, $this->logger);
             
             $newRegistrants = array_diff_key($formRegistrantKeys, $registrantKeys);
             $deletedRegistrants = array_diff_key($registrantKeys, $formRegistrantKeys);
@@ -487,30 +488,31 @@ class EventController extends AbstractController {
         );
     }
 
-	/**
-	 * @param int $id event id
-	 *
-	 * @return Response
-	 */
-	#[Route('/event/results/{id}', name: 'event_results', methods: ['GET'])]
-	#[IsGranted('ROLE_USER')]
-	public function results(int $id): Response {
+    /**
+     * @param int $id event id
+     *
+     * @return Response
+     */
+    #[Route('/event/results/{id}', name: 'event_results', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
+    public function results(int $id): Response {
         $user = $this->getUser();
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         $league = $user->getLeague();
 
         $eventRepository = new EventRepository($this->em, $this->logger);
         $event = $eventRepository->find($id);
 
-		if ($event == null) {
-			return $this->render('error/error.html.twig',
-				[
-					'title' => 'Event',
-					'e' => "Event[$id] is undefined"
-				]
-			);
-		}
+        if ($event == null) {
+            return $this->render('error/error.html.twig',
+                [
+                    'title' => 'Event',
+                    'e' => "Event[$id] is undefined"
+                ]
+            );
+        }
 
-		$eventType = $event->getEventtype();
+        $eventType = $event->getEventtype();
         $eventFormat = $event->getFormat();
         
         if ($event->isTeamEvent($eventType)) {
@@ -606,10 +608,12 @@ class EventController extends AbstractController {
      */
     private function singlesMatchPlayResultsResponse(EventDE $event) : Response {
         $user = $this->getUser();
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         $league = $user->getLeague();
         $season = $event->getSession()->getSeason();
         $singlesMatchPlaySeasonStandingsViewBean = new SinglesMatchPlaySeasonStandingsViewBean();
         
+        $found = false;
         foreach($season->getSessions() as $session) {
             $singlesMatchPlaySeasonStandingsViewBean->setSessionPoints([]);
             
@@ -622,15 +626,17 @@ class EventController extends AbstractController {
                         $singlesMatchPlaySeasonStandingsViewBean->updatePlayerPoints($singlesMatchPlayEventViewBean);
                         
                         if ($e->getId() == $event->getId()) {
+                            $found = true;
                             break;
                         }
                     }
                 }
             }
-            if ($e->getId() == $event->getId()) {
+            if ($found) {
                 break;
             }
         }
+        /** @noinspection PhpUndefinedVariableInspection */
         $players = $singlesMatchPlayEventViewBean->array_sort($singlesMatchPlayEventViewBean->players, "sessionPoints", SORT_DESC);
         
         return $this->render('event/singlesmatchplayresults.html.twig',
@@ -651,10 +657,12 @@ class EventController extends AbstractController {
      */
     private function singlesStrokePlayResultsResponse(EventDE $event) : Response {
         $user = $this->getUser();
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         $league = $user->getLeague();
         $season = $event->getSession()->getSeason();
         $singlesStrokePlaySeasonStandingsViewBean = new SinglesStrokePlaySeasonStandingsViewBean();
         
+        $found = false;
         foreach($season->getSessions() as $session) {
             $singlesStrokePlaySeasonStandingsViewBean->setSessionPoints([]);
             
@@ -667,15 +675,17 @@ class EventController extends AbstractController {
                         $singlesStrokePlaySeasonStandingsViewBean->updatePlayerPoints($singlesStrokePlayEventViewBean);
                         
                         if ($e->getId() == $event->getId()) {
+                            $found = true;
                             break;
                         }
                     }
                 }
             }
-            if ($e->getId() == $event->getId()) {
+            if ($found) {
                 break;
             }
         }
+        /** @noinspection PhpUndefinedVariableInspection */
         $players = $singlesStrokePlayEventViewBean->array_sort($singlesStrokePlayEventViewBean->players, "sessionPoints", SORT_DESC);
         
         return $this->render('event/singlesstrokeplayresults.html.twig',
@@ -696,6 +706,7 @@ class EventController extends AbstractController {
      */
     private function teamEventResultsResponse(EventDE $event) : Response {
         $user = $this->getUser();
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         $league = $user->getLeague();
         $season = $event->getSession()->getSeason();
         
@@ -725,10 +736,12 @@ class EventController extends AbstractController {
      */
     private function teamStandingsResultsResponse(EventDE $event) : Response {
         $user = $this->getUser();
-        $league = $user->getLeague();        
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
+        $league = $user->getLeague();
         $season = $event->getSession()->getSeason();
         $seasonStandingsViewBean = new SeasonStandingsViewBean($season);
         
+        $found = false;
         foreach($season->getSessions() as $session) {
             foreach($session->getEvents() as $e) {
                 if ($e->isTeamMatch($e->getEventtype())) {
@@ -737,12 +750,13 @@ class EventController extends AbstractController {
                         $seasonStandingsViewBean->updateTeamStandingsViewBeans($e, $session->getName(), $gameResultsViewBean);
                         
                         if ($e->getId() == $event->getId()) {
+                            $found = true;
                             break;
                         }
                     }
                 }
             }
-            if ($e->getId() == $event->getId()) {
+            if ($found) {
                 break;
             }
         }
@@ -750,7 +764,8 @@ class EventController extends AbstractController {
             $seasonStandingsViewBean->sortSessionTeamStandings($session->getName());
         }
         $seasonStandingsViewBean->sortSeasonTeamStandings();
-        
+
+        /** @noinspection PhpUndefinedVariableInspection */
         return $this->render('event/teammatchresults.html.twig',
             [
                 'title' => 'Event Results',
@@ -823,25 +838,25 @@ class EventController extends AbstractController {
         return $unrecordedTeamGames;
     }
 
-	/**
-	 * @param $id
-	 *
-	 * @return Response
-	 */
-	#[Route('/event/view/{id}', name: 'event_view', methods: ['GET'])]
-	#[IsGranted('ROLE_USER')]
+    /**
+     * @param $id
+     *
+     * @return Response
+     */
+    #[Route('/event/view/{id}', name: 'event_view', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function view($id): Response {
         $eventRepository = new EventRepository($this->em, $this->logger);
         $event = $eventRepository->find($id);
 
-		if ($event == null) {
-			return $this->render('error/error.html.twig',
-				[
-					'title' => 'Event',
-					'e' => "Event[$id] is undefined"
-				]
-			);
-		}
+        if ($event == null) {
+            return $this->render('error/error.html.twig',
+                [
+                    'title' => 'Event',
+                    'e' => "Event[$id] is undefined"
+                ]
+            );
+        }
         $season = $event->getSession()->getSeason();
         $singlesMatch = \App\Model\EventType::isSinglesMatch($event->getEventtype());
         
@@ -862,12 +877,12 @@ class EventController extends AbstractController {
     }
 
 
-	/**
-	 * @return RedirectResponse|Response
-	 */
-	#[Route('/event/viewlast', name: 'event_viewlast', methods: ['GET'])]
-	#[IsGranted('ROLE_USER')]
-	public function viewLastEvent(): RedirectResponse|Response {
+    /**
+     * @return RedirectResponse|Response
+     */
+    #[Route('/event/viewlast', name: 'event_viewlast', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
+    public function viewLastEvent(): RedirectResponse|Response {
         $event = $this->lastEvent();
         
         if ($event == null) {
@@ -879,12 +894,12 @@ class EventController extends AbstractController {
         }
     }
 
-	/**
-	 * @return Response
-	 */
-	#[Route('/event/viewnext', name: 'event_viewnext', methods: ['GET'])]
-	#[IsGranted('ROLE_USER')]
-	public function viewNextEvent(): Response {
+    /**
+     * @return Response
+     */
+    #[Route('/event/viewnext', name: 'event_viewnext', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
+    public function viewNextEvent(): Response {
         $event = $this->nextEvent();
         
         if ($event == null) {
@@ -896,11 +911,11 @@ class EventController extends AbstractController {
         }
     }
 
-	/**
-	 * @return RedirectResponse|Response
-	 */
-	#[Route('/event/viewseason', name: 'event_viewseason', methods: ['GET'])]
-	#[IsGranted('ROLE_USER')]
+    /**
+     * @return RedirectResponse|Response
+     */
+    #[Route('/event/viewseason', name: 'event_viewseason', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function viewSeasonEvents(): RedirectResponse|Response {
         $event = $this->lastEvent();
         

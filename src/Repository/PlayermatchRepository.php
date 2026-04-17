@@ -27,7 +27,7 @@ class PlayermatchRepository extends AbstractBaseRepository {
             $qb = $this->createQueryBuilder('playermatch');
             $qb->setMaxResults(1);
             $qb->where($qb->expr()->orX($qb->expr()->eq('playermatch.playerone', ':id'), $qb->expr()->eq('playermatch.playertwo', ':id')));
-            $qb->setParameters(array('id' => $id));
+            $qb->setParameter('id', $id);
 
             $queryResult = $qb->getQuery()->getResult();
             // echo $qb->getQuery()->getSql();
@@ -49,14 +49,15 @@ class PlayermatchRepository extends AbstractBaseRepository {
 	 *
 	 * @return object|NULL PlayermatchDE
 	 * @throws Exception
-	 */
-    public function findOneByScoreId( int $id) : ?PlayermatchDE {
+     * @noinspection PhpUnused
+     */
+    public function findOneByScoreId(int $id) : ?PlayermatchDE {
         try {
             // get QB instance
             $qb = $this->createQueryBuilder('playermatch');
             $qb->setMaxResults(1);
             $qb->where($qb->expr()->orX($qb->expr()->eq('playermatch.playeronescore', ':id'), $qb->expr()->eq('playermatch.playertwoscore', ':id')));
-            $qb->setParameters(array('id' => $id));
+            $qb->setParameter('id', $id);
 
             $queryResult = $qb->getQuery()->getResult();
             // echo $qb->getQuery()->getSql();

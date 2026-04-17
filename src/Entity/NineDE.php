@@ -2,85 +2,83 @@
 namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\PersistentCollection;
 
 #[ORM\Entity("App\Entity\NineDE")]
 #[ORM\Table(name: "nine")]
-#[ORM\Index( columns: ["course_id"], name: "fk_nine_course_id" )]
+#[ORM\Index( name: "fk_nine_course_id", columns: ["course_id"])]
 class NineDE {
-	#[ORM\ManyToOne( targetEntity: "App\Entity\CourseDE", cascade: ["refresh"], inversedBy: "nines" )]
-	private CourseDE $course;
+    #[ORM\ManyToOne( targetEntity: "App\Entity\CourseDE", cascade: ["refresh"], inversedBy: "nines" )]
+    private CourseDE $course;
 
-	#[ORM\Id]
-	#[ORM\Column(name: "id", type: "bigint", nullable: false)]
-	#[ORM\GeneratedValue(strategy: "AUTO")]
-	private int $id;
+    #[ORM\Id]
+    #[ORM\Column(name: "id", type: "bigint", nullable: false)]
+    #[ORM\GeneratedValue(strategy: "AUTO")]
+    private int $id;
 
-	#[ORM\Column(name: "name", type: "string", length: 255, nullable: true)]
-	private ?string $name;
+    #[ORM\Column(name: "name", type: "string", length: 255, nullable: true)]
+    private ?string $name;
 
-	#[ORM\OneToMany( mappedBy: "nine", targetEntity: "App\Entity\TeeDE", cascade: ["all"], fetch: "EAGER" )]
-	private PersistentCollection $tees;
+    #[ORM\OneToMany( targetEntity: "App\Entity\TeeDE", mappedBy: "nine", cascade: ["all"], fetch: "EAGER")]
+    private Collection $tees;
 
-	#[ORM\Version]
-	#[ORM\Column(name: "version", type: "integer", nullable: true)]
-	private ?int $version;
+    #[ORM\Version]
+    #[ORM\Column(name: "version", type: "integer", nullable: true)]
+    private ?int $version;
 
-	public function __construct(EntityManagerInterface $em) {
-		$this->setId((int) null);
-		$this->setVersion(1);
-		$this->setTees(new PersistentCollection($em, new ClassMetadata('App\Entity\TeeDE'), new ArrayCollection()));
-	}
+    public function __construct() {
+        $this->id = 0;
+        $this->version = 1;
+        $this->tees = new ArrayCollection();
+    }
 
-	public function findTeeByName(string $name): ?TeeDE {
-		foreach ($this->tees as $tee) {
-			if ($tee->getName() === $name) {
-				return $tee;
-			}
-		}
-		return null;
-	}
+    public function findTeeByName(string $name): ?TeeDE {
+        foreach ($this->tees as $tee) {
+            if ($tee->getName() === $name) {
+                return $tee;
+            }
+        }
+        return null;
+    }
 
-	public function getId(): int {
-		return $this->id;
-	}
+    public function getId(): int {
+        return $this->id;
+    }
 
-	public function getName(): ?string {
-		return $this->name;
-	}
+    public function getName(): ?string {
+        return $this->name;
+    }
 
-	public function getTees(): PersistentCollection {
-		return $this->tees;
-	}
+    public function getTees(): Collection {
+        return $this->tees;
+    }
 
-	public function getVersion(): ?int {
-		return $this->version;
-	}
+    public function getVersion(): ?int {
+        return $this->version;
+    }
 
-	public function getCourse(): CourseDE {
-		return $this->course;
-	}
+    public function getCourse(): CourseDE {
+        return $this->course;
+    }
 
-	public function setCourse(CourseDE $course): void {
-		$this->course = $course;
-	}
+    public function setCourse(CourseDE $course): void {
+        $this->course = $course;
+    }
 
-	public function setId(int $id): void {
-		$this->id = $id;
-	}
+    public function setId(int $id): void {
+        $this->id = $id;
+    }
 
-	public function setName(?string $name): void {
-		$this->name = $name;
-	}
+    public function setName(?string $name): void {
+        $this->name = $name;
+    }
 
-	public function setTees(PersistentCollection $tees): void {
-		$this->tees = $tees;
-	}
+    public function setTees(Collection $tees): void {
+        $this->tees = $tees;
+    }
 
-	public function setVersion(?int $version): void {
-		$this->version = $version;
-	}
+    public function setVersion(?int $version): void {
+        $this->version = $version;
+    }
 }

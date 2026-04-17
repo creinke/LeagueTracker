@@ -17,6 +17,12 @@ framework:
     php_errors:
         log: true
 
+    # Symfony 7.3+ configuration
+    property_info:
+        with_constructor_extractor: true
+    profiler:
+        collect_serializer_data: true
+
 when@test:
     framework:
         test: true

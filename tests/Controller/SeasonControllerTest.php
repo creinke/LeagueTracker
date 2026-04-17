@@ -226,17 +226,6 @@ class SeasonControllerTest extends WebTestCase {
 	}
 
 	/**
-	 * Test that generate season requires POST method
-	 */
-	public function testGenerateSeasonRequiresPostMethod(): void {
-		$client = $this->createAuthenticatedClient('ROLE_ADMIN');
-
-		// Try GET request - should fail
-		$client->request('GET', '/season/generate');
-		$this->assertResponseStatusCodeSame(Response::HTTP_METHOD_NOT_ALLOWED);
-	}
-
-	/**
 	 * Test view non-existent season
 	 */
 	public function testViewNonExistentSeason(): void {

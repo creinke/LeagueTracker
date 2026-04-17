@@ -3,7 +3,6 @@ namespace App\Repository;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Psr\Log\LoggerInterface;
 
 abstract class AbstractBaseRepository extends EntityRepository {
@@ -22,11 +21,13 @@ abstract class AbstractBaseRepository extends EntityRepository {
 		$this->logger->error($message, $context);
 	}
 
-	protected function logInfo(string $message, array $context = []): void {
+    /** @noinspection PhpUnused */
+    protected function logInfo(string $message, array $context = []): void {
 		$this->logger->info($message, $context);
 	}
 
-	protected function logWarning(string $message, array $context = []): void {
+    /** @noinspection PhpUnused */
+    protected function logWarning(string $message, array $context = []): void {
 		$this->logger->warning($message, $context);
 	}
 

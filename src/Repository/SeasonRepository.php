@@ -5,9 +5,8 @@ use App\Entity\LeagueDE;
 use App\Entity\SeasonDE;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\PersistentCollection;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Exception;
 use Psr\Log\LoggerInterface;
 
@@ -20,7 +19,7 @@ class SeasonRepository extends AbstractBaseRepository {
 	}
 
     /**
-     * Checks to make sure all season required fields are set
+     * Checks to make sure all season-required fields are set
      * This is also where to perform secondary filtering/sanitization of data
      *
      * @param array $seasonData
@@ -34,7 +33,7 @@ class SeasonRepository extends AbstractBaseRepository {
     /**
      * @param int $id of season
      *
-     * @return SeasonDE
+     * @return SeasonDE|null
      */
     public function findById(int $id): ?SeasonDE {
         return $this->findOneBy(array('id' => $id));
@@ -52,9 +51,10 @@ class SeasonRepository extends AbstractBaseRepository {
             $qb = $this->createQueryBuilder('season');
             $qb->where($qb->expr()->eq('season.league', '?1'))
                 ->orderBy('season.startdate', 'ASC')
-                ->setParameters(array(1 => $leagueId));
+                ->setParameter(1, $leagueId);
 
             // echo $qb->getQuery()->getSql();
+            /** @noinspection PhpUnnecessaryLocalVariableInspection */
             $queryResult = $qb->getQuery()->getResult();
             return $queryResult;
         } catch (Exception $e) {
@@ -68,7 +68,8 @@ class SeasonRepository extends AbstractBaseRepository {
 	 *
 	 * @return mixed SeasonDE
 	 * @throws Exception
-	 */
+     * @noinspection PhpUnused
+     */
     public function findSeasonByName(int $leagueId, string $seasonName): mixed {
         try {
             // get QB instance
@@ -79,8 +80,10 @@ class SeasonRepository extends AbstractBaseRepository {
                 $qb->expr()->like('season.name', '?2'));
 
             $qb->where($expr)
-                ->setParameters(array(1 => $leagueId, 2 => $seasonName));
+                ->setParameter(1, $leagueId)
+                ->setParameter(2, $seasonName);
 
+            /** @noinspection PhpUnnecessaryLocalVariableInspection */
             $queryResult = $qb->getQuery()->getResult();
             // echo $qb->getQuery()->getSql();
             return $queryResult;
@@ -95,7 +98,9 @@ class SeasonRepository extends AbstractBaseRepository {
      * Deletes a season entity
      *
      * @param SeasonDE $season
+     *
      * @return SeasonDE
+     * @throws Exception
      */
     public function removeSeason(SeasonDE $season): SeasonDE {
         try {
@@ -144,11 +149,11 @@ class SeasonRepository extends AbstractBaseRepository {
 	 *
 	 * @param array $seasonsData new or modified list of season data
 	 *
-	 * @return PersistentCollection of SeasonDEs
+	 * @return Collection of SeasonDEs
 	 * @throws Exception
 	 */
-    public function saveAll(array $seasonsData, LeagueDE $league): PersistentCollection {
-        $seasons = new PersistentCollection($this->getEntityManager(), new ClassMetadata('App\Entity\SeasonDE'), new ArrayCollection());
+    public function saveAll(array $seasonsData, LeagueDE $league): Collection {
+        $seasons = new ArrayCollection();
 
         foreach($seasonsData as $seasonData) {
             $season = $this->save($seasonData, $league);
@@ -188,7 +193,7 @@ class SeasonRepository extends AbstractBaseRepository {
 	 */
     protected function setSeasonData(array $seasonData, LeagueDE $league, ?SeasonDE $season = NULL): ?SeasonDE {
         if (!$season) {
-            $season = new SeasonDE($this->getEntityManager());
+            $season = new SeasonDE();
         }
         $season->setName($seasonData['name']);
 

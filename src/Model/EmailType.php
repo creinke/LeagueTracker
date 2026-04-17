@@ -6,9 +6,9 @@ use App\Utility\EnumTrait;
 abstract class EmailType {
     use EnumTrait;
 
-    const WORK = "WORK";
-    const PERSONAL = "PERSONAL";
-    const OTHER = "OTHER";
+    const string WORK = "WORK";
+    const string PERSONAL = "PERSONAL";
+    const string OTHER = "OTHER";
 
     private static array $enum = array( 1 => "WORK", 2 => "PERSONAL", 3 => "OTHER");
 }

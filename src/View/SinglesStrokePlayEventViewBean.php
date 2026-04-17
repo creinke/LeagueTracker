@@ -133,7 +133,7 @@ class SinglesStrokePlayEventViewBean {
      *
      * @return number[]|array[]
      */
-    private function eighteenHoleHandicaps(array &$firstNineHoleHandicaps, array &$secondNineHoleHandicaps): array {
+    private function eighteenHoleHandicaps(array &$firstNineHoleHandicaps, ?array &$secondNineHoleHandicaps): array {
         ksort($firstNineHoleHandicaps);
         
         if (!empty($secondNineHoleHandicaps)) {

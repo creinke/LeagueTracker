@@ -4,46 +4,41 @@ namespace App\Form;
 use App\Entity\FullnameDE;
 use App\Entity\LeagueDE;
 use App\Entity\PlayerDE;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\PersistentCollection;
 
 /**
  * PlayersFormBean
  */
 class PlayersFormBean {
-    private $players;
+    private array $players = [];
 
     /**
-     * @return PersistentCollection
+     * @return array
      */
-    public function getPlayers() {
+    public function getPlayers(): array {
         return $this->players;
     }
 
     /**
-     * @param EntityManagerInterface $em
      * @param LeagueDE $league
      */
-    public function populate(EntityManagerInterface $em, LeagueDE $league) {
-        $this->setPlayers(new PersistentCollection($em, new ClassMetadata('App\Entity\PlayerDE'), new ArrayCollection()));
-        
+    public function populate(LeagueDE $league): void {
+        $this->players = [];
+
         $x = 15;
-        
+
         do {
-            $player = new PlayerDE($em);
+            $player = new PlayerDE();
             $player->setLeague($league);
             $player->setName(new FullnameDE());
-            
-            $this->players->add($player);
+
+            $this->players[] = $player;
         } while (--$x > 0);
     }
-    
+
     /**
-     * @param PersistentCollection $players
+     * @param array $players
      */
-    public function setPlayers($players) {
+    public function setPlayers(array $players): void {
         $this->players = $players;
     }
 }

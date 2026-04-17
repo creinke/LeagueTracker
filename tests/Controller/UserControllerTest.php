@@ -171,28 +171,6 @@ class UserControllerTest extends WebTestCase {
 	}
 
 	/**
-	 * Test that edit user requires POST method
-	 */
-	public function testEditUserRequiresPostMethod(): void {
-		$client = $this->createAuthenticatedClient('ROLE_SUPER');
-
-		$container = static::getContainer();
-		$em = $container->get(EntityManagerInterface::class);
-		$logger = $container->get(LoggerInterface::class);
-		$passwordHasher = $container->get(UserPasswordHasherInterface::class);
-		$userRepository = new UserRepository($em, $logger, $passwordHasher);
-		$user = $userRepository->findOneBy([]);
-
-		if (!$user) {
-			$this->markTestSkipped('No user found in database');
-		}
-
-		// Try GET request - should fail
-		$client->request('GET', '/user/edit/' . $user->getId());
-		$this->assertResponseStatusCodeSame(Response::HTTP_METHOD_NOT_ALLOWED);
-	}
-
-	/**
 	 * Test that delete user requires super role
 	 */
 	public function testDeleteUserRequiresSuper(): void {
@@ -302,7 +280,8 @@ class UserControllerTest extends WebTestCase {
 		$this->assertContains('POST', $newRoute->getMethods());
 
 		$editRoute = $router->getRouteCollection()->get('user_edit');
-		$this->assertContains('POST', $editRoute->getMethods());
+        $this->assertContains('GET', $editRoute->getMethods());
+        $this->assertContains('POST', $editRoute->getMethods());
 
 		$deleteRoute = $router->getRouteCollection()->get('user_delete');
 		$this->assertContains('DELETE', $deleteRoute->getMethods());

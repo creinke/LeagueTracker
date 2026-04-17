@@ -1,21 +1,20 @@
 <?php
 namespace App\Controller;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class SecurityController extends AbstractController {
 
-	/**
-	 * @param AuthenticationUtils $authenticationUtils
-	 *
-	 * @return Response
-	 */
-	#[Route('/login', name: 'app_login')]
+    /**
+     * @param AuthenticationUtils $authenticationUtils
+     *
+     * @return Response
+     */
+    #[Route('/login', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response {
         // Get the login error if there is one
         $error = $authenticationUtils->getLastAuthenticationError();
@@ -32,12 +31,12 @@ class SecurityController extends AbstractController {
         );
     }
 
-	/**
-	 * @return mixed
-	 * @throws \Exception
-	 */
-	#[Route('/logout', name: 'app_logout')]
-    public function logout() {
-        throw new \Exception('Will be intercepted before getting here');
+    /**
+     * @return mixed
+     * @throws Exception
+     */
+    #[Route('/logout', name: 'app_logout')]
+    public function logout(): mixed {
+        throw new Exception('Will be intercepted before getting here');
     }
 }

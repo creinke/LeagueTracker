@@ -169,24 +169,6 @@ class LeagueControllerTest extends WebTestCase {
 	}
 
 	/**
-	 * Test that edit league requires POST method
-	 */
-	public function testEditLeagueRequiresPostMethod(): void {
-		$client = $this->createAuthenticatedClient('ROLE_SUPER');
-
-		$leagueRepository = new LeagueRepository($this->getEntityManager(), $this->getLogger());
-		$league = $leagueRepository->findOneBy([]);
-
-		if (!$league) {
-			$this->markTestSkipped('No league found in database');
-		}
-
-		// Try GET request - should fail
-		$client->request('GET', '/league/edit/' . $league->getId());
-		$this->assertResponseStatusCodeSame(Response::HTTP_METHOD_NOT_ALLOWED);
-	}
-
-	/**
 	 * Test that delete league requires super admin role
 	 */
 	public function testDeleteLeagueRequiresSuperAdmin(): void {

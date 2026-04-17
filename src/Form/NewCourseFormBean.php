@@ -6,9 +6,9 @@ class NewCourseFormBean {
     private int $numberOfNines;
     private int $numberOfTees;
 
-	/**
-	 * @return string name
-	 */
+    /**
+     * @return string name
+     */
     public function getName(): string {
         return $this->name;
     }
@@ -44,7 +44,7 @@ class NewCourseFormBean {
     /**
      * @param int $numberOfTees
      */
-    public function setNumberOfTees( int $numberOfTees) {
+    public function setNumberOfTees( int $numberOfTees): void {
         $this->numberOfTees = $numberOfTees;
     }
 

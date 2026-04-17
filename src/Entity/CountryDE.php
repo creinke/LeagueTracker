@@ -1,11 +1,11 @@
 <?php
+/** @noinspection PhpGetterAndSetterCanBeReplacedWithPropertyHooksInspection */
+
 namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\PersistentCollection;
 #[ORM\Entity("App\Entity\CountryDE")]
 #[ORM\Table(name: "country")]
 class CountryDE {
@@ -17,17 +17,17 @@ class CountryDE {
 	#[ORM\Column(name: "name", type: "string", length: 255, nullable: false)]
 	private ?string $name;
 
-	#[ORM\OneToMany( mappedBy: "country", targetEntity: "App\Entity\RegionDE", cascade: ["all"], fetch: "EAGER" )]
-	private PersistentCollection $regions;
+	#[ORM\OneToMany( targetEntity: "App\Entity\RegionDE", mappedBy: "country", cascade: ["all"], fetch: "EAGER")]
+	private Collection $regions;
 
 	#[ORM\Version]
 	#[ORM\Column(name: "version", type: "integer", length: 11, nullable: false)]
 	private int $version;
 
-	public function __construct(EntityManagerInterface $em) {
-		$this->setId((int) null);
-		$this->setVersion(1);
-		$this->setRegions(new PersistentCollection($em, new ClassMetadata('App\Entity\RegionDE'), new ArrayCollection()));
+	public function __construct() {
+		$this->id = 0;
+		$this->version = 1;
+		$this->regions = new ArrayCollection();
 	}
 
 	public function getId(): int {
@@ -46,11 +46,11 @@ class CountryDE {
 		$this->name = $name;
 	}
 
-	public function getRegions(): PersistentCollection {
+	public function getRegions(): Collection {
 		return $this->regions;
 	}
 
-	public function setRegions(PersistentCollection $regions): void {
+	public function setRegions(Collection $regions): void {
 		$this->regions = $regions;
 	}
 

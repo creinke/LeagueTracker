@@ -9,13 +9,13 @@ use DateTime;
  * GameFormBean
  */
 class GameFormBean {
-	private ArrayCollection $players;
-	private DateTime $startingtime;
+    private array $players;
+    private DateTime $startingtime;
 
-	/**
+    /**
      * public contructor
      */
-    public function __construct(LeagueDE $league, ArrayCollection $players, DateTime $startingtime) {
+    public function __construct(LeagueDE $league, array $players, DateTime $startingtime) {
         $this->setStartingtime($startingtime);
         
         foreach($players as $player) {
@@ -34,10 +34,10 @@ class GameFormBean {
         }
     }
 
-	/**
-	 * @return ArrayCollection|array of \App\Entity\PlayerDE objects
-	 */
-    public function getPlayers(): ArrayCollection|array {
+    /**
+     * @return array of \App\Entity\PlayerDE objects
+     */
+    public function getPlayers(): array {
         return $this->players;
     }
 
@@ -47,11 +47,11 @@ class GameFormBean {
     public function getStartingtime(): DateTime {
         return $this->startingtime;
     }
-    
+
     /**
-     * @param ArrayCollection $players of \App\Entity\PlayerDE of objects $players
+     * @param array $players of \App\Entity\PlayerDE of objects $players
      */
-    public function setPlayers(ArrayCollection $players): void {
+    public function setPlayers(array $players): void {
         $this->players = $players;
     }
 

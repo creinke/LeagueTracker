@@ -3,8 +3,6 @@ namespace App\Repository;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\PersistentCollection;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use App\Entity\LeagueDE;
 use Exception;
 use Psr\Log\LoggerInterface;
@@ -26,7 +24,7 @@ class LeagueRepository extends AbstractBaseRepository {
      */
     protected function checkLeagueData(array &$leagueData): void {
         $leagueData['name'] ??= 'League';
-        $leagueData['courses'] ??= new PersistentCollection($this->getEntityManager(), new ClassMetadata('App\Entity\CourseDE'), new ArrayCollection());
+        $leagueData['courses'] ??= new ArrayCollection();
     }
 
 	/**
@@ -70,8 +68,9 @@ class LeagueRepository extends AbstractBaseRepository {
 	 * @param string $leagueName
 	 *
 	 * @return int|null leagueId
-	 * @throws Exception
-	 */
+	 * @throws Exception|\Doctrine\DBAL\Exception
+     * @noinspection PhpUnused
+     */
 	public function findLeagueIdByName(string $leagueName): ?int {
 		try {
 			$result = $this->executeLeagueQuery($leagueName);
@@ -153,7 +152,7 @@ class LeagueRepository extends AbstractBaseRepository {
 	 * @return LeagueDE $league
 	 */
     protected function setLeagueData(array $leagueData, ?LeagueDE $league = NULL): LeagueDE {
-        $league ??= new LeagueDE($this->getEntityManager());
+        $league ??= new LeagueDE();
 
         $league->setName($leagueData['name']);
         $league->setCourses($leagueData['courses']);

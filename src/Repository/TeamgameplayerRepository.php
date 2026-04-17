@@ -3,7 +3,6 @@ namespace App\Repository;
 
 use App\Entity\TeamgameplayerDE;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Exception;
 use Psr\Log\LoggerInterface;
 
@@ -23,7 +22,8 @@ class TeamgameplayerRepository extends AbstractBaseRepository {
 	 *
 	 * @return TeamgameplayerDE
 	 * @throws Exception
-	 */
+     * @noinspection PhpUnused
+     */
     public function removeTeamGamePlayer(TeamgameplayerDE $teamgameplayer): TeamgameplayerDE {
         try {
             $this->getEntityManager()->remove($teamgameplayer);
@@ -43,7 +43,8 @@ class TeamgameplayerRepository extends AbstractBaseRepository {
 	 *
 	 * @return TeamgameplayerDE
 	 * @throws Exception
-	 */
+     * @noinspection PhpUnused
+     */
     public function saveTeamGamepPayer(TeamgameplayerDE $teamgameplayer): TeamgameplayerDE {
         try {
             $this->getEntityManager()->persist($teamgameplayer);

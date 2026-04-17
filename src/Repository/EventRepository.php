@@ -12,10 +12,9 @@ use App\Model\EventFormatType;
 use App\Model\EventType;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\NonUniqueResultException;
-use Doctrine\ORM\PersistentCollection;
 use Exception;
 use Psr\Log\LoggerInterface;
 
@@ -171,33 +170,42 @@ class EventRepository extends AbstractBaseRepository {
 	 * @param int $formatType The format type (1-6 corresponding to EventFormatType constants)
 	 *
 	 * @return EventDE|null First EventDE entity matching the criteria or null if not found
-	 * @throws NonUniqueResultException
-	 */
-public function findFirstByEventTypeAndFormat(int $eventType, int $formatType): ?EventDE {
-	try {
-		$qb = $this->createQueryBuilder('e')
-			->leftJoin('e.games', 'g')
-			->where('e.eventtype = :eventType')
-			->andWhere('e.format = :format')
-			->setParameter('eventType', $eventType)
-			->setParameter('format', $formatType)
-			->groupBy('e.id')
-			->having('COUNT(g.id) > 0')
-			->orderBy('e.id', 'ASC')
-			->setMaxResults(1);
+	 * @throws NonUniqueResultException|Exception
+     */
+    public function findFirstByEventTypeAndFormatAndLeague(int $eventType, int $formatType, int $leagueId): ?EventDE {
+        try {
+            $qb = $this->createQueryBuilder('e')
+                ->innerJoin('e.session', 's')
+                ->innerJoin('s.season', 'se')
+                ->innerJoin('se.league', 'l')
+                ->leftJoin('e.games', 'g')
+                ->where('e.eventtype = :eventType')
+                ->andWhere('e.format = :format')
+                ->andWhere('l.id = :leagueId')
+                ->setParameter('eventType', $eventType)
+                ->setParameter('format', $formatType)
+                ->setParameter('leagueId', $leagueId)
+                ->groupBy('e.id')
+                ->having('COUNT(g.id) > 0')
+                ->orderBy('e.id', 'ASC')
+                ->setMaxResults(1);
 
-		return $qb->getQuery()->getOneOrNullResult();
-	} catch (Exception $e) {
-		$this->logError(sprintf('Error in the %s method for eventType [%d] and format [%d]: %s',
-			'EventRepository::findFirstByEventTypeAndFormat', $eventType, $formatType, $e->getMessage()));
-		throw $e;
-	}
-}
-
-/**
- * Checks to make sure all event-required fields are set
- * This is also where to perform secondary filtering/sanitization of data
-// ... existing code ...	/**
+            return $qb->getQuery()->getOneOrNullResult();
+        } catch (\Exception $e) {
+            $this->logError(sprintf(
+                'Error in the %s method for eventType [%d], format [%d], leagueId [%d]: %s',
+                'EventRepository::findFirstByEventTypeAndFormatAndLeague',
+                $eventType,
+                $formatType,
+                $leagueId,
+                $e->getMessage()
+            ));
+            throw $e;
+        }
+    }
+    /**
+     * Checks to make sure all event-required fields are set
+     * This is also where to perform secondary filtering/sanitization of data
 	 * @throws NonUniqueResultException
 	 */
 	public function findFirstEventWithMoreThanOneGame(): ?EventDE	{
@@ -231,8 +239,8 @@ public function findFirstByEventTypeAndFormat(int $eventType, int $formatType): 
 	 * Find a first team event with at least one teamgame
 	 *
 	 * @return EventDE|null First EventDE entity matching the criteria or null if not found
-	 * @throws NonUniqueResultException
-	 */
+	 * @throws NonUniqueResultException|Exception
+     */
 	public function findFirstTeamEventWithTeamgame(): ?EventDE {
 		try {
 			$qb = $this->createQueryBuilder('e')
@@ -257,19 +265,20 @@ public function findFirstByEventTypeAndFormat(int $eventType, int $formatType): 
 	 * @param int $formatType The format type (2-5 corresponding to team EventFormatType constants)
 	 *
 	 * @return EventDE|null First EventDE entity matching the criteria or null if not found
-	 * @throws NonUniqueResultException
-	 */
+	 * @throws NonUniqueResultException|Exception
+     * @noinspection PhpUnused
+     */
 	public function findFirstTeamEventByFormat(int $formatType): ?EventDE {
 		try {
 			$qb = $this->createQueryBuilder('e')
-			           ->leftJoin('e.teamgames', 'tg')
-			           ->where('e.eventtype = 4')
-			           ->andWhere('e.format = :format')
-			           ->setParameter('format', $formatType)
-			           ->groupBy('e.id')
-			           ->having('COUNT(tg.id) > 0')
-			           ->orderBy('e.id', 'ASC')
-			           ->setMaxResults(1);
+                ->leftJoin('e.teamgames', 'tg')
+                ->where('e.eventtype = 4')
+                ->andWhere('e.format = :format')
+                ->setParameter('format', $formatType)
+                ->groupBy('e.id')
+                ->having('COUNT(tg.id) > 0')
+                ->orderBy('e.id', 'ASC')
+                ->setMaxResults(1);
 
 			return $qb->getQuery()->getOneOrNullResult();
 		} catch (Exception $e) {
@@ -288,7 +297,7 @@ public function findFirstByEventTypeAndFormat(int $eventType, int $formatType): 
 	 */
     protected function gameDateTime(DateTime $eventStartDateAndTime, array $gameData): DateTime {
         $gameTime = DateTime::createFromFormat("H:i:s", $gameData['startingTime']);
-        $gameDateAndTime = new DateTime("@" . (string) $eventStartDateAndTime->getTimestamp());
+        $gameDateAndTime = new DateTime("@" . $eventStartDateAndTime->getTimestamp());
         $d = getDate($gameTime->getTimestamp());
         $gameDateAndTime->setTime($d['hours'], $d['minutes']);
         return $gameDateAndTime;
@@ -306,7 +315,7 @@ public function findFirstByEventTypeAndFormat(int $eventType, int $formatType): 
     protected function playerMatch(EventDE $event, array $gameData, GameDE $game, array $playerMatchData) : PlayermatchDE {
         $playerMatch = new PlayermatchDE();
         $playerMatch->setGame($game);
-        $playerMatch->setPlayerscores(new PersistentCollection($this->getEntityManager(), new ClassMetadata('App\Entity\ScoreDE'), new ArrayCollection()));
+        $playerMatch->setPlayerscores(new ArrayCollection());
         
         $playerRepository = new PlayerRepository($this->getEntityManager(),$this->getLogger());
         $scoreRepository = new ScoreRepository($this->getEntityManager(),$this->getLogger());
@@ -338,7 +347,8 @@ public function findFirstByEventTypeAndFormat(int $eventType, int $formatType): 
                 } else {
                     $nine = $event->getSecondnine();
                 }
-                
+
+                /** @noinspection DuplicatedCode */
                 foreach($nine->getTees() as $tee) {
                     if ($tee->getName() == $teeName) {
                         $playerScore->setTee($tee);
@@ -368,11 +378,11 @@ public function findFirstByEventTypeAndFormat(int $eventType, int $formatType): 
 	 * @param GameDE $game
 	 * @param array $playerMatchesData
 	 *
-	 * @return PersistentCollection
+	 * @return Collection
 	 * @throws Exception
 	 */
-    protected function playerMatches(EventDE $event, array $gameData, GameDE $game, array $playerMatchesData): PersistentCollection {
-        $playerMatches = new PersistentCollection($this->getEntityManager(), new ClassMetadata('App\Entity\PlayermatchDE'), new ArrayCollection());
+    protected function playerMatches(EventDE $event, array $gameData, GameDE $game, array $playerMatchesData): Collection {
+        $playerMatches = new ArrayCollection();
         
         for ($i = 0; $i < sizeof($playerMatchesData); $i++) {
             $playerMatch = $this->playerMatch($event, $gameData, $game, $playerMatchesData[$i]);
@@ -438,6 +448,7 @@ public function findFirstByEventTypeAndFormat(int $eventType, int $formatType): 
                 } else {
                     $nine = $event->getSecondnine();
                 }
+                /** @noinspection DuplicatedCode */
                 foreach($nine->getTees() as $tee) {
                     if ($tee->getName() == $teeName) {
                         $playerScore->setTee($tee);
@@ -512,11 +523,11 @@ public function findFirstByEventTypeAndFormat(int $eventType, int $formatType): 
 	 * @param array $eventsData new or modified list of event data
 	 * @param SessionDE $session
 	 *
-	 * @return PersistentCollection PersistentCollection of Entity\EventDE
+	 * @return Collection of Entity\EventDE
 	 * @throws Exception
 	 */
-    public function saveAll(array $eventsData, SessionDE $session): PersistentCollection {
-        $events = new PersistentCollection($this->getEntityManager(), new ClassMetadata('App\Entity\EventDE'), new ArrayCollection());
+    public function saveAll(array $eventsData, SessionDE $session): Collection {
+        $events = new ArrayCollection();
 
         foreach($eventsData as $eventData) {
             $events[] = $this->save($eventData, $session);
@@ -554,7 +565,7 @@ public function findFirstByEventTypeAndFormat(int $eventType, int $formatType): 
 	 * @throws Exception
 	 */
     protected function setEventData(array $eventData, SessionDE $session) : EventDE {
-        $event = new EventDE($this->getEntityManager());
+        $event = new EventDE();
         $event->setEventnumber($eventData['number']);
         $event->setEventtype(EventType::toOrdinal($eventData['type']));
         $event->setFormat(EventFormatType::toOrdinal($eventData['format']));
@@ -606,7 +617,7 @@ public function findFirstByEventTypeAndFormat(int $eventType, int $formatType): 
 	 */
     protected function setGameData(EventDE $event, array $gameData, ?GameDE $game = NULL): GameDE {
         if (!$game) {
-            $game = new GameDE($this->getEntityManager());
+            $game = new GameDE();
         }
         $game->setRecorded(true);
         $game->setFormat(GameFormatType::toOrdinal($gameData['format']));
@@ -637,7 +648,7 @@ public function findFirstByEventTypeAndFormat(int $eventType, int $formatType): 
                     
                     $playerMatch = new PlayermatchDE();
                     $playerMatch->setGame($game);
-                    $playerMatch->setPlayerscores(new PersistentCollection($this->getEntityManager(), new ClassMetadata('App\Entity\ScoreDE'), new ArrayCollection()));
+                    $playerMatch->setPlayerscores(new ArrayCollection());
                     
                     $playerMatch->setPlayerone($playerScores[0][0]);
                     $playerMatch->setPlayertwo($playerScores[1][0]);
@@ -664,11 +675,11 @@ public function findFirstByEventTypeAndFormat(int $eventType, int $formatType): 
 	 * @param EventDE $event Entity\EventDE $event
 	 * @param array $gamesData
 	 *
-	 * @return PersistentCollection
+	 * @return Collection
 	 * @throws Exception
 	 */
-    protected function setGamesData(EventDE $event, array $gamesData): PersistentCollection {
-        $games = new PersistentCollection($this->getEntityManager(), new ClassMetadata('App\Entity\GameDE'), new ArrayCollection());
+    protected function setGamesData(EventDE $event, array $gamesData): Collection {
+        $games = new ArrayCollection();
 
         foreach($gamesData as $gameData) {
             $games[] = $this->setGameData($event, $gameData);
@@ -683,7 +694,8 @@ public function findFirstByEventTypeAndFormat(int $eventType, int $formatType): 
 	 * @param TeammatchDE|null $teammatch Entity\TeammatchDE $teammatch
 	 *
 	 * @return TeammatchDE Entity\TeammatchDE $teammatch
-	 */
+     * @noinspection PhpUnused
+     */
     protected function setTeamMatchData(array $teamMatchData, ?TeammatchDE $teammatch = NULL): TeammatchDE {
         $teammatch ??= new TeammatchDE();
 
@@ -698,9 +710,9 @@ public function findFirstByEventTypeAndFormat(int $eventType, int $formatType): 
 	 * @param GameDE $game
 	 * @param array $teamMatchData
 	 *
-	 * @return PersistentCollection of TeammatchDEs
+	 * @return Collection of TeammatchDEs
 	 */
-    protected function teamMatches(EventDE $event, GameDE $game, array $teamMatchData): PersistentCollection {
+    protected function teamMatches(EventDE $event, GameDE $game, array $teamMatchData): Collection {
         $league = $event->getSession()->getSeason()->getLeague();
         $teamRepository = new TeamRepository($this->getEntityManager(), $this->getLogger());
 
@@ -715,7 +727,7 @@ public function findFirstByEventTypeAndFormat(int $eventType, int $formatType): 
         $teamMatch->setTeamone($teamOne);
         $teamMatch->setTeamtwo($teamTwo);
 
-        $teamMatches = new PersistentCollection($this->getEntityManager(), new ClassMetadata('App\Entity\TeammatchDE'), new ArrayCollection());
+        $teamMatches = new ArrayCollection();
         $teamMatches[] = $teamMatch;
 
         return $teamMatches;

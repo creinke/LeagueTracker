@@ -3,99 +3,109 @@ namespace App\Entity;
 
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\PersistentCollection;
 
 #[ORM\Entity("App\Entity\SessionDE")]
 #[ORM\Table(name: "session")]
-#[ORM\Index( columns: ["season_id"], name: "fk_session_season_id" )]
+#[ORM\Index( name: "fk_session_season_id", columns: ["season_id"])]
 class SessionDE {
-	#[ORM\Id]
-	#[ORM\Column(name: "id", type: "bigint", nullable: false)]
-	#[ORM\GeneratedValue(strategy: "AUTO")]
-	private int $id;
+    #[ORM\Id]
+    #[ORM\Column(name: "id", type: "bigint", nullable: false)]
+    #[ORM\GeneratedValue(strategy: "AUTO")]
+    private int $id;
 
-	#[ORM\Column(name: "enddate", type: "datetime", nullable: false)]
-	private ?DateTime $enddate;
+    #[ORM\Column(name: "enddate", type: "datetime", nullable: false)]
+    private ?DateTime $enddate;
 
-	#[ORM\OneToMany( mappedBy: "session", targetEntity: "App\Entity\EventDE", cascade: ["all"], fetch: "LAZY" )]
-	#[ORM\OrderBy(["startdateandtime" => "ASC"])]
-	private PersistentCollection $events;
+    #[ORM\OneToMany( targetEntity: "App\Entity\EventDE", mappedBy: "session", cascade: ["all"], fetch: "LAZY")]
+    #[ORM\OrderBy(["startdateandtime" => "ASC"])]
+    private Collection $events;
 
-	#[ORM\Column(name: "name", type: "string", length: 255, nullable: true)]
-	private ?string $name;
+    #[ORM\Column(name: "name", type: "string", length: 255, nullable: true)]
+    private ?string $name;
 
-	#[ORM\ManyToOne( targetEntity: "App\Entity\SeasonDE", cascade: ["refresh"], inversedBy: "sessions" )]
-	private ?SeasonDE $season;
+    #[ORM\ManyToOne( targetEntity: "App\Entity\SeasonDE", cascade: ["refresh"], inversedBy: "sessions" )]
+    private ?SeasonDE $season;
 
-	#[ORM\Column(name: "startdate", type: "datetime", nullable: true)]
-	private ?DateTime $startdate;
+    #[ORM\Column(name: "startdate", type: "datetime", nullable: true)]
+    private ?DateTime $startdate;
 
-	#[ORM\Version]
-	#[ORM\Column(name: "version", type: "integer", nullable: true)]
-	private ?int $version;
+    #[ORM\Version]
+    #[ORM\Column(name: "version", type: "integer", nullable: true)]
+    private ?int $version;
 
-	public function __construct(EntityManagerInterface $em) {
-		$this->setId((int) null);
-		$this->setVersion(1);
-		$this->setEvents(new PersistentCollection($em, new ClassMetadata('App\Entity\EventDE'), new ArrayCollection()));
-	}
+    public function __construct() {
+        $this->id = 0;
+        $this->version = 1;
+        $this->events = new ArrayCollection();
+    }
 
-	public function getEvents(): PersistentCollection {
-		return $this->events;
-	}
+    public function __toString(): string {
+        if (isset($this->name) && $this->name !== '') {
+            return $this->name;
+        }
 
-	public function getId(): int {
-		return $this->id;
-	}
+        if (isset($this->id) && $this->id !== null) {
+            return 'Session #' . $this->id;
+        }
 
-	public function getEnddate(): ?DateTime {
-		return $this->enddate;
-	}
+        return 'Session';
+    }
 
-	public function setEvents(PersistentCollection $events): void {
-		$this->events = $events;
-	}
+    public function getEvents(): Collection {
+        return $this->events;
+    }
 
-	public function getName(): ?string {
-		return $this->name;
-	}
+    public function getId(): int {
+        return $this->id;
+    }
 
-	public function getSeason(): ?SeasonDE {
-		return $this->season;
-	}
+    public function getEnddate(): ?DateTime {
+        return $this->enddate;
+    }
 
-	public function getStartdate(): ?DateTime {
-		return $this->startdate;
-	}
+    public function setEvents(Collection $events): void {
+        $this->events = $events;
+    }
 
-	public function getVersion(): ?int {
-		return $this->version;
-	}
+    public function getName(): ?string {
+        return $this->name;
+    }
 
-	public function setId(int $id): void {
-		$this->id = $id;
-	}
+    public function getSeason(): ?SeasonDE {
+        return $this->season;
+    }
 
-	public function setEnddate(?DateTime $enddate): void {
-		$this->enddate = $enddate;
-	}
+    public function getStartdate(): ?DateTime {
+        return $this->startdate;
+    }
 
-	public function setName(?string $name): void {
-		$this->name = $name;
-	}
+    public function getVersion(): ?int {
+        return $this->version;
+    }
 
-	public function setSeason(?SeasonDE $season): void {
-		$this->season = $season;
-	}
+    public function setId(int $id): void {
+        $this->id = $id;
+    }
 
-	public function setStartdate(?DateTime $startdate): void {
-		$this->startdate = $startdate;
-	}
+    public function setEnddate(?DateTime $enddate): void {
+        $this->enddate = $enddate;
+    }
 
-	public function setVersion(?int $version): void {
-		$this->version = $version;
-	}
+    public function setName(?string $name): void {
+        $this->name = $name;
+    }
+
+    public function setSeason(?SeasonDE $season): void {
+        $this->season = $season;
+    }
+
+    public function setStartdate(?DateTime $startdate): void {
+        $this->startdate = $startdate;
+    }
+
+    public function setVersion(?int $version): void {
+        $this->version = $version;
+    }
 }

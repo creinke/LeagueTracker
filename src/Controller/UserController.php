@@ -14,30 +14,32 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Exception;
 use App\Repository\LeagueRepository;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class UserController extends AbstractController {
-	private EntityManagerInterface $em;
-	private LoggerInterface $logger;
-	private UserPasswordHasherInterface $passwordHasher;
+    private EntityManagerInterface $em;
+    private LoggerInterface $logger;
+    private UserPasswordHasherInterface $passwordHasher;
 
-	public function __construct(EntityManagerInterface $em, LoggerInterface $logger, UserPasswordHasherInterface $passwordHasher) {
-		$this->em = $em;
-		$this->logger = $logger;
-		$this->passwordHasher = $passwordHasher;
-	}
+    public function __construct(EntityManagerInterface $em, LoggerInterface $logger, UserPasswordHasherInterface $passwordHasher) {
+        $this->em = $em;
+        $this->logger = $logger;
+        $this->passwordHasher = $passwordHasher;
+    }
 
-	private function buildForm(UserDE &$user) : FormInterface {
+    /** @noinspection PhpParameterByRefIsNotUsedAsReferenceInspection */
+    private function buildForm(UserDE &$user) : FormInterface {
         if ($user->getLeague()) {
             $user->setLeagueName($user->getLeague()->getName());
         }
         $roleList = "";
 
         if ($user->getRoles()) {
+            /** @noinspection DuplicatedCode */
             $roles = $user->getRoles();
             $roleCount = sizeof($roles);
 
@@ -54,6 +56,7 @@ class UserController extends AbstractController {
         }
         $disableSaveButton = in_array('ROLE_SAMPLE', $this->getUser()->getRoles());
 
+        /** @noinspection PhpUnnecessaryLocalVariableInspection */
         $form = $this->createFormBuilder($user)
             ->add('username', TextType::class, array('label' => 'User Name', 'required' => true, 'attr' => array('class' => 'form-control')))
             ->add('leagueName', TextType::class, array('label' => 'League Name', 'required' => true, 'attr' => array('class' => 'form-control')))
@@ -65,8 +68,8 @@ class UserController extends AbstractController {
         return $form;
     }
 
-	#[Route('/user/delete/{id}', name: 'user_delete', methods: ['DELETE'])]
-	#[IsGranted('ROLE_SUPER')]
+    #[Route('/user/delete/{id}', name: 'user_delete', methods: ['DELETE'])]
+    #[IsGranted('ROLE_SUPER')]
     public function delete(Request $request, int $id): RedirectResponse {
         $userRepository = new UserRepository($this->em, $this->logger, $this->passwordHasher);
         $user = $userRepository->find($id);
@@ -74,14 +77,14 @@ class UserController extends AbstractController {
         try {
             $userRepository->removeUser($user);
         } catch (Exception $e) {
-	        $this->addFlash('error', 'Trouble deleting selected user: ' . $e->getMessage() . ' Please retry.');
+            $this->addFlash('error', 'Trouble deleting selected user: ' . $e->getMessage() . ' Please retry.');
         }
         return $this->redirectToRoute('user_list');
     }
 
-	#[Route('/user/edit/{id}', name: 'user_edit', methods: ['GET', 'POST'])]
-	#[IsGranted('ROLE_SUPER')]
-	public function edit(Request $request, int $id, UserPasswordHasherInterface $passwordHasher): RedirectResponse|Response {
+    #[Route('/user/edit/{id}', name: 'user_edit', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_SUPER')]
+    public function edit(Request $request, int $id, UserPasswordHasherInterface $passwordHasher): RedirectResponse|Response {
         $userRepository = new UserRepository($this->em, $this->logger, $passwordHasher);
         $user = $userRepository->find($id);
 
@@ -90,14 +93,15 @@ class UserController extends AbstractController {
 
         if ($form->isSubmitted() && $form->isValid()) {
             try {
+                /** @noinspection DuplicatedCode */
                 $leagueRepository = new LeagueRepository($this->em, $this->logger);
                 $league = $leagueRepository->findLeagueByName($user->getLeagueName());
 
                 if ($league) {
                     $user->setLeague($league);
 
-	                $password = $passwordHasher->hashPassword($user, $user->getPlainPassword());
-					$user->setPassword($password);
+                    $password = $passwordHasher->hashPassword($user, $user->getPlainPassword());
+                    $user->setPassword($password);
 
                     $roles = array();
                     $s = explode(", ", $user->getRoleList());
@@ -125,8 +129,8 @@ class UserController extends AbstractController {
     /**
      * @return Response
      */
-	#[Route('/user/list', name: 'user_list', methods: ['GET'])]
-	#[IsGranted('ROLE_SUPER')]
+    #[Route('/user/list', name: 'user_list', methods: ['GET'])]
+    #[IsGranted('ROLE_SUPER')]
     public function list(): Response {
         $userRepository = new UserRepository($this->em, $this->logger, $this->passwordHasher);
         $users = $userRepository->findAll();
@@ -138,39 +142,40 @@ class UserController extends AbstractController {
             );
     }
 
-	/**
-	 * @param Request $request
-	 * @param UserPasswordHasherInterface $passwordEncoder
-	 *
-	 * @return Response
-	 * @throws Exception
-	 */
-	#[Route('/user/new', name: 'user_new', methods: ['GET', 'POST'])]
-	#[IsGranted('ROLE_SUPER')]
-	public function new(Request $request, UserPasswordHasherInterface $passwordEncoder): Response {
-		$currentUser = $this->getUser();  // Get the current logged-in UserDE
-		$user = new UserDE($this->em);
+    /**
+     * @param Request $request
+     * @param UserPasswordHasherInterface $passwordEncoder
+     *
+     * @return Response
+     * @throws Exception
+     */
+    #[Route('/user/new', name: 'user_new', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_SUPER')]
+    public function new(Request $request, UserPasswordHasherInterface $passwordEncoder): Response {
+        $currentUser = $this->getUser();  // Get the current logged-in UserDE
+        $user = new UserDE();
 
-		// Prefill the new user's league from the current user's league
-		if ($currentUser instanceof UserDE && $currentUser->getLeague()) {
-			$user->setLeague($currentUser->getLeague());
-		}
+        // Prefill the new user's league from the current user's league
+        if ($currentUser instanceof UserDE && $currentUser->getLeague()) {
+            $user->setLeague($currentUser->getLeague());
+        }
 
-		$form = $this-> buildForm($user);
+        $form = $this-> buildForm($user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $form->getData();
             $userRepository = new UserRepository($this->em, $this->logger, $passwordEncoder);
 
+            /** @noinspection DuplicatedCode */
             $leagueRepository = new LeagueRepository($this->em, $this->logger);
             $league = $leagueRepository->findLeagueByName($user->getLeagueName());
 
             if ($league) {
                 $user->setLeague($league);
 
-	            $password = $passwordEncoder->hashPassword($user, $user->getPlainPassword());
-	            $user->setPassword($password);
+                $password = $passwordEncoder->hashPassword($user, $user->getPlainPassword());
+                $user->setPassword($password);
 
                 $roles = array();
                 $s = explode(", ", $user->getRoleList());
@@ -192,39 +197,40 @@ class UserController extends AbstractController {
                 'form' => $form->createView()));
     }
 
-	#[Route('/user/view/{id}', name: 'user_view', methods: ['GET'])]
-	#[IsGranted('ROLE_SUPER')]
+    #[Route('/user/view/{id}', name: 'user_view', methods: ['GET'])]
+    #[IsGranted('ROLE_SUPER')]
     public function view(int $id): Response {
         $userRepository = new UserRepository($this->em, $this->logger, $this->passwordHasher);
         $user = $userRepository->find($id);
 
-		if ($user == null) {
-			return $this->render('error/error.html.twig',
-				['title' => 'Error', 'e' => 'There are no users that match the criteria specified.'] );
-		} else {
-			$user->setLeagueName( $user->getLeague()->getName() );
+        if ($user == null) {
+            return $this->render('error/error.html.twig',
+                ['title' => 'Error', 'e' => 'There are no users that match the criteria specified.'] );
+        } else {
+            $user->setLeagueName( $user->getLeague()->getName() );
 
-			$roleList  = "";
-			$roles     = $user->getRoles();
-			$roleCount = sizeof( $roles );
+            $roleList  = "";
+            /** @noinspection DuplicatedCode */
+            $roles = $user->getRoles();
+            $roleCount = sizeof( $roles );
 
-			for ( $i = 0; $i < $roleCount; $i ++ ) {
-				$role = $roles[ $i ];
+            for ( $i = 0; $i < $roleCount; $i ++ ) {
+                $role = $roles[ $i ];
 
-				$roleList .= $role;
+                $roleList .= $role;
 
-				if ( $i + 1 < $roleCount ) {
-					$roleList .= ", ";
-				}
-			}
-			$user->setRoleList( $roleList );
+                if ( $i + 1 < $roleCount ) {
+                    $roleList .= ", ";
+                }
+            }
+            $user->setRoleList( $roleList );
 
-			return $this->render( 'user/view.html.twig',
-				array(
-					'title' => 'User',
-					'user'  => $user
-				)
-			);
-		}
+            return $this->render( 'user/view.html.twig',
+                array(
+                    'title' => 'User',
+                    'user'  => $user
+                )
+            );
+        }
     }
 }

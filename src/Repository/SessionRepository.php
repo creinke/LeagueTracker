@@ -4,10 +4,8 @@ namespace App\Repository;
 use App\Entity\SeasonDE;
 use App\Entity\SessionDE;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\PersistentCollection;
 use DateTime;
 use Exception;
 use Psr\Log\LoggerInterface;
@@ -54,9 +52,10 @@ class SessionRepository extends AbstractBaseRepository {
             $qb = $this->createQueryBuilder('session');
             $qb->where($qb->expr()->eq('session.season', '?1'))
             ->orderBy('session.startdate', 'ASC')
-            ->setParameters(array(1 => $seasonId));
+            ->setParameter(1, $seasonId);
             
             // echo $qb->getQuery()->getSql();
+            /** @noinspection PhpUnnecessaryLocalVariableInspection */
             $queryResult = $qb->getQuery()->getResult();
             return $queryResult;
         } catch (Exception $e) {
@@ -66,12 +65,14 @@ class SessionRepository extends AbstractBaseRepository {
         }
     }
 
-	/**
-	 * Deletes a session entity
-	 *
-	 * @param SessionDE $session
-	 * @return SessionDE
-	 */
+    /**
+     * Deletes a session entity
+     *
+     * @param SessionDE $session
+     *
+     * @return SessionDE
+     * @throws Exception
+     */
 	public function removeSession(SessionDE $session): SessionDE {
 		try {
 			$this->getEntityManager()->remove($session);
@@ -119,11 +120,11 @@ class SessionRepository extends AbstractBaseRepository {
 	 *
 	 * @param array $sessionsData new or modified list of session data
 	 *
-	 * @return PersistentCollection of SessionDE
+	 * @return Collection of SessionDE
 	 * @throws Exception
 	 */
-    public function saveAll(array $sessionsData, SeasonDE $season): PersistentCollection {
-        $sessions = new PersistentCollection($this->getEntityManager(), new ClassMetadata('App\Entity\SessionDE'), new ArrayCollection());
+    public function saveAll(array $sessionsData, SeasonDE $season): Collection {
+        $sessions = new ArrayCollection();
 
         foreach($sessionsData as $sessionData) {
             $session = $this->save($sessionData, $season);
@@ -162,7 +163,7 @@ class SessionRepository extends AbstractBaseRepository {
      * @return SessionDE $session
      */
     protected function setSessionData(array $sessionData, SeasonDE $season, ?SessionDE $session = NULL): SessionDE {
-        $session ??= new SessionDE($this->getEntityManager());
+        $session ??= new SessionDE();
 
         $session->setName($sessionData['name']);
 

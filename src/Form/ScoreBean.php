@@ -1,11 +1,11 @@
 <?php
 namespace App\Form;
 
+use Doctrine\Common\Collections\Collection;
 use App\Entity\PlayerDE;
 use App\Entity\PlayermatchDE;
 use App\Entity\ScoreDE;
 use App\Entity\TeeDE;
-use Doctrine\ORM\PersistentCollection;
 
 
 class ScoreBean {
@@ -21,7 +21,7 @@ class ScoreBean {
     private $tee;
     private $tees;
     
-    public function __construct(?PlayermatchDE $playerMatch, PlayerDE $player, ?array $playingPartners, ?ScoreDE $score, $duplicate, PersistentCollection $tees, TeeDE $tee, array $strokes) {
+   	public function __construct(?PlayermatchDE $playerMatch, PlayerDE $player, ?array $playingPartners, ?ScoreDE $score, $duplicate, Collection $tees, TeeDE $tee, array $strokes) {
         $this->playerMatch = $playerMatch;
         $this->player = $player;
         $this->playingPartners = $playingPartners;
@@ -119,11 +119,11 @@ class ScoreBean {
     }
     
     /**
-     * @return PersistentCollection of \App\Entity\TeeDE
-     */
-    public function getTees() {
-        return $this->tees;
-    }
+   	 * @return Collection of \App\Entity\TeeDE
+   	 */
+   	public function getTees() {
+   		return $this->tees;
+   	}
     
     /**
      * @param array $score
@@ -217,11 +217,11 @@ class ScoreBean {
     }
     
     /**
-     * @param PersistentCollection of \App\Entity\TeeDE $tees
-     */
-    public function setTees($tees) {
-    	$this->tees = $tees;
-    }
+   	 * @param Collection of \App\Entity\TeeDE $tees
+   	 */
+   	public function setTees($tees) {
+   		$this->tees = $tees;
+   	}
     
     /**
      * @param \App\Entity\PlayerDE $substitutePlayer

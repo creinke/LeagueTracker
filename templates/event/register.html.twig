@@ -11,7 +11,7 @@
             padding: 0.15rem 0.275rem;
         }
         .form-control {
-            padding: 1em inherit;
+            padding: 1em;
             height: 1.5em;
             width: 75%;
         }
@@ -46,13 +46,11 @@
     </script>
     <div>
         {% if is_granted('ROLE_ADMIN') %}
-            <h2 id="admin">
+            <h2 id="admin"></h2>
         {% else %}
-            <h2>
+            <h2>Register Selected Players in Event</h2>
         {% endif %}
-                Register Selected Players in Event
-            </h2>
-        
+
         <p>
             Click the checkbox next to each player to register that player in this event.<br/>
             <span style = "padding-left: 60px;">Impirtant Note: </span><br/>

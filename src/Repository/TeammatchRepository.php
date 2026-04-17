@@ -3,7 +3,6 @@ namespace App\Repository;
 
 use App\Entity\TeammatchDE;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Exception;
 use Psr\Log\LoggerInterface;
 
@@ -28,7 +27,7 @@ class TeammatchRepository extends AbstractBaseRepository {
             $qb = $this->createQueryBuilder('teammatch');
             $qb->setMaxResults(1);
             $qb->where($qb->expr()->orX($qb->expr()->eq('teammatch.teamone', ':id'), $qb->expr()->eq('teammatch.teamtwo', ':id')));
-            $qb->setParameters(array('id' => $id));
+            $qb->setParameter('id', $id);
 
             $queryResult = $qb->getQuery()->getResult();
             // echo $qb->getQuery()->getSql();
@@ -52,7 +51,8 @@ class TeammatchRepository extends AbstractBaseRepository {
 	 *
 	 * @return TeammatchDE
 	 * @throws Exception
-	 */
+     * @noinspection PhpUnused
+     */
     public function saveTeammatch(TeammatchDE $teammatch): TeammatchDE {
         try {
             $this->getEntityManager()->persist($teammatch);

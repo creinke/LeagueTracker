@@ -6,10 +6,10 @@ use App\Utility\EnumTrait;
 abstract class GameFormatType {
     use EnumTrait;
 
-    const SINGLES_MATCH_PLAY = "SINGLES MATCH PLAY";
-    const SINGLES_STROKE_PLAY = "SINGLES STROKE PLAY";
+    const string SINGLES_MATCH_PLAY = "SINGLES MATCH PLAY";
+    const string SINGLES_STROKE_PLAY = "SINGLES STROKE PLAY";
 
-    private static $enum = array(1 => "SINGLES MATCH PLAY", 2 => "SINGLES STROKE PLAY");
+    private static array $enum = array(1 => "SINGLES MATCH PLAY", 2 => "SINGLES STROKE PLAY");
 
 	/**
 	 * @param int $value

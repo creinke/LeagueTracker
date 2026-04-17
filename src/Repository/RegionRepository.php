@@ -4,9 +4,8 @@ namespace App\Repository;
 use App\Entity\CountryDE;
 use App\Entity\RegionDE;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\PersistentCollection;
 use Exception;
 use Psr\Log\LoggerInterface;
 
@@ -30,21 +29,22 @@ class RegionRepository extends AbstractBaseRepository {
 		$regionData['code'] ??= '';
 	}
 
-	/**
-	 * @param string $code
-	 * @param string $country
-	 *
-	 * @return ?RegionDE
-	 */
+    /**
+     * @param string $code
+     * @param CountryDE $country
+     *
+     * @return ?RegionDE
+     */
     public function findRegionByCode( string $code, CountryDE $country) : ?RegionDE {
         return $this->findOneBy(array('code' => $code, 'country' => $country));
     }
 
     /**
      * @param string $name
-     * @param string $country
+     * @param CountryDE $country
      *
      * @return ?RegionDE
+     * @noinspection PhpUnused
      */
     public function findRegionByName(string $name, CountryDE $country) : ?RegionDE {
         return $this->findOneBy(array('name' => $name, 'country' => $country));
@@ -86,11 +86,11 @@ class RegionRepository extends AbstractBaseRepository {
 	 *
 	 * @param array $regionsData new or modified list of region data
 	 *
-	 * @return PersistentCollection of Entity\RegionDE
+	 * @return Collection of Entity\RegionDE
 	 * @throws Exception
 	 */
-	public function saveAll(CountryDE $country, array $regionsData): PersistentCollection {
-		$regions = new PersistentCollection($this->getEntityManager(), new ClassMetadata('App\Entity\RegionDE'), new ArrayCollection());
+	public function saveAll(CountryDE $country, array $regionsData): Collection {
+		$regions = new ArrayCollection();
 
 		foreach($regionsData as $regionData) {
 			$region = $this->save($country, $regionData);

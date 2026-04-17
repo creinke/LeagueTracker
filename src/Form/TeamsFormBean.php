@@ -5,9 +5,7 @@ use App\Entity\LeagueDE;
 use App\Entity\PlayerDE;
 use App\Entity\TeamDE;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\PersistentCollection;
+use Doctrine\Common\Collections\Collection;
 
 /**
  * TeamsFormBean
@@ -16,36 +14,36 @@ class TeamsFormBean {
     /**
      * public contructor
      */
-    public function __construct(EntityManagerInterface $em, LeagueDE $league) {
-        $this->setTeams(new PersistentCollection($em, new ClassMetadata('App\Entity\TeamDE'), new ArrayCollection()));
+    public function __construct(LeagueDE $league) {
+        $this->teams = new ArrayCollection();
 
         $x = 15;
 
         do {
-            $team = new TeamDE($em);
+            $team = new TeamDE();
             $team->setLeague($league);
-            $team->getPlayers()->add(new PlayerDE($em));
-            $team->getPlayers()->add(new PlayerDE($em));
-            $team->getPlayers()->add(new PlayerDE($em));
-            $team->getPlayers()->add(new PlayerDE($em));
+            $team->getPlayers()->add(new PlayerDE());
+            $team->getPlayers()->add(new PlayerDE());
+            $team->getPlayers()->add(new PlayerDE());
+            $team->getPlayers()->add(new PlayerDE());
             
             $this->teams->add($team);
         } while (--$x > 0);
     }
 
-    private $teams;
+    private Collection $teams;
 
     /**
-     * @return PersistentCollection
+     * @return Collection
      */
-    public function getTeams() {
+    public function getTeams() : Collection {
         return $this->teams;
     }
 
     /**
-     * @param PersistentCollection $teams
+     * @param Collection $teams
      */
-    public function setTeams($teams) {
+    public function setTeams(Collection $teams): void {
         $this->teams = $teams;
     }
 }

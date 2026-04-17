@@ -7,10 +7,9 @@ use App\Entity\HoleDE;
 use App\Entity\NineDE;
 use App\Entity\TeeDE;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr\Join;
-use Doctrine\ORM\PersistentCollection;
 use Exception;
 use Psr\Log\LoggerInterface;
 
@@ -153,11 +152,12 @@ use Psr\Log\LoggerInterface;
         $qb = $this->getEntityManager()->createQueryBuilder();
 
         $qb->select('course')
-            ->from('App\Entity\LeagueDE', 'league')
+            ->from('App\Entity\LeagueDE'/** @type MODEL */, 'league')
             ->join('App\Entity\CourseDE', 'course', Join::WITH, 'course member of league.courses')
             ->where($qb->expr()->eq('league.id', ':leagueId'))
             ->setParameter('leagueId', $leagueId);
 
+        /** @noinspection PhpUnnecessaryLocalVariableInspection */
         $result = $qb->getQuery()->getResult();
         return $result;
     }
@@ -199,7 +199,7 @@ use Psr\Log\LoggerInterface;
 	    }
 
 	    $this->checkCourseData($courseData);
-        $course = $this->setCourseData($courseData, $course);
+        $course = $this->setCourseData($courseData);
 
         try {
             $this->getEntityManager()->persist($course);
@@ -212,16 +212,16 @@ use Psr\Log\LoggerInterface;
         return $course;
     }
 
-	 /**
-	  * Adds all course entities
-	  *
-	  * @param array $coursesData new or modified list of course data
-	  *
-	  * @return PersistentCollection of Entity\CourseDE
-	  * @throws Exception
-	  */
-    public function saveAll(array $coursesData): PersistentCollection {
-        $courses = new PersistentCollection($this->getEntityManager(), new ClassMetadata('App\Entity\CourseDE'), new ArrayCollection());
+ 	/**
+ 	 * Adds all course entities
+ 	 *
+ 	 * @param array $coursesData new or modified list of course data
+ 	 *
+ 	 * @return Collection of Entity\CourseDE
+ 	 * @throws Exception
+ 	 */
+     public function saveAll(array $coursesData): Collection {
+         $courses = new ArrayCollection();
 
         foreach($coursesData as $courseData) {
             $course = $this->save($courseData);
@@ -280,7 +280,7 @@ use Psr\Log\LoggerInterface;
 	  * @return CourseDE $course
 	  */
     protected function setCourseData(array $courseData): CourseDE {
-        $course = new CourseDE($this->getEntityManager());
+        $course = new CourseDE();
 
         $course->setName($courseData['name']);
         $course->setWebsite($courseData['website']);
@@ -315,10 +315,10 @@ use Psr\Log\LoggerInterface;
 	  * @param array $holesData array of hole data
 	  * @param TeeDE $tee , the TeeDE associated with this set of HoleDEs
 	  *
-	  * @return PersistentCollection of HoleDE
+	  * @return Collection of HoleDE
 	  */
-    protected function setHolesData(array $holesData, TeeDE $tee): PersistentCollection {
-        $holes = new PersistentCollection($this->getEntityManager(), new ClassMetadata('App\Entity\HoleDE'), new ArrayCollection());
+    protected function setHolesData(array $holesData, TeeDE $tee): Collection {
+        $holes = new ArrayCollection();
 
         foreach($holesData as $holeData) {
             $holes[] = $this->setHoleData($holeData, $tee);
@@ -335,7 +335,7 @@ use Psr\Log\LoggerInterface;
 	  * @return NineDE $nine
 	  */
     protected function setNineData(array $nineData, CourseDE $course): NineDE {
-		$nine = new NineDE($this->getEntityManager());
+		$nine = new NineDE();
 
         $nine->setName($nineData['name']);
         $nine->setCourse($course);
@@ -348,10 +348,10 @@ use Psr\Log\LoggerInterface;
 	  * @param array $ninesData array of nine data
 	  * @param CourseDE $course , the CourseDE associated with this set of NineDEs
 	  *
-	  * @return PersistentCollection of NineDE
+	  * @return Collection of NineDE
 	  */
-    protected function setNinesData(array $ninesData, CourseDE $course): PersistentCollection {
-        $nines = new PersistentCollection($this->getEntityManager(), new ClassMetadata('App\Entity\NineDE'), new ArrayCollection());
+    protected function setNinesData(array $ninesData, CourseDE $course): Collection {
+        $nines = new ArrayCollection();
 
         foreach($ninesData as $nineData) {
             $nines[] = $this->setNineData($nineData, $course);
@@ -369,7 +369,7 @@ use Psr\Log\LoggerInterface;
 	  * @return TeeDE $tee
 	  */
     protected function setTeeData(array $teeData, NineDE $nine, ?TeeDE $tee = NULL): TeeDE {
-        $tee ??= new TeeDE($this->getEntityManager());
+        $tee ??= new TeeDE();
 
         $tee->setName($teeData['name']);
         $tee->setLength($teeData['length']);
@@ -385,12 +385,12 @@ use Psr\Log\LoggerInterface;
 	 /**
 	  * @param array $teesData array of tee data
 	  * @param NineDE $nine , the NineDE associated with this set of TeeDEs
-	  * @param PersistentCollection|null $tees of Entity\TeeDE
+	  * @param Collection|null $tees of Entity\TeeDE
 	  *
-	  * @return PersistentCollection of Entity\TeeDE
+	  * @return Collection of Entity\TeeDE
 	  */
-    protected function setTeesData(array $teesData, NineDE $nine, ?PersistentCollection $tees = NULL): PersistentCollection {
-        $tees ??= new PersistentCollection($this->getEntityManager(), new ClassMetadata('App\Entity\TeeDE'), new ArrayCollection());
+    protected function setTeesData(array $teesData, NineDE $nine, ?Collection $tees = NULL): Collection {
+        $tees ??= new ArrayCollection();
 
         foreach($teesData as $teeData) {
             $tees[] = $this->setTeeData($teeData, $nine);
@@ -406,6 +406,7 @@ use Psr\Log\LoggerInterface;
      * @param CourseDE $course
      *
      * @return CourseDE $course
+     * @noinspection PhpUnused
      */
     public function updateData(array $courseData, CourseDE $course): CourseDE {
         if (isset($data['name'])) {

@@ -78,7 +78,7 @@ h3{
 }
 [class^="icon-"], [class*=" icon-"] {
 	font-family: 'icomoon';
-	speak: none;
+	speak: never;
 	font-style: normal;
 	font-weight: normal;
 	font-variant: normal;

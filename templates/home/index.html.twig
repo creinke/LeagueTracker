@@ -5,15 +5,13 @@
 {% block body %}
     <!-- <h1>League Tracker Home Page</h1>  -->
     {% if app.user and is_granted('ROLE_SAMPLE') %}
+        <h2>xxxWelcome to Premier Golf League Tracker!</h2>
         <p>
-            <h2>xxxWelcome to Premier Golf League Tracker!</h2>
-            To see if you might be interested in using this application, take a quick look at list of bullet items below.  If these features 
+            To see if you might be interested in using this application, take a quick look at list of bullet items below.  If these features
             meet your league requirements, then just contact me at the email address I provide below and provide the information that I require.  I will help you get set 
             up.  There is no cost to League Tracker.  It's here for any league to use free of charge.  
         </p>
-        <p>
-            <h2>Feature List</h2>
-        </p>
+        <h2>Feature List</h2>
         <ul>
             <li>Designed specifically for league play, with singles, 2, 3, or 4 person teams, stroke or match play.</li>
             <li>Accomodates both singles and team play as well as special league match events, e.g., scramples, shambles, etc.</li>
@@ -97,21 +95,21 @@
         <p>
             To get started with your league, send an email to 
             <a href="javascript:window.location.href = 'mailto:' + ['League','Tracker'].join('@')">creinke<!---->@<!---->rkm-associates.com</a> 
-            and provide the following information:  
-            <ul>
-                <li>The name of your league.</li>
-                <li>The course that your league plays, including:</li>
-                    <li style="padding-left: 4em;">The website where the the course scorecard can be found.</li> 
-            </ul>
+            and provide the following information:
         </p>
+        <ul>
+            <li>The name of your league.</li>
+            <li>The course that your league plays, including:</li>
+                <li style="padding-left: 4em;">The website where the the course scorecard can be found.</li>
+        </ul>
         <p>
-            Generally within 24 hours, you will recieve two sets of trial credentials for your league, administrator credentials and user credentials.  
+            Generally, within 24 hours, you will receive two sets of trial credentials for your league, administrator credentials and user credentials.
         </p>
     {%  endif %}
     {% if not app.user %}
+        <h2>Welcome to Premier Golf League Tracker!</h2>
         <p>
-            <h2>Welcome to Premier Golf League Tracker!</h2>
-            If you have set up your league already, just log in with either your league's admin or user credentials.  
+            If you have set up your league already, just log in with either your league's admin or user credentials.
         </p>
         <p>
             If you are here checking out League Tracker, firstly, <strong>it is free to use</strong>!  To get started, you can log in with either the credentials 

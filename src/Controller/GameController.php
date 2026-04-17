@@ -26,8 +26,6 @@ use App\Repository\TeamRepository;
 use App\Utility\Pairings;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\PersistentCollection;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use DateTime;
 use Exception;
 use Psr\Log\LoggerInterface;
@@ -49,22 +47,22 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
  *
  */
 class GameController extends AbstractController {
-	private EntityManagerInterface $em;
-	private LoggerInterface $logger;
+    private EntityManagerInterface $em;
+    private LoggerInterface $logger;
 
-	public function __construct(EntityManagerInterface $em, LoggerInterface $logger) {
-		$this->em = $em;
-		$this->logger = $logger;
-	}
+    public function __construct(EntityManagerInterface $em, LoggerInterface $logger) {
+        $this->em = $em;
+        $this->logger = $logger;
+    }
 
-	/**
-	 * Build change players form
-	 *
-	 * @param ChangeGamePlayersFormBean $formbean
-	 * @param LeagueDE $league
-	 *
-	 * @return FormInterface
-	 */
+    /**
+     * Build change player form
+     *
+     * @param ChangeGamePlayersFormBean $formbean
+     * @param LeagueDE $league
+     *
+     * @return FormInterface
+     */
     private function buildChangeGamePlayersForm(ChangeGamePlayersFormBean $formbean, LeagueDE $league) : FormInterface {
         $playerChoices = array();
         foreach($league->getPlayers() as $player) {
@@ -76,25 +74,27 @@ class GameController extends AbstractController {
         $builder = $this->createFormBuilder($formbean)
             ->add('players', CollectionType::class, ['entry_type' => ChoiceType::class, 'entry_options' => [ 'choices' => $playerChoices, 'attr' => ['style' => 'height: 45px;', 'class' => 'form-control'],],])
             ->add('save', SubmitType::class, array('label' => 'Save Changes', 'disabled' => $disableSaveButton, 'attr' => array('class' => 'btn btn-primary mt-3', 'style' => 'margin-top: 2em;')));
-        
+
+        /** @noinspection PhpUnnecessaryLocalVariableInspection */
         $form = $builder->getForm();
         return $form;
     }
 
-	/**
-	 * Build game scores form
-	 *
-	 * @param int $eventId
-	 * @param $viewOnly
-	 * @param GameScoresFormBean $formbean
-	 *
-	 * @return FormInterface
-	 */
+    /**
+     * Build game scores form
+     *
+     * @param int $eventId
+     * @param $viewOnly
+     * @param GameScoresFormBean $formbean
+     *
+     * @return FormInterface
+     */
     private function buildGameScoresForm(int $eventId, $viewOnly, GameScoresFormBean $formbean) : FormInterface {
         $builder = $this->createFormBuilder($formbean)
             ->add('playerScores', CollectionType::class, array('entry_type' => ScoreType::class, 'entry_options' => array('attr' => array('style' => 'height: 2.5em; width: 2.7em; color: black;')),'required' => true))
             ->add('save', SubmitType::class, array('label' => 'Save Game', 'disabled' => $viewOnly, 'attr' => array('class' => 'btn btn-primary mt-3', 'style' => 'margin-top: 2em;')));
 
+        /** @noinspection PhpUnnecessaryLocalVariableInspection */
         $form = $builder->getForm();
         return $form;
     }
@@ -103,11 +103,13 @@ class GameController extends AbstractController {
      * Build generate form
      *
      * @param LeagueDE $league
+     * @param EventDE $event
+     *
      * @return FormInterface
      */
     private function buildGenerateSinglesGamesForm(LeagueDE $league, EventDE $event) : FormInterface {
+        /** @noinspection DuplicatedCode */
         $formbean = new PlayersFormBean();
-        $formbean->setPlayers(new PersistentCollection($this->em, new ClassMetadata('App\Entity\PlayerDE'), new ArrayCollection()));
         $players = [];
         $formbean->setPlayers($players);
         
@@ -126,19 +128,20 @@ class GameController extends AbstractController {
                     return ['checked' => $val->registered];
                 }])
             ->add('generate', SubmitType::class, array('label' => 'Generate', 'disabled' => $disableGenerateButton, 'attr' => array('class' => 'btn btn-primary mt-3', 'style' => 'margin-top: 2em;')));
-        
+
+        /** @noinspection PhpUnnecessaryLocalVariableInspection */
         $form = $builder->getForm();
         return $form;
     }
 
-	/**
-	 * Build singles game form
-	 *
-	 * @param LeagueDE $league
-	 * @param GameFormBean $gameFormBean
-	 *
-	 * @return FormInterface
-	 */
+    /**
+     * Build singles game form
+     *
+     * @param LeagueDE $league
+     * @param GameFormBean $gameFormBean
+     *
+     * @return FormInterface
+     */
     private function buildSinglesGameForm(LeagueDE $league, GameFormBean $gameFormBean) : FormInterface {
         $playerChoices = array();
         $playerChoices[' '] = NULL;
@@ -148,7 +151,8 @@ class GameController extends AbstractController {
         }
         
         $disableSaveButton = in_array('ROLE_SAMPLE', $this->getUser()->getRoles());
-        
+
+        /** @noinspection PhpUnnecessaryLocalVariableInspection */
         $form = $this->createFormBuilder($gameFormBean)
             ->add('startingtime', TimeType::class, array('label' => ' Tee Time', 'widget' => 'single_text', 'required' => true, 'attr' => array('class' => 'form-control', 'style' => 'height: 45px;')))
             ->add('players', CollectionType::class, ['entry_type' => ChoiceType::class, 'entry_options' => [ 'choices' => $playerChoices, 'attr' => ['style' => 'width:100%; height: 45px;', 'class' => 'form-control'],],])
@@ -158,14 +162,14 @@ class GameController extends AbstractController {
         return $form;
     }
 
-	/**
-	 * Build team game form
-	 *
-	 * @param GameDE $game
-	 * @param LeagueDE $league
-	 *
-	 * @return FormInterface
-	 */
+    /**
+     * Build team game form
+     *
+     * @param GameDE $game
+     * @param LeagueDE $league
+     *
+     * @return FormInterface
+     */
     private function buildTeamGameForm(GameDE $game, LeagueDE $league) : FormInterface {
         $teamChoices = array();
         foreach($league->getTeams() as $team) {
@@ -174,6 +178,7 @@ class GameController extends AbstractController {
 
         $disableSaveButton = in_array('ROLE_SAMPLE', $this->getUser()->getRoles());
 
+        /** @noinspection PhpUnnecessaryLocalVariableInspection */
         $form = $this->createFormBuilder($game)
             ->add('startingtime', TimeType::class, array('label' => ' Tee Time', 'widget' => 'single_text', 'required' => true, 'attr' => array('class' => 'form-control', 'style' => 'height: 45px;')))
             ->add('teamOneId', ChoiceType::class, array('label' => 'Team One', 'required' => true, 'attr' => array('class' => 'form-control', 'style' => 'height: 45px;'),
@@ -186,23 +191,24 @@ class GameController extends AbstractController {
         return $form;
     }
 
-	/**
-	 * @param Request $request
-	 * @param $event_id
-	 * @param $game_id
-	 * @param $gamenumber
-	 *
-	 * @return RedirectResponse|Response
-	 */
-	#[Route('/game/change/players/{event_id}/{game_id}/{gamenumber}', name: 'game_change_players', methods: ['GET', 'POST'])]
-	#[IsGranted('ROLE_USER')]
-	public function changePlayers(Request $request, $event_id, $game_id, $gamenumber): RedirectResponse|Response {
+    /**
+     * @param Request $request
+     * @param $event_id
+     * @param $game_id
+     * @param $gamenumber
+     *
+     * @return RedirectResponse|Response
+     */
+    #[Route('/game/change/players/{event_id}/{game_id}/{gamenumber}', name: 'game_change_players', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function changePlayers(Request $request, $event_id, $game_id, $gamenumber): RedirectResponse|Response {
         $user = $this->getUser();
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         $league = $user->getLeague();
 
-		$gameRepository = new GameRepository($this->em, $this->logger);
+        $gameRepository = new GameRepository($this->em, $this->logger);
 
-		$game = $gameRepository->find($game_id);
+        $game = $gameRepository->find($game_id);
 
         $eventRepository = new EventRepository($this->em, $this->logger);
         $event = $eventRepository->find($event_id);
@@ -213,6 +219,7 @@ class GameController extends AbstractController {
 
         if ($form->isSubmitted() && $form->isValid()) {
             $formbeanPlayers = $formbean->getPlayers();
+            /** @noinspection DuplicatedCode */
             $formbeanPlayerIndex = 0;
             $changedPlayers = false; 
             
@@ -225,6 +232,7 @@ class GameController extends AbstractController {
             }
             if ($changedPlayers) {
                 try {
+                    /** @noinspection DuplicatedCode */
                     foreach($game->getPlayermatches() as $playerMatch) {
                         $playerOneScores = $playerMatch->getPlayeronescores();
                         
@@ -239,6 +247,7 @@ class GameController extends AbstractController {
                             $playerMatch->getPlayerscores()->removeElement($score);
                         }
                     }
+                    /** @noinspection PhpConditionAlreadyCheckedInspection */
                     $formbeanPlayerIndex = 0;
                     $playerRepository = new PlayerRepository($this->em, $this->logger);
                     
@@ -265,17 +274,17 @@ class GameController extends AbstractController {
                 'form' => $form->createView()));
     }
 
-	/**
-	 * @param Request $request
-	 * @param $event_id
-	 * @param $game_id
-	 *
-	 * @return RedirectResponse
-	 * @throws Exception
-	 */
-	#[Route('/game/delete/{event_id}/{game_id}', name: 'game_delete', methods: ['DELETE'])]
-	#[IsGranted('ROLE_ADMIN')]
-	public function delete(Request $request, $event_id, $game_id): RedirectResponse {
+    /**
+     * @param Request $request
+     * @param $event_id
+     * @param $game_id
+     *
+     * @return RedirectResponse
+     * @throws Exception
+     */
+    #[Route('/game/delete/{event_id}/{game_id}', name: 'game_delete', methods: ['DELETE'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function delete(Request $request, $event_id, $game_id): RedirectResponse {
         $gameRepository = new GameRepository($this->em, $this->logger);
         $game = $gameRepository->find($game_id);
         $gameRepository->removeGame($game);
@@ -284,17 +293,18 @@ class GameController extends AbstractController {
         return $this->redirectToRoute('event_edit', $parameters);
     }
 
-	/**
-	 * @param PlayerDE $player
-	 * @param DateTime $startingdateandtime
-	 * @param TeeDE $tee
-	 *
-	 * @return ScoreDE|NULL
-	 * @throws Exception
-	 */
+    /**
+     * @param PlayerDE $player
+     * @param DateTime $startingdateandtime
+     * @param TeeDE $tee
+     *
+     * @return ScoreDE|NULL
+     * @throws Exception
+     */
     private function findHighestScore(PlayerDE $player, DateTime $startingdateandtime, TeeDE $tee) : ?ScoreDE {
         $scoreRepository = new ScoreRepository($this->em, $this->logger);
         $scores = $scoreRepository->findPlayerScores($player, $startingdateandtime);
+        /** @noinspection DuplicatedCode */
         $highestScore = null;
 
         foreach($scores as $score) {
@@ -331,17 +341,17 @@ class GameController extends AbstractController {
         return $highestScore;
     }
 
-	/**
-	 * @param Request $request
-	 * @param $event_id
-	 * @param $game_id
-	 * @param $gamenumber
-	 *
-	 * @return Response
-	 */
-	#[Route('/game/edit/{event_id}/{game_id}/{gamenumber}', name: 'game_edit', methods: ['GET', 'POST'])]
-	#[IsGranted('ROLE_ADMIN')]
-	public function edit(Request $request, $event_id, $game_id, $gamenumber): Response {
+    /**
+     * @param Request $request
+     * @param $event_id
+     * @param $game_id
+     * @param $gamenumber
+     *
+     * @return Response
+     */
+    #[Route('/game/edit/{event_id}/{game_id}/{gamenumber}', name: 'game_edit', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function edit(Request $request, $event_id, $game_id, $gamenumber): Response {
         $eventRepository = new EventRepository($this->em, $this->logger);
         $event = $eventRepository->find($event_id);
         
@@ -360,8 +370,9 @@ class GameController extends AbstractController {
      * @param int $gamenumber
      * @return Response
      */
-    private function editSinglesGame(Request $request, EventRepository $eventRepository, EventDE $event, $game_id, $gamenumber) : Response {
+    private function editSinglesGame(Request $request, EventRepository $eventRepository, EventDE $event, int $game_id, int $gamenumber) : Response {
         $user = $this->getUser();
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         $league = $user->getLeague();
         
         $gameRepository = new GameRepository($this->em, $this->logger);
@@ -375,7 +386,7 @@ class GameController extends AbstractController {
             $players = $game->getPlayers()->toArray();
             $newPlayerCount = $event->getPlayersperteam() * $event->getTeamsorplayerspergame() - sizeof($players);
             while ($newPlayerCount-- > 0) {
-                $players[] = new PlayerDE($this->em);
+                $players[] = new PlayerDE();
             }
             $form =$this->buildSinglesGameForm($league, new GameFormBean($league, $players, $game->getStartingtime()));
         }
@@ -387,6 +398,7 @@ class GameController extends AbstractController {
                 $game->setStartingtime($form->getData()->getStartingtime());
                 
                 if ($matchPlay) {
+                    /** @noinspection DuplicatedCode */
                     $playerIndex = 0;
                     $changedPlayers = false;
                     
@@ -398,6 +410,7 @@ class GameController extends AbstractController {
                         }
                     }
                     if ($changedPlayers) {
+                        /** @noinspection DuplicatedCode */
                         foreach($game->getPlayermatches() as $playerMatch) {
                             $playerOneScores = $playerMatch->getPlayeronescores();
                             
@@ -412,6 +425,7 @@ class GameController extends AbstractController {
                                 $playerMatch->getPlayerscores()->removeElement($score);
                             }
                         }
+                        /** @noinspection PhpConditionAlreadyCheckedInspection */
                         $playerIndex = 0;
                         $playerRepository = new PlayerRepository($this->em, $this->logger);
                         
@@ -432,7 +446,8 @@ class GameController extends AbstractController {
                         }
                     }
                     $playerRepository = new PlayerRepository($this->em, $this->logger);
-                    
+
+                    /** @noinspection PhpUndefinedVariableInspection */
                     $newPlayers = array_diff_key($formPlayerKeys, $gamePlayerKeys);
                     $deletedPlayers = array_diff_key($gamePlayerKeys, $formPlayerKeys);
                     
@@ -483,8 +498,9 @@ class GameController extends AbstractController {
      * @param int $gamenumber
      * @return Response
      */
-    private function editTeamGame(Request $request, EventRepository $eventRepository, EventDE $event, $game_id, $gamenumber) : Response {
+    private function editTeamGame(Request $request, EventRepository $eventRepository, EventDE $event, int $game_id, int $gamenumber) : Response {
         $user = $this->getUser();
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         $league = $user->getLeague();
 
         $gameRepository = new GameRepository($this->em, $this->logger);
@@ -516,12 +532,13 @@ class GameController extends AbstractController {
                         }
                     }
                     $game->getPlayermatches()->clear();
-                    $game->setPlayermatches(new PersistentCollection($this->em, new ClassMetadata('App\Entity\PlayermatchDE'), new ArrayCollection()));
+                    $game->setPlayermatches(new ArrayCollection());
                     
                     $playerRepository = new PlayerRepository($this->em, $this->logger);
                     $teamOne = $teamRepository->find($game->getTeamOneId());
                     $teamTwo = $teamRepository->find($game->getTeamTwoId());
-                    
+
+                    /** @noinspection DuplicatedCode */
                     for ($playerIndex = 0; $playerIndex < $teamOne->getPlayers()->count(); $playerIndex++) {
                         $playerOne = $playerRepository->find($teamOne->getPlayers()->get($playerIndex)->getId());
                         $playerTwo = $playerRepository->find($teamTwo->getPlayers()->get($playerIndex)->getId());
@@ -556,17 +573,18 @@ class GameController extends AbstractController {
         );
     }
 
-	/**
-	 * @param Request $request
-	 * @param int $event_id event id
-	 *
-	 * @return Response
-	 * @throws Exception
-	 */
-	#[Route('/game/generate/{event_id}', name: 'game_generate', methods: ['GET', 'POST'])]
-	#[IsGranted('ROLE_ADMIN')]
-	public function generate(Request $request, int $event_id): Response {
+    /**
+     * @param Request $request
+     * @param int $event_id event id
+     *
+     * @return Response
+     * @throws Exception
+     */
+    #[Route('/game/generate/{event_id}', name: 'game_generate', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function generate(Request $request, int $event_id): Response {
         $user = $this->getUser();
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         $league = $user->getLeague();
         
         $eventRepository = new EventRepository($this->em, $this->logger);
@@ -606,11 +624,13 @@ class GameController extends AbstractController {
                 $startGeneratingPairings = false;
             }
         }
+        /** @noinspection PhpUndefinedVariableInspection */
         if ($startGeneratingPairings) {
             $minutesBetweenGames = $event->getMinutesbetweengames();
             $eventDateAndTime = $event->getStartdateandtime();
             $teeDateAndTime = clone $eventDateAndTime;
-            
+
+            /** @noinspection PhpUndefinedVariableInspection */
             for ($gameNumber = 0; $gameNumber < sizeof($pairings[0]); $gameNumber++) {
                 $gameDateAndTime = clone $teeDateAndTime;
                 
@@ -619,84 +639,16 @@ class GameController extends AbstractController {
                     $teamPairings = [];
                     $teamPairings[] = $teamRepository->find($pairings[0][$gameNumber][0]->getId());
                     $teamPairings[] = $teamRepository->find($pairings[0][$gameNumber][1]->getId());
-                    
-                    $game = SeasonController::createNewTeamMatchGame(new GameDE($this->em), $event, $this->em, $this->logger, $teamPairings, $gameDateAndTime, $gameFormat);
+
+                    /** @noinspection PhpUndefinedVariableInspection */
+                    $game = SeasonController::createNewTeamMatchGame(new GameDE(), $event, $this->em, $this->logger, $teamPairings, $gameDateAndTime, $gameFormat);
                 } else {
                     if (EventFormatType::isStrokePlay($eventFormat)) {
-                        $game = SeasonController::createNewSinglesGame(new GameDE($this->em), $event, $this->em, $this->logger, $pairings[0][$gameNumber], $gameDateAndTime, $gameFormat);
-
-                        /*
-                            Add scores to generated game 
-                            
-                        $tees = [];
-                        $tees[] = $event->getNine()->findTeeByName($event->getTee()->getName());
-                        
-                        if (!empty($event->getSecondnine())) {
-                            $tees[] = $event->getSecondnine()->findTeeByName($event->getTee()->getName());
-                        }
-                        $game->setRecorded(true);
-                        $scoreRepository = new ScoreRepository($this->em, $this->logger);
-                        
-                        foreach($game->getPlayers() as $player) {
-                            $scores = $scoreRepository->findAllPlayerScores($player, new DateTime());
-                            
-                            foreach($tees as $tee) {
-                                $scoreAdded = false;
-                                
-                                while (!$scoreAdded) {
-                                    $randomScoreIndex = random_int(0, sizeof($scores) - 1);
-                                    $score = $scores[$randomScoreIndex];
-                                    
-                                    if ($tee->getId() == $score->getTee()->getId() && !$score->getDuplicatescore() && !$score->getPartialscore()) {
-                                        $game->getPlayerscores()->add($score);
-                                        $scoreAdded = true;
-                                    }
-                                }
-                            }
-                        }
-                        */
-
+                        /** @noinspection PhpUndefinedVariableInspection */
+                        $game = SeasonController::createNewSinglesGame(new GameDE(), $event, $this->em, $this->logger, $pairings[0][$gameNumber], $gameDateAndTime, $gameFormat);
                     } else {
-                        $game = SeasonController::createNewSinglesTeamMatchGame(new GameDE($this->em), $event, $this->em, $this->logger, $pairings[0][$gameNumber], $gameDateAndTime, $gameFormat);
-                        
-                        /*
-                            Add scores to generated game
-                         
-                        $tees = [];
-                        $tees[] = $event->getNine()->findTeeByName($event->getTee()->getName());
-                        
-                        if (!empty($event->getSecondnine())) {
-                            $tees[] = $event->getSecondnine()->findTeeByName($event->getTee()->getName());
-                        }
-                        $game->setRecorded(true);
-                        $scoreRepository = new ScoreRepository($this->em, $this->logger);
-                        
-                        foreach($game->getPlayermatches() as $playerMatch) {
-                            $players = [];
-                            $players[] = $playerMatch->getPlayerone();
-                            $players[] = $playerMatch->getPlayertwo();
-                            
-                            $playerScores = [];
-                            foreach($players as $player) {
-                                $scores = $scoreRepository->findAllPlayerScores($player, new DateTime());
-                                
-                                foreach($tees as $tee) {
-                                    $scoreAdded = false;
-                                    
-                                    while (!$scoreAdded) {
-                                        $randomScoreIndex = random_int(0, sizeof($scores) - 1);
-                                        $score = $scores[$randomScoreIndex];
-                                        
-                                        if ($tee->getId() == $score->getTee()->getId() && !$score->getDuplicatescore() && !$score->getPartialscore()) {
-                                            $playerScores[] = $score;
-                                            $scoreAdded = true;
-                                        }
-                                    }
-                                }
-                            }
-                            $playerMatch->setPlayerscores($playerScores);
-                        }
-                        */
+                        /** @noinspection PhpUndefinedVariableInspection */
+                        $game = SeasonController::createNewSinglesTeamMatchGame(new GameDE(), $event, $this->em, $this->logger, $pairings[0][$gameNumber], $gameDateAndTime, $gameFormat);
                     }
                 }
                 $event->getGames()->add($game);
@@ -707,6 +659,8 @@ class GameController extends AbstractController {
             $parameters = array('id' => $event_id);
             return $this->redirectToRoute('event_edit', $parameters);
         }
+
+        /** @noinspection PhpUndefinedVariableInspection */
         return $this->render('game/generate.html.twig',
             [
                 'title' => "Generate Games",
@@ -723,7 +677,7 @@ class GameController extends AbstractController {
      * @param GameScoresFormBean $formbean
      * @return boolean valid form
      */
-    private function isValid(Form $form, GameScoresFormBean $formbean): bool {
+    private function isValid(FormInterface $form, GameScoresFormBean $formbean): bool {
         foreach($formbean->getPlayerScores() as $playerScores) {
             foreach($playerScores as $score) {
                 if (!is_numeric($score)) {
@@ -736,10 +690,11 @@ class GameController extends AbstractController {
     }
 
     /**
-     * @return EventDE id
+     * @return int id
      */
-    private function lastEvent(): EventDE|int {
+    private function lastEvent(): int {
         $user = $this->getUser();
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         $league = $user->getLeague();
         $dateTime =  new DateTime();
         $lastEvent = null;
@@ -764,16 +719,17 @@ class GameController extends AbstractController {
             return $lastEvent->getId();
         }
     }
-    
+
     /**
      * @param Request $request
      * @param int $event_id event id
      *
      * @return Response
+     * @throws Exception
      */
-	#[Route('/game/new/{event_id}', name: 'game_new', methods: ['GET', 'POST'])]
-	#[IsGranted('ROLE_ADMIN')]
-	public function new(Request $request, int $event_id): Response {
+    #[Route('/game/new/{event_id}', name: 'game_new', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function new(Request $request, int $event_id): Response {
         $eventRepository = new EventRepository($this->em, $this->logger);
         $event = $eventRepository->find($event_id);
 
@@ -792,9 +748,8 @@ class GameController extends AbstractController {
      */
     private function newSinglesGame(Request $request, EventRepository $eventRepository, EventDE $event) : Response {
         $user = $this->getUser();
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         $league = $user->getLeague();
-        
-        $game = new GameDE($this->em);
         
         if (EventFormatType::isMatchPlay($event->getFormat())) {
             $matchPlay = true;
@@ -803,21 +758,22 @@ class GameController extends AbstractController {
             $matchPlay = false;
             $playerCount = $event->getTeamsorplayerspergame();
         }
+        $players = new ArrayCollection();
         while ($playerCount-- > 0) {
-            $players[] = new PlayerDE($this->em);
+            $players->add(new PlayerDE());
         }
         $form = $this->buildSinglesGameForm($league, new GameFormBean($league, $players, clone($event->getStartdateandtime())));
         $form->handleRequest($request);
         
         if ($form->isSubmitted() && $form->isValid()) {
             try {
-                $game = new GameDE($this->em);
+                $game = new GameDE();
                 $game->setStartingtime($form->getData()->getStartingtime());
                 $game->setEvent($event);
                 
                 $players = $form->getData()->getPlayers();
-                $playerCount = sizeof($players);
-    
+                $playerCount = $players->count();
+
                 $playerRepository = new PlayerRepository($this->em, $this->logger);
                 
                 if ($matchPlay) {
@@ -864,18 +820,21 @@ class GameController extends AbstractController {
             ]
         );
     }
-    
+
     /**
      * @param Request $request
      * @param EventRepository $eventRepository
      * @param EventDE $event
+     *
      * @return Response
+     * @throws Exception
      */
     private function newTeamMatchGame(Request $request, EventRepository $eventRepository, EventDE $event) : Response {
         $user = $this->getUser();
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         $league = $user->getLeague();
         
-        $g = new  GameDE($this->em);
+        $g = new  GameDE();
         
         $form = $this->buildTeamGameForm($g, $league);
         $form->handleRequest($request);
@@ -883,7 +842,7 @@ class GameController extends AbstractController {
         if ($form->isSubmitted() && $form->isValid()) {
             $g = $form->getData();
             
-            $game = new GameDE($this->em);
+            $game = new GameDE();
             $gameFormat = GameFormatType::toOrdinal(GameFormatType::SINGLES_MATCH_PLAY);
             $gameDateAndTime = clone($g->getStartingtime());
             
@@ -923,13 +882,16 @@ class GameController extends AbstractController {
         }
         return false;
     }
-    
+
     /**
      * @param ScoreBean $scoreBean
      * @param DateTime $startingdateandtime
+     *
      * @return ScoreDE
+     * @throws Exception
      */
     private function playerScore(ScoreBean $scoreBean, DateTime $startingdateandtime): ScoreDE {
+        /** @noinspection DuplicatedCode */
         $playerScore = $scoreBean->getScore();
         
         if (empty($playerScore)) {
@@ -948,7 +910,8 @@ class GameController extends AbstractController {
         
         $scoreRepository = new ScoreRepository($this->em, $this->logger);
         $scores = $scoreRepository->findPlayerScores($player, $startingdateandtime);
-        
+
+        /** @noinspection DuplicatedCode */
         if (sizeof($scores) > 20) {
             $scores = array_slice($scores, 0, 20);
         }
@@ -961,18 +924,18 @@ class GameController extends AbstractController {
         return $playerScore;
     }
 
-	/**
-	 * @param Request $request
-	 * @param $gamenumber
-	 * @param $event_id
-	 * @param $game_id
-	 *
-	 * @return RedirectResponse|Response
-	 * @throws Exception
-	 */
-	#[Route('/game/post/scores/{event_id}/{game_id}/{gamenumber}', name: 'post_scores', methods: ['GET', 'POST'])]
-	#[IsGranted('ROLE_USER')]
-	public function postScores(Request $request, $gamenumber, $event_id, $game_id): RedirectResponse|Response {
+    /**
+     * @param Request $request
+     * @param $gamenumber
+     * @param $event_id
+     * @param $game_id
+     *
+     * @return RedirectResponse|Response
+     * @throws Exception
+     */
+    #[Route('/game/post/scores/{event_id}/{game_id}/{gamenumber}', name: 'post_scores', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function postScores(Request $request, $gamenumber, $event_id, $game_id): RedirectResponse|Response {
         $eventRepository = new EventRepository($this->em, $this->logger);
         $event = $eventRepository->find($event_id);
 
@@ -1065,66 +1028,66 @@ class GameController extends AbstractController {
         );
     }
 
-	/**
-	 * @param GameScoresFormBean $formbean
-	 * @param EventDE $event
-	 * @param GameDE $game
-	 */
+    /**
+     * @param GameScoresFormBean $formbean
+     * @param EventDE $event
+     * @param GameDE $game
+     *
+     * @noinspection PhpUnusedPrivateMethodInspection*/
     private function saveGameScores(GameScoresFormBean $formbean, EventDE $event, GameDE &$game): void {
-        $tee = $event->getTee();
-        $startingdateandtime = $event->getStartdateandtime();
-        
+//        $tee = $event->getTee();
+//        $startingdateandtime = $event->getStartdateandtime();
     }
 
-	/**
-	 * @param $event_id
-	 * @param $game_id
-	 * @param $gamenumber
-	 *
-	 * @return Response
-	 */
-	#[Route('/game/view/{event_id}/{game_id}/{gamenumber}', name: 'game_view', methods: ['GET'])]
-	#[IsGranted('ROLE_USER')]
-	public function view($event_id, $game_id, $gamenumber): Response {
+    /**
+     * @param $event_id
+     * @param $game_id
+     * @param $gamenumber
+     *
+     * @return Response
+     */
+    #[Route('/game/view/{event_id}/{game_id}/{gamenumber}', name: 'game_view', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
+    public function view($event_id, $game_id, $gamenumber): Response {
         $eventRepository = new EventRepository($this->em, $this->logger);
         $event = $eventRepository->find($event_id);
 
-		if ($event == null) {
-			return $this->render('error/error.html.twig',
-				['title' => 'Error', 'e' => 'There are no events that match the criteria specified.'] );
-		} else {
-			$singlesMatch = EventType::isSinglesMatch( $event->getEventtype() );
-			$matchPlay = EventFormatType::isMatchPlay( $event->getFormat() );
+        if ($event == null) {
+            return $this->render('error/error.html.twig',
+                ['title' => 'Error', 'e' => 'There are no events that match the criteria specified.'] );
+        } else {
+            $singlesMatch = EventType::isSinglesMatch( $event->getEventtype() );
+            $matchPlay = EventFormatType::isMatchPlay( $event->getFormat() );
 
-			$gameRepository = new GameRepository( $this->em, $this->logger );
-			$game = $gameRepository->find( $game_id );
+            $gameRepository = new GameRepository( $this->em, $this->logger );
+            $game = $gameRepository->find( $game_id );
 
-			if ( $game == null ) {
-				return $this->render( 'error/error.html.twig',
-					[ 'title' => 'Error', 'e' => 'There are no games that match the criteria specified.' ] );
-			} else {
-				$gamenumber = 0;
-				foreach ( $event->getGames() as $g ) {
-					$gamenumber ++;
+            if ( $game == null ) {
+                return $this->render( 'error/error.html.twig',
+                    [ 'title' => 'Error', 'e' => 'There are no games that match the criteria specified.' ] );
+            } else {
+                $gamenumber = 0;
+                foreach ( $event->getGames() as $g ) {
+                    $gamenumber ++;
 
-					if ( $g->getId() == $game->getId() ) {
-						break;
-					}
-				}
-				$season = $event->getSession()->getSeason();
+                    if ( $g->getId() == $game->getId() ) {
+                        break;
+                    }
+                }
+                $season = $event->getSession()->getSeason();
 
-				return $this->render( 'game/view.html.twig',
-					[
-						'title'        => 'Game',
-						'game'         => $game,
-						'gamenumber'   => $gamenumber,
-						'event'        => $event,
-						'matchPlay'    => $matchPlay,
-						'season'       => $season,
-						'singlesMatch' => $singlesMatch
-					]
-				);
-			}
-		}
+                return $this->render( 'game/view.html.twig',
+                    [
+                        'title'        => 'Game',
+                        'game'         => $game,
+                        'gamenumber'   => $gamenumber,
+                        'event'        => $event,
+                        'matchPlay'    => $matchPlay,
+                        'season'       => $season,
+                        'singlesMatch' => $singlesMatch
+                    ]
+                );
+            }
+        }
     }
 }

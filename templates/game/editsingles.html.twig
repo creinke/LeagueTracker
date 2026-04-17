@@ -10,7 +10,7 @@
             padding: 0.15rem 0.275rem;
         }
         .form-control {
-            padding: 0.3em inherit;
+            padding: 0.3em;
             height: 2.5em;
             width: 100%;
         }
@@ -32,8 +32,8 @@
             {{ form_errors(form) }}
             
             {% if matchPlay %}
-                <div class="table-responsive" style="width=100%;">
-                    <table class="table" style="width: 100%;">
+                <div class="table-responsive" style="width:100%;">
+                    <table class="table" style="width:100%;">
                         <thead>
                             <tr>
                                 <th style="width: 50%;">Player[1]</th>
@@ -65,7 +65,7 @@
                     </table>
                 </div>
             {% else %}
-                <div class="table-responsive" style="width=100%;">
+                <div class="table-responsive" style="width: 100%;">
                     <table class="table" style="width: 100%;">
                         <tbody>
                             {% for player in form.players %}

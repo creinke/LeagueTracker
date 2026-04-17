@@ -12,6 +12,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 abstract class ApiTestCase extends WebTestCase {
     protected ?EntityManagerInterface $entityManager = null;
+    protected ?LoggerInterface $logger = null;
     protected ?string $apiToken = null;
 
     protected function setUp(): void {
@@ -31,7 +32,7 @@ abstract class ApiTestCase extends WebTestCase {
         $container = static::getContainer();
 
         $this->entityManager = $container->get(EntityManagerInterface::class);
-        $logger = $container->get(LoggerInterface::class);
+        $this->logger = $container->get(LoggerInterface::class);
         $passwordHasher = $container->get(UserPasswordHasherInterface::class);
 
         $userRepository = $this->entityManager->getRepository(\App\Entity\UserDE::class);
@@ -49,7 +50,7 @@ abstract class ApiTestCase extends WebTestCase {
         return $client;
     }
 
-    protected function request(KernelBrowser $client, string $method, string $uri, array $parameters = [], array $files = [], array $server = [], string $content = null, bool $changeHistory = true): void {
+    protected function request(KernelBrowser $client, string $method, string $uri, array $parameters = [], array $files = [], array $server = [], ?string $content = null, bool $changeHistory = true): void {
         $server['HTTP_AUTHORIZATION'] = 'Bearer ' . $this->apiToken;
         $server['CONTENT_TYPE'] = 'application/json';
 

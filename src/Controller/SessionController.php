@@ -3,10 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\SessionDE;
-use App\Model\DoctrineTrait;
 use App\Repository\SeasonRepository;
 use App\Repository\SessionRepository;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Psr\Log\LoggerInterface;
@@ -19,26 +17,28 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class SessionController extends AbstractController {
-	private EntityManagerInterface $em;
-	private LoggerInterface $logger;
+    private EntityManagerInterface $em;
+    private LoggerInterface $logger;
 
-	public function __construct(EntityManagerInterface $em, LoggerInterface $logger) {
-		$this->em = $em;
-		$this->logger = $logger;
-	}
+    public function __construct(EntityManagerInterface $em, LoggerInterface $logger) {
+        $this->em = $em;
+        $this->logger = $logger;
+    }
 
-	/**
+    /**
      * @param SessionDE $session
      * @return FormInterface
      */
     private function buildSessionForm(SessionDE $session) : FormInterface {
+        /** @noinspection DuplicatedCode */
         $disableSaveButton = in_array('ROLE_SAMPLE', $this->getUser()->getRoles());
 
+        /** @noinspection PhpUnnecessaryLocalVariableInspection */
         $form = $this->createFormBuilder($session)
             ->add('name', TextType::class, array('label' => 'Name', 'required' => true, 'attr' => array('class' => 'form-control')))
             ->add('startdate', DateType::class, array('label' => 'Start Date', 'required' => true, 'widget' => 'single_text', 'attr' => array('class' => 'form-control')))
@@ -49,34 +49,36 @@ class SessionController extends AbstractController {
         return $form;
     }
 
-	/**
-	 * @param Request $request
-	 * @param $id
-	 *
-	 * @return RedirectResponse
-	 * @throws Exception
-	 */
-	#[Route('/session/delete/{id}', name: 'session_delete', methods: ['DELETE'])]
-	#[IsGranted('ROLE_ADMIN')]
+    /**
+     * @param Request $request
+     * @param $id
+     *
+     * @return RedirectResponse
+     * @throws Exception
+     */
+    #[Route('/session/delete/{id}', name: 'session_delete', methods: ['DELETE'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function delete(Request $request, $id): RedirectResponse {
         $sessionRepository = new SessionRepository($this->em, $this->logger);
         $session = $sessionRepository->find($id);
-		$season = $session->getSeason();
+        $season = $session->getSeason();
         $sessionRepository->removeSession($session);
 
-		$parameters = ['id' => $season->getId()];
-		$absoluteUrl = $this->generateUrl('session_list', $parameters, UrlGeneratorInterface::ABSOLUTE_URL);
-		return $this->redirect($absoluteUrl, 302); // Explicitly use redirect() with status
-	}
+        $parameters = ['id' => $season->getId()];
+        $absoluteUrl = $this->generateUrl('session_list', $parameters, UrlGeneratorInterface::ABSOLUTE_URL);
 
-	/**
-	 * @param Request $request
-	 * @param $id
-	 *
-	 * @return RedirectResponse|Response
-	 */
-	#[Route('/session/edit/{id}', name: 'session_edit', methods: ['GET', 'POST'])]
-	#[IsGranted('ROLE_ADMIN')]
+        /** @noinspection PhpRedundantOptionalArgumentInspection */
+        return $this->redirect($absoluteUrl, 302); // Explicitly use redirect() with status
+    }
+
+    /**
+     * @param Request $request
+     * @param $id
+     *
+     * @return RedirectResponse|Response
+     */
+    #[Route('/session/edit/{id}', name: 'session_edit', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function edit(Request $request, $id): RedirectResponse|Response {
         $sessionRepository = new SessionRepository($this->em, $this->logger);
         $session = $sessionRepository->find($id);
@@ -105,14 +107,14 @@ class SessionController extends AbstractController {
         );
     }
 
-	/**
-	 * @param Request $request
-	 * @param $id
-	 *
-	 * @return Response
-	 */
-	#[Route('/session/list/{id}', name: 'session_list', methods: ['GET'])]
-	#[IsGranted('ROLE_ADMIN')]
+    /**
+     * @param Request $request
+     * @param $id
+     *
+     * @return Response
+     */
+    #[Route('/session/list/{id}', name: 'session_list', methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function list(Request $request, $id): Response {
         $seasonRepository = new SeasonRepository($this->em, $this->logger);
         $season = $seasonRepository->findById($id);
@@ -127,17 +129,17 @@ class SessionController extends AbstractController {
         );
     }
 
-	/**
-	 * @param Request $request
-	 * @param $id
-	 *
-	 * @return Response
-	 * @throws Exception
-	 */
-	#[Route('/session/new/{id}', name: 'session_new', methods: ['GET', 'POST'])]
-	#[IsGranted('ROLE_ADMIN')]
+    /**
+     * @param Request $request
+     * @param $id
+     *
+     * @return Response
+     * @throws Exception
+     */
+    #[Route('/session/new/{id}', name: 'session_new', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function new(Request $request, $id): Response {
-        $session = new SessionDE($this->em);
+        $session = new SessionDE();
         
         $form = $this-> buildSessionForm($session);
         $form->handleRequest($request);
@@ -163,30 +165,30 @@ class SessionController extends AbstractController {
         );
     }
 
-	/**
-	 * @param $id
-	 *
-	 * @return Response
-	 */
-	#[Route('/session/view/{id}', name: 'session_view', methods: ['GET'])]
-	#[IsGranted('ROLE_ADMIN')]
+    /**
+     * @param $id
+     *
+     * @return Response
+     */
+    #[Route('/session/view/{id}', name: 'session_view', methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function view($id): Response {
         $sessionRepository = new SessionRepository($this->em, $this->logger);
         $session = $sessionRepository->find($id);
 
-		if ($session == null) {
-			return $this->render('error/error.html.twig',
-				['title' => 'Error', 'e' => 'There are no seasons that match the criteria specified.'] );
-		} else {
-			$season = $session->getSeason();
+        if ($session == null) {
+            return $this->render('error/error.html.twig',
+                ['title' => 'Error', 'e' => 'There are no seasons that match the criteria specified.'] );
+        } else {
+            $season = $session->getSeason();
 
-			return $this->render( 'session/view.html.twig',
-				array(
-					'title'   => 'Session',
-					'season'  => $season,
-					'session' => $session
-				)
-			);
-		}
+            return $this->render( 'session/view.html.twig',
+                array(
+                    'title'   => 'Session',
+                    'season'  => $season,
+                    'session' => $session
+                )
+            );
+        }
     }
 }

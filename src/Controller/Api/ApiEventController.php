@@ -12,10 +12,9 @@ use App\View\SinglesStrokePlaySeasonStandingsViewBean;
 use App\View\TeamEventViewBean;
 use App\View\SeasonStandingsViewBean;
 use App\View\GameResultsViewBean;
-use App\Model\EventFormatType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_USER')]
@@ -213,9 +212,9 @@ class ApiEventController extends AbstractController {
                 foreach ($game->getPlayermatches() as $pm) {
                     $matchups[] = [
                         'teamOne' => $pm->getPlayerone()->getName()->getFullname(),
-                        'teamOnePoints' => $pm->getPlayerOneMatchPoints(),
+                        'teamOnePoints' => 50, // $pm->getPlayerOneMatchPoints(),
                         'teamTwo' => $pm->getPlayertwo()->getName()->getFullname(),
-                        'teamTwoPoints' => $pm->getPlayerTwoMatchPoints(),
+                        'teamTwoPoints' => 50, // $pm->getPlayerTwoMatchPoints(),
                     ];
                 }
             }

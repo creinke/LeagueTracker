@@ -2,23 +2,20 @@
 
 namespace App\Tests\Controller;
 
-use App\Form\EventForm;
-use App\Model\EventFormatType;
-use App\Model\EventType;
 use App\Repository\EventRepository;
-use App\Repository\TeamgameRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NonUniqueResultException;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class TeamgameControllerTest extends WebTestCase {
-	const LEAGUE_MATCH = 1;
-	CONST MATCH_PLAY = 1;
+	const int LEAGUE_MATCH = 1;
+	CONST int MATCH_PLAY = 1;
 	private ?EntityManagerInterface $entityManager = null;
 	private ?LoggerInterface $logger = null;
 
@@ -72,7 +69,7 @@ class TeamgameControllerTest extends WebTestCase {
 		}
 
 		if (!$testUser) {
-			throw new \RuntimeException("Test user with role {$role} not found. Create a test user first.");
+			throw new RuntimeException("Test user with role {$role} not found. Create a test user first.");
 		}
 
 		$client->loginUser($testUser);

@@ -2,9 +2,7 @@
 namespace App\Controller;
 
 use App\Entity\LeagueDE;
-use App\Model\DoctrineTrait;
 use App\Repository\LeagueRepository;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -15,28 +13,29 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse ;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Exception;
 use App\Repository\CourseRepository;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class LeagueController extends AbstractController {
-	private EntityManagerInterface $em;
-	private LoggerInterface $logger;
+    private EntityManagerInterface $em;
+    private LoggerInterface $logger;
 
-	public function __construct(EntityManagerInterface $em, LoggerInterface $logger) {
-		$this->em = $em;
-		$this->logger = $logger;
-	}
+    public function __construct(EntityManagerInterface $em, LoggerInterface $logger) {
+        $this->em = $em;
+        $this->logger = $logger;
+    }
 
-	/**
-	 * @param LeagueDE $league
-	 *
-	 * @return FormInterface
-	 */
-	private function buildForm(LeagueDE $league) : FormInterface {
+    /**
+     * @param LeagueDE $league
+     *
+     * @return FormInterface
+     */
+    private function buildForm(LeagueDE $league) : FormInterface {
         $disableSaveButton = in_array('ROLE_SAMPLE', $this->getUser()->getRoles());
 
+        /** @noinspection PhpUnnecessaryLocalVariableInspection */
         $form = $this->createFormBuilder($league)
             ->add('name', TextType::class, array('label' => 'League Name', 'required' => true, 'attr' => array('class' => 'form-control')))
             ->add('save', SubmitType::class, array('label' => 'Save', 'disabled' => $disableSaveButton, 'attr' => array('class' => 'btn btn-primary mt-3', 'style' => 'margin-top: 2em;')))
@@ -45,17 +44,19 @@ class LeagueController extends AbstractController {
         return $form;
     }
 
-	/**
-	 * @param Request $request
-	 *
-	 * @return Response
-	 */
-	#[Route('/league/courses', name: 'league_courses', methods: ['GET'])]
-	#[IsGranted('ROLE_ADMIN')]
-	public function courses(Request $request): Response {
+    /**
+     * @param Request $request
+     *
+     * @return Response
+     */
+    #[Route('/league/courses', name: 'league_courses', methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function courses(Request $request): Response {
+        /** @noinspection PhpUnusedLocalVariableInspection */
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         $league = $this->getUser()->getLeague();
 
-        $courseRepository = new CourseRepository($this->em, $this->logger);;
+        $courseRepository = new CourseRepository($this->em, $this->logger);
         $elementName = $_GET["name"];
         preg_match("/([0-9]+)/", $elementName, $matches);
         $eventNumber = $matches[1];
@@ -96,14 +97,14 @@ class LeagueController extends AbstractController {
         return new Response($html);
     }
 
-	/**
-	 * @param Request $request
-	 * @param $id
-	 *
-	 * @return RedirectResponse
-	 */
-	#[Route('/league/delete/{id}', name: 'league_delete', methods: ['DELETE'])]
-	#[IsGranted('ROLE_SUPER')]
+    /**
+     * @param Request $request
+     * @param $id
+     *
+     * @return RedirectResponse
+     */
+    #[Route('/league/delete/{id}', name: 'league_delete', methods: ['DELETE'])]
+    #[IsGranted('ROLE_SUPER')]
     public function delete(Request $request, $id): RedirectResponse {
         $leagueRepository = new LeagueRepository($this->em, $this->logger);
         $league = $leagueRepository->find($id);
@@ -111,19 +112,19 @@ class LeagueController extends AbstractController {
         try {
             $leagueRepository->removeLeague($league);
         } catch (Exception $e) {
-	        $this->addFlash('error', 'Trouble deleting selected league: ' . $e->getMessage() . ' Please retry.');
+            $this->addFlash('error', 'Trouble deleting selected league: ' . $e->getMessage() . ' Please retry.');
         }
         return $this->redirectToRoute('league_list');
     }
 
-	/**
-	 * @param Request $request
-	 * @param $id
-	 *
-	 * @return RedirectResponse|Response
-	 */
-	#[Route('/league/edit/{id}', name: 'league_edit', methods: ['GET', 'POST'])]
-	#[IsGranted('ROLE_SUPER')]
+    /**
+     * @param Request $request
+     * @param $id
+     *
+     * @return RedirectResponse|Response
+     */
+    #[Route('/league/edit/{id}', name: 'league_edit', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_SUPER')]
     public function edit(Request $request, $id): RedirectResponse|Response {
         $leagueRepository = new LeagueRepository($this->em, $this->logger);
         $league = $leagueRepository->find($id);
@@ -148,9 +149,9 @@ class LeagueController extends AbstractController {
     /**
      * @return Response
      */
-	#[Route('/league/list', name: 'league_list', methods: ['GET'])]
-	#[IsGranted('ROLE_ADMIN')]
-	public function list(): Response {
+    #[Route('/league/list', name: 'league_list', methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function list(): Response {
         $leagueRepository = new LeagueRepository($this->em, $this->logger);
         $leagues = $leagueRepository->findAll();
 
@@ -161,16 +162,16 @@ class LeagueController extends AbstractController {
             );
     }
 
-	/**
-	 * @param Request $request
-	 *
-	 * @return Response
-	 * @throws Exception
-	 */
-	#[Route('/league/new', name: 'league_new', methods: ['GET', 'POST'])]
-	#[IsGranted('ROLE_ADMIN')]
-	public function new(Request $request): Response {
-        $league = new  LeagueDE($this->em);
+    /**
+     * @param Request $request
+     *
+     * @return Response
+     * @throws Exception
+     */
+    #[Route('/league/new', name: 'league_new', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function new(Request $request): Response {
+        $league = new  LeagueDE();
         $form = $this-> buildForm($league);
         $form->handleRequest($request);
 
@@ -187,27 +188,27 @@ class LeagueController extends AbstractController {
                 'form' => $form->createView()));
     }
 
-	/**
-	 * @param $id
-	 *
-	 * @return Response
-	 */
-	#[Route('/league/view/{id}', name: 'league_view', methods: ['GET'])]
-	#[IsGranted('ROLE_ADMIN')]
-	public function view($id): Response {
+    /**
+     * @param $id
+     *
+     * @return Response
+     */
+    #[Route('/league/view/{id}', name: 'league_view', methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function view($id): Response {
         $leagueRepository = new LeagueRepository($this->em, $this->logger);
         $league = $leagueRepository->find($id);
 
-		if ($league == null) {
-			return $this->render('error/error.html.twig',
-				['title' => 'Error', 'e' => 'There are no leagues that match the criteria specified.'] );
-		} else {
-			return $this->render( 'league/view.html.twig',
-				array(
-					'title'  => 'League',
-					'league' => $league
-				)
-			);
-		}
+        if ($league == null) {
+            return $this->render('error/error.html.twig',
+                ['title' => 'Error', 'e' => 'There are no leagues that match the criteria specified.'] );
+        } else {
+            return $this->render( 'league/view.html.twig',
+                array(
+                    'title'  => 'League',
+                    'league' => $league
+                )
+            );
+        }
     }
 }

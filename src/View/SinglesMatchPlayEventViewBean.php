@@ -143,7 +143,7 @@ class SinglesMatchPlayEventViewBean {
      *
      * @return number[]|array[]
      */
-    private function eighteenHoleHandicaps(array &$firstNineHoleHandicaps, array &$secondNineHoleHandicaps): array {
+    private function eighteenHoleHandicaps(array &$firstNineHoleHandicaps, ?array &$secondNineHoleHandicaps): array {
         ksort($firstNineHoleHandicaps);
         
         if (!empty($secondNineHoleHandicaps)) {
@@ -152,7 +152,7 @@ class SinglesMatchPlayEventViewBean {
         
         $holeHandicaps = [];
         for ($holeHandicap = 1; $holeHandicap <= 18; $holeHandicap++) {
-            $key = '' . $holeHandicap . '';
+            $key = '' . $holeHandicap;
             
             if (array_key_exists($key, $firstNineHoleHandicaps)) {
                 $holeHandicaps[$key][] = $firstNineHoleHandicaps[$key];
@@ -186,7 +186,7 @@ class SinglesMatchPlayEventViewBean {
         
         $tee = $this->tee($nine, $teeName); 
         foreach($tee->getHoles() as $hole) {
-            $holeHandicaps['' . $hole->getHandicap() . ''] = $hole->getHoleNumber();
+            $holeHandicaps['' . $hole->getHandicap()] = $hole->getHoleNumber();
         }
         return $holeHandicaps;
     }

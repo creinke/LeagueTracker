@@ -4,8 +4,8 @@ namespace App\Repository;
 use App\Entity\LeagueDE;
 use App\Entity\UserDE;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Exception;
 use Psr\Log\LoggerInterface;
@@ -104,11 +104,11 @@ class UserRepository extends AbstractBaseRepository {
 	 * @param array $usersData new or modified list of user data
 	 * @param LeagueDE $league
 	 *
-	 * @return PersistentCollection of PlayerDE
+	 * @return Collection of PlayerDE
 	 * @throws Exception
 	 */
-    public function saveAll(array $usersData, LeagueDE $league): PersistentCollection {
-        $users = new PersistentCollection($this->getEntityManager(), new ClassMetadata('App\Entity\UserDE'), new ArrayCollection());
+    public function saveAll(array $usersData, LeagueDE $league): Collection {
+        $users = new ArrayCollection();
 
         foreach($usersData as $userData) {
             $user = $this->save($userData, $league);
@@ -145,7 +145,7 @@ class UserRepository extends AbstractBaseRepository {
 	 * @return UserDE $user
 	 */
     protected function setUserData(array $userData, LeagueDE $league, ?UserDE $user = NULL): UserDE {
-	    $user ??= new UserDE($this->getEntityManager());
+	    $user ??= new UserDE();
 
         $user->setUsername($userData['username']);
 	    $hashedPassword = $this->passwordHasher->hashPassword($user, $userData['password']);

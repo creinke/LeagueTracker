@@ -3,9 +3,8 @@ namespace App\Repository;
 
 use App\Entity\CountryDE;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\PersistentCollection;
 use Exception;
 use Psr\Log\LoggerInterface;
 
@@ -72,11 +71,11 @@ class CountryRepository extends AbstractBaseRepository {
 	 *
 	 * @param array $countriesData new or modified list of country data
 	 *
-	 * @return PersistentCollection of Entity\CountryDE
+	 * @return Collection of Entity\CountryDE
 	 * @throws Exception
 	 */
-	public function saveAll(array $countriesData): PersistentCollection {
-		$countries = new PersistentCollection($this->getEntityManager(), new ClassMetadata('App\Entity\CountryDE'), new ArrayCollection());
+	public function saveAll(array $countriesData): Collection {
+		$countries = new ArrayCollection();
 
 		foreach($countriesData as $countryData) {
 			$country = $this->save($countryData);
@@ -93,7 +92,7 @@ class CountryRepository extends AbstractBaseRepository {
 	 * @return CountryDE $country
 	 */
 	protected function setCountryData(array $countryData): CountryDE {
-		$country = new CountryDE($this->getEntityManager());
+		$country = new CountryDE();
 		$country->setName($countryData['iso3']);
 		return $country;
 	}

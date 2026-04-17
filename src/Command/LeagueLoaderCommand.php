@@ -10,6 +10,7 @@ use App\Repository\SeasonRepository;
 use App\Repository\TeamRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -33,10 +34,11 @@ class LeagueLoaderCommand extends Command {
 	}
 
 	/**
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output): int	{
-		$appEnv      = $_ENV['APP_ENV'] ?? ($_SERVER['APP_ENV'] ?? null);
+        /** @noinspection DuplicatedCode */
+        $appEnv = $_ENV['APP_ENV'] ?? ($_SERVER['APP_ENV'] ?? null);
 		$databaseUrl = $_ENV['DATABASE_URL'] ?? ($_SERVER['DATABASE_URL'] ?? null);
 
 		// Print these out so that you know what environment the application is running in.
@@ -68,6 +70,7 @@ class LeagueLoaderCommand extends Command {
         if (isset($d['country'])) {
             // Create the Countries in the database needed by other pertinant entities.
             $countryRepository = new CountryRepository($this->em, $this->logger);
+            /** @noinspection PhpUnusedLocalVariableInspection */
             $countries = $countryRepository->saveAll($d['country']);
 
             // Create all the regions in the database associated with these countries.
@@ -76,6 +79,7 @@ class LeagueLoaderCommand extends Command {
             foreach ($d['country'] as $country) {
                 $name = $country['iso3'];
                 $c = $countryRepository->findCountryByName($name);
+                /** @noinspection PhpUnusedLocalVariableInspection */
                 $regions = $regionRepository->saveAll($c, $country['region']);
 		    }
         }

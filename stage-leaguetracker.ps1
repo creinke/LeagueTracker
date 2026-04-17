@@ -1,5 +1,5 @@
 # Parameters for easy reuse
-$SourceDir = "C:\wamp64\www\leaguetracker7"
+$SourceDir = "C:\wamp64\www\leaguetracker"
 $TargetDir = "C:\wamp64\www\staging"
 
 Write-Host "--- Starting Staging Deployment ---" -ForegroundColor Cyan

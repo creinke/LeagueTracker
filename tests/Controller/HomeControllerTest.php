@@ -21,14 +21,6 @@ class HomeControllerTest extends WebTestCase {
         $this->assertSelectorTextContains('html', 'League Tracker Home');
     }
 
-    public function testPaymentRoute(): void {
-        $client = static::createClient();
-        $client->request('GET', '/payment');
-
-        $this->assertResponseIsSuccessful();
-        $this->assertSelectorTextContains('html', 'League Payment');
-    }
-
     public function testHelpRoute(): void {
         $client = static::createClient();
         $client->request('GET', '/help');
@@ -44,7 +36,6 @@ class HomeControllerTest extends WebTestCase {
         // Test that route names exist and point to correct paths
         $this->assertEquals('/accessdenied', $router->generate('accessdenied'));
         $this->assertEquals('/', $router->generate('home'));
-        $this->assertEquals('/payment', $router->generate('payment'));
         $this->assertEquals('/help', $router->generate('help'));
     }
 

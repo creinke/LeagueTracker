@@ -10,11 +10,11 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 
 class Init {
-	const DB_USER   = 'creinke';
-	const DB_PWD    = 'zMon@001ca';
-	const DB_NAME   = 'premiergolfleaguetracker';
-	const DB_HOST   = 'localhost';
-	const DB_DRIVER = 'pdo_mysql';
+	const string DB_USER   = 'creinke';
+	const string DB_PWD    = 'zMon@001ca';
+	const string DB_NAME   = 'premiergolfleaguetracker';
+	const string DB_HOST   = 'localhost';
+	const string DB_DRIVER = 'pdo_mysql';
 
 	protected PDO $connection;
 

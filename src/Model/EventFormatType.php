@@ -6,12 +6,12 @@ use App\Utility\EnumTrait;
 abstract class EventFormatType {
     use EnumTrait;
 
-    const MATCH_PLAY = "MATCH PLAY";
-    const BETTER_BALL = "BETTER BALL";
-    const SHAMBLE = "SHAMBLE";
-    const SCRAMBLE = "SCRAMBLE";
-    const LOW_TEAM_NET = "LOW TEAM NET";
-    const STROKE_PLAY = "STROKE PLAY";
+    const string MATCH_PLAY = "MATCH PLAY";
+    const string BETTER_BALL = "BETTER BALL";
+    const string SHAMBLE = "SHAMBLE";
+    const string SCRAMBLE = "SCRAMBLE";
+    const string LOW_TEAM_NET = "LOW TEAM NET";
+    const string STROKE_PLAY = "STROKE PLAY";
     
     private static array $enum = array( 1 => "MATCH PLAY", 2 => "BETTER BALL", 3 => "SHAMBLE", 4 => "SCRAMBLE", 5 => "LOW TEAM NET", 6 => "STROKE PLAY");
 

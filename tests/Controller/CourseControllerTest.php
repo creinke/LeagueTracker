@@ -2,8 +2,11 @@
 
 namespace App\Tests\Controller;
 
+use App\Entity\AddressDE;
 use App\Entity\CourseDE;
+use App\Repository\CountryRepository;
 use App\Repository\CourseRepository;
+use App\Repository\RegionRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -12,7 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class CourseControllerTest extends WebTestCase {
-	private function createAuthenticatedClient(): \Symfony\Bundle\FrameworkBundle\KernelBrowser {
+	private function createAuthenticatedClient(string $username = 'super'): \Symfony\Bundle\FrameworkBundle\KernelBrowser {
         $client = static::createClient();
         
         // Create a user with ROLE_SUPER for authentication
@@ -24,7 +27,7 @@ class CourseControllerTest extends WebTestCase {
 		// Note: You may need to adjust this based on your User entity
 		// This assumes you have a UserDE entity with proper authentication setup
 		$userRepository = new UserRepository($em, $logger, $passwordHasher);
-		$testUser = $userRepository->findOneBy(['username' => 'super']);
+		$testUser = $userRepository->findOneBy(['username' => $username]);
         
         if (!$testUser) {
             // Create test user if doesn't exist
@@ -36,13 +39,30 @@ class CourseControllerTest extends WebTestCase {
         return $client;
     }
 
-	private function createTestCourse(): CourseDE {
+    /**
+     * @throws \Exception
+     */
+    private function createTestCourse(): CourseDE {
         $container = static::getContainer();
         $em = $container->get(EntityManagerInterface::class);
-        $course = new CourseDE($em);
-        $course->setName('Test Course ' . time());
-        $em->persist($course);
-        $em->flush();
+        $logger = $container->get(LoggerInterface::class);
+        $courseRepository = new CourseRepository($em, $logger);
+
+        $course = new CourseDE();
+        $course->setName('Test Course');
+        $course->setWebsite('https://testcourse.com');
+
+        $address = new AddressDE();
+        $address->setAddressline1('Test Street');
+        $address->setAddressline2(null);
+        $address->setCity('Test City');
+        $regionRepository = new RegionRepository($em, $logger);
+        $region = $regionRepository->findOneBy(array('name' => 'Michigan'));
+        $address->setRegion($region);
+
+        $course->setAddress($address);
+
+        $courseRepository->saveCourse($course);
         return $course;
     }
 
@@ -166,27 +186,9 @@ class CourseControllerTest extends WebTestCase {
 		$this->deleteTestCourse($course);
     }
 
-    public function testEditRouteRequiresPostMethod(): void {
-        $client = $this->createAuthenticatedClient();
-
-	    $course = $this->createTestCourse();
-	    $testCourseName = $course->getName();
-
-		$container = static::getContainer();
-        $em = $container->get(EntityManagerInterface::class);
-	    $logger = $container->get(LoggerInterface::class);
-	    $courseRepository = new CourseRepository($em, $logger, CourseDE::class);
-	    $course = $courseRepository->findOneBy(['name' => $testCourseName]);
-        
-        if (!$course) {
-            $this->markTestSkipped('No courses found in database for testing.');
-        }
-        
-        // Try GET request - should fail
-        $client->request('GET', '/course/edit/' . $course->getId());
-        $this->assertResponseStatusCodeSame(Response::HTTP_METHOD_NOT_ALLOWED);
-    }
-
+    /**
+     * @throws \Exception
+     */
     public function testDeleteRouteRequiresDeleteMethod(): void {
         $client = $this->createAuthenticatedClient();
 

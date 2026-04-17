@@ -45,8 +45,11 @@ class EventRepositoryTest extends KernelTestCase  {
 	    }
 		self::assertTrue(true);
 	}
-	
-	public function testPopulateTeamEventView() {
+
+    /**
+     * @throws \Exception
+     */
+    public function testPopulateTeamEventView() {
 	    $eventRepository = new EventRepository($this->em, $this->logger);
 	    $event = $eventRepository->find(318);
 	    

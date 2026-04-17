@@ -11,8 +11,6 @@ use App\Repository\TeamRepository;
 use App\Repository\TeammatchRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\PersistentCollection;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
@@ -26,18 +24,18 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Exception;
 
 class TeamController extends AbstractController {
-	private EntityManagerInterface $em;
-	private LoggerInterface $logger;
+    private EntityManagerInterface $em;
+    private LoggerInterface $logger;
 
-	public function __construct(EntityManagerInterface $em, LoggerInterface $logger) {
-		$this->em = $em;
-		$this->logger = $logger;
-	}
+    public function __construct(EntityManagerInterface $em, LoggerInterface $logger) {
+        $this->em = $em;
+        $this->logger = $logger;
+    }
 
     /**
      * @param TeamDE $team
@@ -45,7 +43,7 @@ class TeamController extends AbstractController {
      *
      * @return FormInterface
      */
-	private function buildForm(TeamDE $team, bool $editForm = false) : FormInterface {
+    private function buildForm(TeamDE $team, bool $editForm = false) : FormInterface {
         $playerChoices = array();
         $league = $team->getLeague();
         $playerChoices[' '] = NULL;
@@ -66,18 +64,20 @@ class TeamController extends AbstractController {
             $builder->add('defunct', CheckboxType::class, array('label' => 'Defuncted', 'required' => false));
 
         }
+        /** @noinspection PhpUnnecessaryLocalVariableInspection */
         $form = $builder->getForm();
         return $form;
     }
 
-	/**
-	 * @param TeamsFormBean $formbean
-	 *
-	 * @return FormInterface
-	 */
-	private function buildTeamsForm(TeamsFormBean $formbean) : FormInterface {
+    /**
+     * @param TeamsFormBean $formbean
+     *
+     * @return FormInterface
+     */
+    private function buildTeamsForm(TeamsFormBean $formbean) : FormInterface {
         $disableSaveButton = in_array('ROLE_SAMPLE', $this->getUser()->getRoles());
 
+        /** @noinspection PhpUnnecessaryLocalVariableInspection */
         $form = $this->createFormBuilder($formbean)
             ->add('teams', CollectionType::class, ['entry_type' => TeamType::class])
             ->add('save', SubmitType::class, array('label' => 'Save', 'disabled' => $disableSaveButton, 'attr' => array('class' => 'btn btn-primary mt-3')))
@@ -87,14 +87,14 @@ class TeamController extends AbstractController {
         return $form;
     }
 
-	/**
-	 * @param Request $request
-	 * @param $id
-	 *
-	 * @return RedirectResponse
-	 */
-	#[Route('/team/delete/{id}', name: 'team_delete', methods: ['DELETE'])]
-	#[IsGranted('ROLE_ADMIN')]
+    /**
+     * @param Request $request
+     * @param $id
+     *
+     * @return RedirectResponse
+     */
+    #[Route('/team/delete/{id}', name: 'team_delete', methods: ['DELETE'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function delete(Request $request, $id): RedirectResponse {
         $teamRepository = new TeamRepository($this->em, $this->logger );
         $team = $teamRepository->find($id);
@@ -110,39 +110,41 @@ class TeamController extends AbstractController {
                 $teamRepository->saveTeam($team);
             }
         } catch (Exception $e) {
-	        $this->addFlash('error', 'Trouble updating/deleting selected team: ' . $e->getMessage() . ' Please retry.');
+            $this->addFlash('error', 'Trouble updating/deleting selected team: ' . $e->getMessage() . ' Please retry.');
         }
         return $this->redirectToRoute('team_list');
     }
 
-	/**
-	 * @param Request $request
-	 * @param $id
-	 *
-	 * @return RedirectResponse|Response
-	 */
-	#[Route('/team/edit/{id}', name: 'team_edit', methods: ['GET', 'POST'])]
-	#[IsGranted('ROLE_ADMIN')]
+    /**
+     * @param Request $request
+     * @param $id
+     *
+     * @return RedirectResponse|Response
+     */
+    #[Route('/team/edit/{id}', name: 'team_edit', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function edit(Request $request, $id): RedirectResponse|Response {
         $user = $this->getUser();
+        /** @noinspection PhpUnusedLocalVariableInspection */
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         $league = $user->getLeague();
 
         $teamRepository = new TeamRepository($this->em, $this->logger);
         $team = $teamRepository->find($id);
         
         while ($team->getPlayers()->count() < 4) {
-        	$team->getPlayers()->add(new PlayerDE($this->em));
+            $team->getPlayers()->add(new PlayerDE());
         }
 
         $form = $this->buildForm($team, true);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-        	foreach($team->getPlayers() as $player) {
-        		if (empty($player)) {
-        			$team->getPlayers()->removeElement($player);
-        		}
-        	}
+            foreach($team->getPlayers() as $player) {
+                if (empty($player)) {
+                    $team->getPlayers()->removeElement($player);
+                }
+            }
             try {
                 $teamRepository->saveTeam($team);
                 return $this->redirectToRoute('team_list');
@@ -156,13 +158,14 @@ class TeamController extends AbstractController {
                 'form' => $form->createView()));
     }
 
-	/**
-	 * @return Response
-	 * @throws Exception
-	 */
-	#[Route('/team/list', name: 'team_list', methods: ['GET'])]
-	#[IsGranted('ROLE_USER')]
+    /**
+     * @return Response
+     * @throws Exception
+     */
+    #[Route('/team/list', name: 'team_list', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function list(): Response {
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         $league = $this->getUser()->getLeague();
         $leagueId = $league->getId();
         $leagueName = $league->getName();
@@ -178,22 +181,23 @@ class TeamController extends AbstractController {
             );
     }
 
-	/**
-	 * @param Request $request
-	 *
-	 * @return Response
-	 * @throws Exception
-	 */
-	#[Route('/team/new', name: 'team_new', methods: ['GET', 'POST'])]
-	#[IsGranted('ROLE_ADMIN')]
+    /**
+     * @param Request $request
+     *
+     * @return Response
+     * @throws Exception
+     */
+    #[Route('/team/new', name: 'team_new', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function new(Request $request): Response {
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         $league = $this->getUser()->getLeague();
-        $team = new TeamDE($this->em);
+        $team = new TeamDE();
         $team->setLeague($league);
-        $team->getPlayers()->add(new PlayerDE($this->em));
-        $team->getPlayers()->add(new PlayerDE($this->em));
-        $team->getPlayers()->add(new PlayerDE($this->em));
-        $team->getPlayers()->add(new PlayerDE($this->em));
+        $team->getPlayers()->add(new PlayerDE());
+        $team->getPlayers()->add(new PlayerDE());
+        $team->getPlayers()->add(new PlayerDE());
+        $team->getPlayers()->add(new PlayerDE());
         
         $form = $this-> buildForm($team);
         $form->handleRequest($request);
@@ -202,9 +206,9 @@ class TeamController extends AbstractController {
             $team = $form->getData();
             
             foreach($team->getPlayers() as $player) {
-            	if (empty($player)) {
-            		$team->getPlayers()->removeElement($player);
-            	}
+                if (empty($player)) {
+                    $team->getPlayers()->removeElement($player);
+                }
             }
             $teamRepository = new TeamRepository($this->em, $this->logger);
             $queryResult = $teamRepository->findByName($league->getId(), $team->getName());
@@ -212,21 +216,21 @@ class TeamController extends AbstractController {
             $playerRepository = new PlayerRepository($this->em, $this->logger);
             $players = $team->getPlayers()->toArray();
             //$teamPlayers = $team->getPlayers();
-			//$teamPlayers->clear();
+            //$teamPlayers->clear();
 
             if (empty($queryResult)) {
                 $leagueRepository = new LeagueRepository($this->em, $this->logger);
                 $league = $leagueRepository->findById($league->getId());
                 $team->setLeague($league);
 
-                $playersCollection = new PersistentCollection($this->em, new ClassMetadata('App\Entity\PlayerDE'), new ArrayCollection());
-	            foreach ($players as $player) {
-		            $playerToAdd = $playerRepository->find($player->getId());
-		            if ($playerToAdd) {
-			            $playersCollection->add($playerToAdd);
-		            }
-	            }
-	            $team->setPlayers($playersCollection);
+                $playersCollection = new ArrayCollection();
+                foreach ($players as $player) {
+                    $playerToAdd = $playerRepository->find($player->getId());
+                    if ($playerToAdd) {
+                        $playersCollection->add($playerToAdd);
+                    }
+                }
+                $team->setPlayers($playersCollection);
                 $teamRepository->saveTeam($team);
 
                 return $this->redirectToRoute('team_list');
@@ -240,20 +244,21 @@ class TeamController extends AbstractController {
                 'form' => $form->createView()));
     }
 
-	/**
-	 * @param Request $request
-	 *
-	 * @return Response
-	 * @throws Exception
-	 */
-	#[Route('/team/newlist', name: 'team_newlist', methods: ['GET', 'POST'])]
-	#[IsGranted('ROLE_ADMIN')]
+    /**
+     * @param Request $request
+     *
+     * @return Response
+     * @throws Exception
+     */
+    #[Route('/team/newlist', name: 'team_newlist', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function newlist(Request $request): Response {
         $user = $this->getUser();
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         $league = $user->getLeague();
         $_SESSION['league'] = $league;
 
-        $teamsFormBean = new TeamsFormBean($this->em, $league);
+        $teamsFormBean = new TeamsFormBean($league);
         $form = $this-> buildTeamsForm($teamsFormBean);
         $form->handleRequest($request);
 
@@ -279,9 +284,9 @@ class TeamController extends AbstractController {
                         $team->getPlayers()->clear();
 
                         foreach($players as $player) {
-                        	if (!empty($player)) {
+                            if (!empty($player)) {
                                 $team->getPlayers()->add($playerRepository->findById($player->getId()));
-                        	}
+                            }
                         }
                         $league->getTeams()->add($team);
                     } else {
@@ -301,16 +306,18 @@ class TeamController extends AbstractController {
                 'form' => $form->createView()));
     }
 
-	/**
-	 * @param Request $request
-	 * @param $id
-	 *
-	 * @return RedirectResponse
-	 */
-	#[Route('/team/undefunct/{id}', name: 'team_undefunct', methods: ['POST'])]
-	#[IsGranted('ROLE_ADMIN')]
+    /**
+     * @param Request $request
+     * @param $id
+     *
+     * @return RedirectResponse
+     */
+    #[Route('/team/undefunct/{id}', name: 'team_undefunct', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function undefunct(Request $request, $id): RedirectResponse {
         $user = $this->getUser();
+        /** @noinspection PhpUnusedLocalVariableInspection */
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         $league = $user->getLeague();
 
         $teamRepository = new TeamRepository($this->em, $this->logger);
@@ -320,32 +327,32 @@ class TeamController extends AbstractController {
         try {
             $teamRepository->saveTeam($team);
         } catch (Exception $e) {
-	        $this->addFlash('error', 'Trouble updating selected team: ' . $e->getMessage() . ' Please retry.');
+            $this->addFlash('error', 'Trouble updating selected team: ' . $e->getMessage() . ' Please retry.');
         }
         return $this->redirectToRoute('team_list');
     }
 
-	/**
-	 * @param $id
-	 *
-	 * @return Response
-	 */
-	#[Route('/team/view/{id}', name: 'team_view', methods: ['GET'])]
-	#[IsGranted('ROLE_USER')]
+    /**
+     * @param $id
+     *
+     * @return Response
+     */
+    #[Route('/team/view/{id}', name: 'team_view', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function view($id): Response {
         $teamRepository = new TeamRepository($this->em, $this->logger);
         $team = $teamRepository->find($id);
 
-		if ($team == null) {
-			return $this->render('error/error.html.twig',
-				['title' => 'Error', 'e' => 'There are no teams that match the criteria specified.'] );
-		} else {
-			return $this->render( 'team/view.html.twig',
-				array(
-					'title' => 'Team',
-					'team'  => $team
-				)
-			);
-		}
+        if ($team == null) {
+            return $this->render('error/error.html.twig',
+                ['title' => 'Error', 'e' => 'There are no teams that match the criteria specified.'] );
+        } else {
+            return $this->render( 'team/view.html.twig',
+                array(
+                    'title' => 'Team',
+                    'team'  => $team
+                )
+            );
+        }
     }
 }

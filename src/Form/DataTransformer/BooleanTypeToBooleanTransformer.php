@@ -9,7 +9,7 @@ class BooleanTypeToBooleanTransformer implements DataTransformerInterface {
     /**
      * {@inheritdoc}
      */
-	public function transform(mixed $value): mixed {
+    public function transform(mixed $value): int {
         if (true === $value || BooleanType::VALUE_TRUE === (int) $value) {
             return BooleanType::VALUE_TRUE;
         }
@@ -19,7 +19,7 @@ class BooleanTypeToBooleanTransformer implements DataTransformerInterface {
     /**
      * {@inheritdoc}
      */
-	public function reverseTransform(mixed $value): mixed {
+    public function reverseTransform(mixed $value): bool {
         if (BooleanType::VALUE_TRUE === (int) $value) {
             return true;
         }
